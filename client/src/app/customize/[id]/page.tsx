@@ -243,31 +243,148 @@ const CustomizePage = () => {
     });
   };
 
-  const handleFileUpload = async (fieldKey: string, file: File | null) => {
+  // Validate image dimensions are within a range (for icons)
+  const validateImageDimensionsRange = (
+    file: File,
+    minWidth: number,
+    minHeight: number,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<{ isValid: boolean; actualWidth: number; actualHeight: number }> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const isValid =
+            img.width >= minWidth &&
+            img.width <= maxWidth &&
+            img.height >= minHeight &&
+            img.height <= maxHeight;
+          console.log(
+            `Image range validation: ${img.width}x${img.height} vs range ${minWidth}x${minHeight} to ${maxWidth}x${maxHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`
+          );
+          resolve({ isValid, actualWidth: img.width, actualHeight: img.height });
+        };
+        img.onerror = () => {
+          console.error("Failed to load image for validation");
+          resolve({ isValid: false, actualWidth: 0, actualHeight: 0 });
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => {
+        console.error("FileReader error");
+        resolve({ isValid: false, actualWidth: 0, actualHeight: 0 });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Validate video dimensions match the required dimensions
+  const validateVideoDimensions = (
+    file: File,
+    requiredWidth: number,
+    requiredHeight: number
+  ): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        const isValid =
+          video.videoWidth === requiredWidth &&
+          video.videoHeight === requiredHeight;
+        console.log(
+          `Video validation: ${video.videoWidth}x${video.videoHeight} vs required ${requiredWidth}x${requiredHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`
+        );
+        resolve(isValid);
+      };
+
+      video.onerror = () => {
+        console.error("Failed to load video for validation");
+        window.URL.revokeObjectURL(video.src);
+        resolve(false);
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileUpload = async (fieldKey: string, file: File | null, inputElement?: HTMLInputElement) => {
     if (!file) return;
 
     if (file.type.startsWith("image/")) {
       // Get the field to check if it has required dimensions
       const field = template?.fields[fieldKey];
       if (field && field.dimensions) {
-        // Parse dimensions (format: "1920x1080")
-        const [width, height] = field.dimensions
-          .split("x")
-          .map((d) => parseInt(d.trim()));
+        // Check if dimensions contain a range (e.g., "800x800-1920x1920")
+        if (field.dimensions.includes("-")) {
+          // Parse range dimensions
+          const [minDimensions, maxDimensions] = field.dimensions.split("-");
+          const [minWidth, minHeight] = minDimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
+          const [maxWidth, maxHeight] = maxDimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
 
-        if (width && height) {
-          try {
-            const isValid = await validateImageDimensions(file, width, height);
-            if (!isValid) {
-              showErrorToast(
-                `❌ Invalid dimensions! Required: ${field.dimensions}`
+          if (minWidth && minHeight && maxWidth && maxHeight) {
+            try {
+              const result = await validateImageDimensionsRange(
+                file,
+                minWidth,
+                minHeight,
+                maxWidth,
+                maxHeight
               );
-              return; // Stop upload if dimensions don't match
+              if (!result.isValid) {
+                showErrorToast(
+                  `❌ Invalid dimensions! Required: ${field.dimensions} (Got: ${result.actualWidth}x${result.actualHeight})`
+                );
+                // Clear the file input so user can try again
+                if (inputElement) {
+                  inputElement.value = "";
+                }
+                return;
+              }
+            } catch (error) {
+              console.error("Image range validation failed", error);
+              showErrorToast("Failed to validate image");
+              if (inputElement) {
+                inputElement.value = "";
+              }
+              return;
             }
-          } catch (error) {
-            console.error("Image validation failed", error);
-            showErrorToast("Failed to validate image");
-            return;
+          }
+        } else {
+          // Parse exact dimensions (format: "1920x1080")
+          const [width, height] = field.dimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
+
+          if (width && height) {
+            try {
+              const isValid = await validateImageDimensions(file, width, height);
+              if (!isValid) {
+                showErrorToast(
+                  `❌ Invalid dimensions! Required: ${field.dimensions}`
+                );
+                // Clear the file input so user can try again
+                if (inputElement) {
+                  inputElement.value = "";
+                }
+                return; // Stop upload if dimensions don't match
+              }
+            } catch (error) {
+              console.error("Image validation failed", error);
+              showErrorToast("Failed to validate image");
+              // Clear the file input
+              if (inputElement) {
+                inputElement.value = "";
+              }
+              return;
+            }
           }
         }
       }
@@ -281,6 +398,39 @@ const CustomizePage = () => {
       };
       reader.readAsDataURL(file);
     } else if (file.type.startsWith("video/")) {
+      // Get the field to check if it has required dimensions
+      const field = template?.fields[fieldKey];
+      if (field && field.dimensions) {
+        // Parse dimensions (format: "1920x1080")
+        const [width, height] = field.dimensions
+          .split("x")
+          .map((d) => parseInt(d.trim()));
+
+        if (width && height) {
+          try {
+            const isValid = await validateVideoDimensions(file, width, height);
+            if (!isValid) {
+              showErrorToast(
+                `❌ Invalid video dimensions! Required: ${field.dimensions}`
+              );
+              // Clear the file input so user can try again
+              if (inputElement) {
+                inputElement.value = "";
+              }
+              return; // Stop upload if dimensions don't match
+            }
+          } catch (error) {
+            console.error("Video validation failed", error);
+            showErrorToast("Failed to validate video");
+            // Clear the file input
+            if (inputElement) {
+              inputElement.value = "";
+            }
+            return;
+          }
+        }
+      }
+
       const videoUrl = URL.createObjectURL(file);
       setFilePreviews((prev) => ({ ...prev, [fieldKey]: videoUrl }));
     }
@@ -335,6 +485,59 @@ const CustomizePage = () => {
       delete newAssets[fieldKey];
       return newAssets;
     });
+  };
+
+  const deleteAsset = async (fieldKey: string) => {
+    if (!uploadedAssets[fieldKey]) return;
+    
+    try {
+      const assetUrl = uploadedAssets[fieldKey];
+      
+      // Extract publicId and resourceType from the URL
+      // Cloudinary URLs are in format: https://res.cloudinary.com/{cloud_name}/{type}/upload/v{version}/{folder}/{path}/{filename}
+      // We need the full path: edikit/uploads/{userId}/{filename}
+      const resourceType = assetUrl.includes("/video/") ? "video" : "image";
+      
+      // Extract everything after /upload/v{version}/
+      const uploadMatch = assetUrl.match(/\/upload\/v\d+\/(.+?)(?:\?|$)/);
+      if (!uploadMatch) {
+        throw new Error("Invalid Cloudinary URL format");
+      }
+      
+      const fullPath = uploadMatch[1];
+      // Remove the file extension
+      const publicId = fullPath.substring(0, fullPath.lastIndexOf("."));
+      
+      console.log(`Deleting asset: ${publicId} (${resourceType})`);
+      
+      // Call the delete endpoint
+      await api.delete("/render/delete-asset", {
+        data: { 
+          publicId,
+          resourceType 
+        },
+        withCredentials: true,
+      });
+      
+      // Remove from state
+      setUploadedAssets((prev) => {
+        const newAssets = { ...prev };
+        delete newAssets[fieldKey];
+        return newAssets;
+      });
+      
+      // Remove preview
+      setFilePreviews((prev) => {
+        const newPreviews = { ...prev };
+        delete newPreviews[fieldKey];
+        return newPreviews;
+      });
+      
+      showSuccessToast(`${fieldKey} deleted successfully`);
+    } catch (error) {
+      console.error("Failed to delete asset:", error);
+      showErrorToast(`Failed to delete ${fieldKey}`);
+    }
   };
 
   const hasRequiredFields = () => {
@@ -554,7 +757,8 @@ const CustomizePage = () => {
                         onChange={(e) =>
                           handleFileUpload(
                             fieldKey,
-                            e.target.files?.[0] || null
+                            e.target.files?.[0] || null,
+                            e.target
                           )
                         }
                         className="hidden"
@@ -570,9 +774,18 @@ const CustomizePage = () => {
                               className="w-full h-40 object-cover rounded-lg"
                             />
                             <button
-                              onClick={() => removeFile(fieldKey)}
+                              onClick={async () => {
+                                // If uploaded, delete from server first
+                                if (uploadedAssets[fieldKey]) {
+                                  await deleteAsset(fieldKey);
+                                } else {
+                                  // If not uploaded, just remove locally
+                                  removeFile(fieldKey);
+                                }
+                              }}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
                               type="button"
+                              title={uploadedAssets[fieldKey] ? "Delete from server" : "Remove file"}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -615,7 +828,8 @@ const CustomizePage = () => {
                         onChange={(e) =>
                           handleFileUpload(
                             fieldKey,
-                            e.target.files?.[0] || null
+                            e.target.files?.[0] || null,
+                            e.target
                           )
                         }
                         className="hidden"
@@ -631,9 +845,18 @@ const CustomizePage = () => {
                               controls
                             />
                             <button
-                              onClick={() => removeFile(fieldKey)}
+                              onClick={async () => {
+                                // If uploaded, delete from server first
+                                if (uploadedAssets[fieldKey]) {
+                                  await deleteAsset(fieldKey);
+                                } else {
+                                  // If not uploaded, just remove locally
+                                  removeFile(fieldKey);
+                                }
+                              }}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
                               type="button"
+                              title={uploadedAssets[fieldKey] ? "Delete from server" : "Remove file"}
                             >
                               <X className="w-4 h-4" />
                             </button>
