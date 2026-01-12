@@ -84,11 +84,26 @@ export const templates: Template[] = [
     fields: {
       text1: { type: "text", label: "Text 1", maxLength: 13, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 13, required: true },
-      image1: { type: "image", label: "Image 1", dimensions: "1080x1080", required: false },
-      image2: { type: "image", label: "Image 2", dimensions: "1080x1080", required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
-  },  
+      image1: {
+        type: "image",
+        label: "Image 1",
+        dimensions: "1080x1080",
+        required: false,
+      },
+      image2: {
+        type: "image",
+        label: "Image 2",
+        dimensions: "1080x1080",
+        required: false,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
+  },
   {
     id: 2,
     name: "Animation 2",
@@ -98,10 +113,25 @@ export const templates: Template[] = [
     category: "Social Media",
     fields: {
       text1: { type: "text", label: "Text 1", maxLength: 20, required: true },
-      icon1: { type: "image", label: "Icon 1", dimensions: "800x800-1920x1920", required: false },
-      icon2: { type: "image", label: "Icon 2", dimensions: "800x800-1920x1920", required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      icon1: {
+        type: "image",
+        label: "Icon 1",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon2: {
+        type: "image",
+        label: "Icon 2",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 3,
@@ -111,11 +141,21 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 3.png",
     category: "Social Media",
     fields: {
-      icon1: { type: "image", label: "Icon 1", dimensions: "800x800-1920x1920", required: false },
+      icon1: {
+        type: "image",
+        label: "Icon 1",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
       text1: { type: "text", label: "Text 1", maxLength: 8, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 8, required: true },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 4,
@@ -126,11 +166,31 @@ export const templates: Template[] = [
     category: "Social Media",
     fields: {
       text1: { type: "text", label: "Text 1", maxLength: 22, required: true },
-      icon1: { type: "image", label: "Icon 1", dimensions: "800x800-1920x1920", required: false },
-      icon2: { type: "image", label: "Icon 2", dimensions: "800x800-1920x1920", required: false },
-      icon3: { type: "image", label: "Icon 3", dimensions: "800x800-1920x1920", required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      icon1: {
+        type: "image",
+        label: "Icon 1",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon2: {
+        type: "image",
+        label: "Icon 2",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon3: {
+        type: "image",
+        label: "Icon 3",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 5,
@@ -142,10 +202,25 @@ export const templates: Template[] = [
     fields: {
       text1: { type: "text", label: "Text 1", maxLength: 15, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 9, required: false },
-      icon1: { type: "image", label: "Icon 1", dimensions: "800x800-1920x1920", required: false },
-      icon2: { type: "image", label: "Icon 2", dimensions: "800x800-1920x1920", required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      icon1: {
+        type: "image",
+        label: "Icon 1",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon2: {
+        type: "image",
+        label: "Icon 2",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 6,
@@ -159,9 +234,19 @@ export const templates: Template[] = [
       text2: { type: "text", label: "Text 2", maxLength: 15, required: true },
       text3: { type: "text", label: "Text 3", maxLength: 15, required: false },
       text4: { type: "text", label: "Text 4", maxLength: 15, required: true },
-      video1: { type: "video", label: "Video 1", dimensions: "1080x1920", required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      video1: {
+        type: "video",
+        label: "Video 1",
+        dimensions: "1080x1920",
+        required: false,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 7,
@@ -174,8 +259,13 @@ export const templates: Template[] = [
       text1: { type: "text", label: "Text 1", maxLength: 14, required: false },
       text2: { type: "text", label: "Text 2", maxLength: 8, required: false },
       text3: { type: "text", label: "Text 3", maxLength: 16, required: true },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 8,
@@ -185,12 +275,22 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 8.png",
     category: "E-commerce",
     fields: {
-      image: { type: "image", label: "Product Image", dimensions: "1080x1080", required: false },
+      image: {
+        type: "image",
+        label: "Product Image",
+        dimensions: "1080x1080",
+        required: false,
+      },
       text1: { type: "text", label: "Text 1", maxLength: 15, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 12, required: true },
       text3: { type: "text", label: "Text 3", maxLength: 30, required: false },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 9,
@@ -203,8 +303,13 @@ export const templates: Template[] = [
       text1: { type: "text", label: "Text 1", maxLength: 15, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 15, required: true },
       text3: { type: "text", label: "Text 3", maxLength: 15, required: true },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 10,
@@ -214,14 +319,44 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 10.png",
     category: "Social Media",
     fields: {
-      icon1: { type: "image", label: "Icon 1", dimensions: "800x800-1920x1920", required: false },
-      icon2: { type: "image", label: "Icon 2", dimensions: "800x800-1920x1920", required: false },
-      icon3: { type: "image", label: "Icon 3", dimensions: "800x800-1920x1920", required: false },
-      icon4: { type: "image", label: "Icon 4", dimensions: "800x800-1920x1920", required: false },
-      icon5: { type: "image", label: "Icon 5", dimensions: "800x800-1920x1920", required: false },
+      icon1: {
+        type: "image",
+        label: "Icon 1",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon2: {
+        type: "image",
+        label: "Icon 2",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon3: {
+        type: "image",
+        label: "Icon 3",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon4: {
+        type: "image",
+        label: "Icon 4",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
+      icon5: {
+        type: "image",
+        label: "Icon 5",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
       text1: { type: "text", label: "Text 1", maxLength: 16, required: true },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
   {
     id: 11,
@@ -231,11 +366,26 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 11.png",
     category: "Social Media",
     fields: {
-      icon1: { type: "image", label: "Profile Icon", dimensions: "800x800-1920x1920", required: false },
+      icon1: {
+        type: "image",
+        label: "Profile Icon",
+        dimensions: "800x800-1920x1920",
+        required: false,
+      },
       text1: { type: "text", label: "Username", maxLength: 13, required: true },
-      video1: { type: "video", label: "Video 1", dimensions: "1080x1920", required: false },
+      video1: {
+        type: "video",
+        label: "Video 1",
+        dimensions: "1080x1920",
+        required: false,
+      },
       text2: { type: "text", label: "Text 2", maxLength: 9, required: true },
-      background: { type: "image", label: "Background", dimensions: "1080x1920", required: false },
-    }
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
+        required: false,
+      },
+    },
   },
 ];
