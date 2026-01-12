@@ -140,6 +140,137 @@ export class RenderController {
     return 'image';
   }
 
+  @Delete('delete-asset')
+  @ApiOperation({ summary: 'Delete user asset from Cloudinary' })
+  @ApiCookieAuth()
+  @ApiResponse({ status: 200, description: 'Asset deleted successfully' })
+  async deleteAsset(
+    @CurrentUser('userId') userId: string,
+    @Body() body: { publicId: string; resourceType?: 'image' | 'video' },
+  ) {
+    if (!body.publicId) {
+      throw new BadRequestException('publicId is required');
+    }
+
+    const resourceType = body.resourceType || 'image';
+
+    // Verify the asset belongs to the user (public_id should contain userId)
+    if (!body.publicId.includes(userId)) {
+      throw new BadRequestException('You can only delete your own assets');
+    }
+
+    await this.renderService.deleteAsset(body.publicId, resourceType);
+
+    return {
+      message: 'Asset deleted successfully',
+      publicId: body.publicId,
+    };
+  }
+
+  @Get('fonts')
+  @ApiOperation({ summary: 'List all fonts uploaded to Nexrender Cloud' })
+  @ApiCookieAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Fonts retrieved successfully',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', description: 'Unique font identifier' },
+          familyName: {
+            type: 'string',
+            description: 'Font family name (e.g., Arial, Helvetica Neue)',
+          },
+          fileName: {
+            type: 'string',
+            description:
+              'Original font file name as uploaded (TTF only). This is the file name referenced in render jobs.',
+          },
+          createdAt: {
+            type: 'string',
+            description: 'ISO timestamp when the font was uploaded',
+          },
+        },
+      },
+    },
+  })
+  async listFonts() {
+    const fonts = await this.renderService.listNexrenderFonts();
+    return {
+      total: fonts.length,
+      fonts,
+    };
+  }
+
+  @Post('fonts')
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiOperation({ summary: 'Upload fonts to Nexrender Cloud' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'Font files to upload (TTF format only)',
+        },
+      },
+      required: ['files'],
+    },
+  })
+  @ApiCookieAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Fonts uploaded successfully',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          familyName: { type: 'string' },
+          fileName: { type: 'string' },
+          createdAt: { type: 'string' },
+        },
+      },
+    },
+  })
+  async uploadFonts(
+    @CurrentUser('userId') userId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files uploaded');
+    }
+
+    // Validate that all files are TTF fonts
+    for (const file of files) {
+      if (
+        !file.originalname.toLowerCase().endsWith('.ttf') &&
+        file.mimetype !== 'application/x-font-ttf' &&
+        file.mimetype !== 'font/ttf'
+      ) {
+        throw new BadRequestException(
+          `Invalid file type: ${file.originalname}. Only TTF font files are allowed.`,
+        );
+      }
+    }
+
+    const uploadResults =
+      await this.renderService.uploadFontsToNexrender(files);
+
+    return {
+      total: uploadResults.length,
+      fonts: uploadResults,
+    };
+  }
+
   @Get('templates')
   @ApiOperation({ summary: 'Get all templates' })
   @ApiCookieAuth()

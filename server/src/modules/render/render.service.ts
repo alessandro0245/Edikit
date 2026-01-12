@@ -13,8 +13,9 @@ import { RenderStatus } from '@generated/prisma/enums';
 import { firstValueFrom } from 'rxjs';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { createReadStream, existsSync } from 'fs';
 import { CreditsService } from '../credits/credits.service';
+import FormData from 'form-data';
 
 interface NexrenderTemplate {
   id: string;
@@ -43,12 +44,20 @@ interface NexrenderJobResponse {
   error?: string;
 }
 
+export interface NexrenderFont {
+  id: string;
+  familyName: string;
+  fileName: string;
+  createdAt: string;
+}
+
 @Injectable()
 export class RenderService {
   private readonly logger = new Logger(RenderService.name);
   private readonly nexrenderApiUrl: string;
   private readonly nexrenderApiKey: string;
   private readonly animationsPath: string;
+  private readonly animationsFontsPath: string;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -61,6 +70,7 @@ export class RenderService {
     this.nexrenderApiKey =
       this.configService.get<string>('NEXRENDER_CLOUD_API_KEY') || '';
     this.animationsPath = path.join(process.cwd(), 'animations');
+    this.animationsFontsPath = path.join(this.animationsPath, 'fonts');
 
     if (!this.nexrenderApiKey) {
       this.logger.warn('NEXRENDER_CLOUD_API_KEY is not set');
@@ -75,6 +85,174 @@ export class RenderService {
       where: { templateId },
     });
     return template?.nexrenderId || null;
+  }
+
+  /**
+   * List font files available in animations/fonts directory
+   */
+  private async listLocalFonts(): Promise<
+    Array<{ fileName: string; fullPath: string }>
+  > {
+    if (!existsSync(this.animationsFontsPath)) {
+      this.logger.warn(
+        `Fonts directory not found: ${this.animationsFontsPath}`,
+      );
+      return [];
+    }
+
+    const entries = await fs.readdir(this.animationsFontsPath, {
+      withFileTypes: true,
+    });
+
+    return entries
+      .filter(
+        (entry) =>
+          entry.isFile() && entry.name.match(/\.(ttf|otf|woff2?|woff)$/i),
+      )
+      .map((entry) => ({
+        fileName: entry.name,
+        fullPath: path.join(this.animationsFontsPath, entry.name),
+      }));
+  }
+
+  /**
+   * List fonts already uploaded to Nexrender Cloud
+   */
+  async listNexrenderFonts(): Promise<NexrenderFont[]> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get<NexrenderFont[]>(`${this.nexrenderApiUrl}/fonts`, {
+          headers: {
+            Authorization: `Bearer ${this.nexrenderApiKey}`,
+          },
+        }),
+      );
+
+      return response.data || [];
+    } catch (error) {
+      this.logger.error('Failed to list Nexrender fonts', error);
+      throw new BadRequestException(
+        `Failed to list fonts: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+    }
+  }
+
+  /**
+   * Upload a single font file to Nexrender Cloud
+   */
+  private async uploadFontToNexrender(
+    fontPath: string,
+  ): Promise<NexrenderFont> {
+    const formData = new FormData();
+    formData.append('font', createReadStream(fontPath));
+
+    const headers = {
+      ...formData.getHeaders(),
+      Authorization: `Bearer ${this.nexrenderApiKey}`,
+    };
+
+    const response = await firstValueFrom(
+      this.httpService.post<NexrenderFont>(
+        `${this.nexrenderApiUrl}/fonts`,
+        formData,
+        { headers },
+      ),
+    );
+
+    this.logger.log(`Uploaded font to Nexrender: ${fontPath}`);
+    return response.data;
+  }
+
+  /**
+   * Upload multiple font files from Express Multer files to Nexrender Cloud
+   */
+  async uploadFontsToNexrender(
+    files: Express.Multer.File[],
+  ): Promise<NexrenderFont[]> {
+    const uploadedFonts: NexrenderFont[] = [];
+
+    for (const file of files) {
+      try {
+        const formData = new FormData();
+        formData.append('font', file.buffer, file.originalname);
+
+        const headers = {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${this.nexrenderApiKey}`,
+        };
+
+        const response = await firstValueFrom(
+          this.httpService.post<NexrenderFont>(
+            `${this.nexrenderApiUrl}/fonts`,
+            formData,
+            { headers },
+          ),
+        );
+
+        uploadedFonts.push(response.data);
+        this.logger.log(
+          `Font uploaded successfully: ${file.originalname} (ID: ${response.data.id})`,
+        );
+      } catch (error) {
+        this.logger.error(`Failed to upload font ${file.originalname}`, error);
+        throw new BadRequestException(
+          `Failed to upload font ${file.originalname}: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`,
+        );
+      }
+    }
+
+    return uploadedFonts;
+  }
+
+  /**
+   * Ensure local fonts are uploaded to Nexrender Cloud and return the file names to reference in jobs
+   */
+  private async ensureFontsUploaded(): Promise<string[]> {
+    if (!this.nexrenderApiKey) {
+      this.logger.warn(
+        'NEXRENDER_CLOUD_API_KEY is missing; skipping font upload',
+      );
+      return [];
+    }
+
+    const localFonts = await this.listLocalFonts();
+    if (localFonts.length === 0) {
+      this.logger.warn('No local fonts found to upload.');
+      return [];
+    }
+
+    const existingFonts = await this.listNexrenderFonts();
+    const existingNames = new Set(
+      existingFonts.map((font) => font.fileName.toLowerCase()),
+    );
+
+    const fontsToReference: string[] = [];
+
+    for (const font of localFonts) {
+      const alreadyUploaded = existingNames.has(font.fileName.toLowerCase());
+      if (alreadyUploaded) {
+        this.logger.log(`Font already uploaded: ${font.fileName}`);
+        fontsToReference.push(font.fileName);
+        continue;
+      }
+
+      try {
+        const uploaded = await this.uploadFontToNexrender(font.fullPath);
+        fontsToReference.push(uploaded.fileName);
+        existingNames.add(uploaded.fileName.toLowerCase());
+      } catch (error) {
+        this.logger.error(`Failed to upload font ${font.fileName}`, error);
+        throw new BadRequestException(
+          `Unable to upload font ${font.fileName}. Please try again later.`,
+        );
+      }
+    }
+
+    return fontsToReference;
   }
 
   /**
@@ -597,6 +775,13 @@ export class RenderService {
     return result.secure_url;
   }
 
+  async deleteAsset(
+    publicId: string,
+    resourceType: 'image' | 'video' = 'image',
+  ): Promise<void> {
+    await this.cloudinaryService.deleteFile(publicId, resourceType);
+  }
+
   /**
    * Submit render job to Nexrender Cloud
    */
@@ -611,6 +796,7 @@ export class RenderService {
       src?: string;
     }>,
     webhookUrl: string,
+    fonts: string[] = [],
   ): Promise<NexrenderJobResponse> {
     try {
       const response = await firstValueFrom(
@@ -622,6 +808,7 @@ export class RenderService {
               composition,
             },
             assets,
+            fonts: fonts.length > 0 ? fonts : undefined,
             webhook: {
               url: webhookUrl,
               method: 'POST',
@@ -1370,6 +1557,9 @@ export class RenderService {
     // Build assets array (only includes assets if frontend provides them)
     const assets = await this.buildNexrenderAssets(dto, templateId);
 
+    // Ensure fonts are uploaded and capture filenames to reference in job
+    const fonts = await this.ensureFontsUploaded();
+
     // Log assets being sent for debugging
     this.logger.log(
       `Submitting render job with ${assets.length} assets:`,
@@ -1382,6 +1572,7 @@ export class RenderService {
       composition,
       assets,
       webhookUrl,
+      fonts,
     );
 
     // Create job in database
