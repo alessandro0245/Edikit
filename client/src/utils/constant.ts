@@ -99,7 +99,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -128,7 +128,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -152,7 +152,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -187,7 +187,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -217,7 +217,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -243,7 +243,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -262,7 +262,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -287,7 +287,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -306,7 +306,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -353,7 +353,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
@@ -383,7 +383,7 @@ export const templates: Template[] = [
       background: {
         type: "image",
         label: "Background",
-        dimensions: "1080x1920",
+        dimensions: "2160x3840",
         required: false,
       },
     },
