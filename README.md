@@ -1,4 +1,4 @@
-# 🎬 Edikit - AI-Powered Video Template Platform
+# 🎬 Edikit - Template-Based Video Rendering Platform
 
 [![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
