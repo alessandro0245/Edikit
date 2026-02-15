@@ -6,7 +6,7 @@ import Video from "./Video";
 export default function Hero() {
   const featuredTemplates = templates.slice(0, 3);
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-background">
       <main>
         {/* Hero Section - Video/Image on Left, Text on Right */}
         <section className="py-12 md:py-24 bg-background">
