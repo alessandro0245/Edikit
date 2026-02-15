@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
-import { Google_Sans_Flex } from 'next/font/google'
+import { Google_Sans_Flex } from "next/font/google";
 
 // Google Sans Flex Variable Font
 // const googleSansFlex = localFont({
@@ -21,7 +21,6 @@ import { Google_Sans_Flex } from 'next/font/google'
 //   variable: "--font-google-sans-flex",
 //   display: "swap",
 // });
-
 
 export const metadata: Metadata = {
   title: "Edikit : Create Production-Level Motion Graphics in Seconds",
@@ -46,15 +45,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-<head>
-  <link rel="preconnect" href="https://fonts.googleapis.com"></link>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"></link>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"></link>
-</head>
-      <body
-        className={` antialiased dark`}
-        suppressHydrationWarning
-      >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com"></link>
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        ></link>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"
+        ></link>
+        <link rel="icon" href="/favicon.svg" sizes="any" />
+      </head>
+      <body className={` antialiased dark`} suppressHydrationWarning>
         <Providers>
           <Navbar />
           {children}

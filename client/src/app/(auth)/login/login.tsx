@@ -97,9 +97,9 @@ const Login = () => {
         <div className="max-w-md mx-auto">
           <div className="p-8 rounded-lg border border-border bg-card">
             {/* Header */}
-            <div className="text-center space-y-3 mb-8">
-              <div className="w-40 h-12 rounded-lg flex items-center justify-center mx-auto">
-                <Image src="/Logo png.png" alt="Logo" width={160} height={50} />
+            <div className="text-center space-y-5 mb-8">
+              <div className="w-30 h-12 rounded-lg flex items-center justify-center mx-auto">
+                <Image src="/Logo.svg" alt="Logo" width={120} height={50} />
               </div>
               <h1 className="text-2xl font-bold text-foreground">
                 Welcome back
