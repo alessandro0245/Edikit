@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Livello_1" data-name="Livello 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 3000 3000">
+  <defs>
+    <linearGradient id="Sfumatura_senza_nome_99" data-name="Sfumatura senza nome 99" x1="729.5751" y1="1965.7429" x2="2270.4249" y2="1965.7429" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a73e8"/>
+      <stop offset=".2739" stop-color="#1d76e8"/>
+      <stop offset=".502" stop-color="#2780eb"/>
+      <stop offset=".7134" stop-color="#3890f1"/>
+      <stop offset=".9139" stop-color="#51a8f8"/>
+      <stop offset="1" stop-color="#5eb5fc"/>
+    </linearGradient>
+    <linearGradient id="Sfumatura_senza_nome_95" data-name="Sfumatura senza nome 95" x1="729.5751" y1="1034.2571" x2="2270.4249" y2="1034.2571" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a73e8"/>
+      <stop offset=".2619" stop-color="#1d76e9"/>
+      <stop offset=".4945" stop-color="#2880ec"/>
+      <stop offset=".7161" stop-color="#3a92f1"/>
+      <stop offset=".9296" stop-color="#53abf9"/>
+      <stop offset="1" stop-color="#5eb5fc"/>
+    </linearGradient>
+    <linearGradient id="Sfumatura_senza_nome_95-2" data-name="Sfumatura senza nome 95" y1="1500" x2="1915.8114" y2="1500" xlink:href="#Sfumatura_senza_nome_95"/>
+  </defs>
+  <rect x="729.5751" y="1791.0893" width="1540.8498" height="349.3072" fill="url(#Sfumatura_senza_nome_99)"/>
+  <rect x="729.5751" y="859.6034" width="1540.8498" height="349.3072" fill="url(#Sfumatura_senza_nome_95)"/>
+  <rect x="729.5751" y="1325.3464" width="1186.2363" height="349.3072" fill="url(#Sfumatura_senza_nome_95-2)"/>
+</svg>
