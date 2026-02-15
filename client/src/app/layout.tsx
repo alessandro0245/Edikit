@@ -26,16 +26,10 @@ export const metadata: Metadata = {
   title: "Edikit : Create Production-Level Motion Graphics in Seconds",
   description:
     "Edikit lets you create viral, production-level motion graphics in seconds. Choose a template, customize it, and generate videos automatically.",
-  // icons: {
-  //   icon: [
-  //     { url: "/favicon.ico" },
-  //     { url: "/favicon-16x16.png", sizes: "16x16",  },
-  //     { url: "/favicon-32x32.png", sizes: "32x32",  },
-  //     { url: "/favicon-192x192.png", sizes: "192x192",  },
-  //     {url: "/favicon-512x512.png", sizes: "512x512",  }
-  //   ] ,
-  // apple: '/apple-touch-icon.png',
-  // }
+  icons: {
+    icon: [{ url: "/logo.svg", type: "image/svg+xml", sizes: "any" }],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -56,7 +50,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
         ></link>
-        <link rel="icon" href="/favicon.svg" sizes="any" />
       </head>
       <body className={` antialiased dark`} suppressHydrationWarning>
         <Providers>
