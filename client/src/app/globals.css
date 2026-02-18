@@ -45,7 +45,7 @@
 
 .dark {
   /* Black #191919 as background */
-  --background: oklch(0.15 0.005 280);
+  --background: oklch(0.21 0 0);
   /* Bright white for foreground - maximum contrast */
   --foreground: oklch(0.98 0 0);
   /* Slightly lighter than background for cards */
@@ -79,7 +79,7 @@
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   /* Sidebar with black background */
-  --sidebar: oklch(0.15 0.005 280);
+  --sidebar: oklch(0.21 0 0);
   /* Bright white for sidebar foreground */
   --sidebar-foreground: oklch(0.98 0 0);
   /* Blue #1A73E8 for sidebar primary */

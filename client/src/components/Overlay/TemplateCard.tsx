@@ -86,7 +86,7 @@ const TemplateCard = ({
   return (
     <div className="group block">
       <div
-        className="relative overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10"
+        className="relative overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
