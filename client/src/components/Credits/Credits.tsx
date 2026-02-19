@@ -125,7 +125,7 @@ export default function Credits() {
           <div className="space-y-3">
             <Link
               href="/pricing"
-              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               Upgrade Plan
             </Link>

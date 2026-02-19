@@ -177,7 +177,7 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="w-full px-6 py-3 cursor-pointer rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3 cursor-pointer rounded-lg bg-primary-gradient text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? (
