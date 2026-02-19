@@ -75,9 +75,9 @@ const Pricing = () => {
                             if (isCurrentPlan) return;
                             handlePayment(plan.id, user?.userId || user?.id);
                           }}
-                          className={`w-full px-6 py-3 rounded-lg font-medium transition-colors cursor-pointer focus:bg-primary/50 disabled:opacity-60 disabled:cursor-not-allowed ${
+                          className={`w-full px-6 py-3 rounded-lg font-medium cursor-pointer focus:bg-primary/50 disabled:opacity-60 disabled:cursor-not-allowed ${
                             plan.popular
-                              ? "bg-primary-gradient text-primary-foreground hover:bg-primary/90"
+                              ? "bg-primary-gradient text-primary-foreground"
                               : "bg-secondary text-secondary-foreground hover:bg-primary/80"
                           }`}
                         >

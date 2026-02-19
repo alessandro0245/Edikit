@@ -33,7 +33,7 @@ export default function CancelPage() {
             {/* Action Buttons */}
             <div className="space-y-3">
               <Link href="/" className="w-full block">
-                <button className="w-full bg-primary-gradient text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-lg font-medium transition-colors duration-200 cursor-pointer">
+                <button className="w-full bg-primary-gradient text-primary-foreground py-2 px-4 rounded-lg font-medium cursor-pointer">
                   Back to Home
                 </button>
               </Link>
