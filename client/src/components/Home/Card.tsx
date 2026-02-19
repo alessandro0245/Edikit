@@ -61,8 +61,8 @@ export default function Card({
       <div
         className={`group h-full rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer ${
           isFeatured
-            ? "border-primary/50 bg-linear-to-br from-card to-card/80 shadow-2xl shadow-primary/20 hover:shadow-3xl hover:shadow-primary/30 hover:border-primary"
-            : "border-border bg-card hover:border-primary/50 shadow-lg hover:shadow-xl hover:shadow-primary/10"
+            ? " bg-linear-to-br from-card to-card/80 border-primary"
+            : "border-border bg-card hover:border-primary/50 shadow-lg"
         }`}
       >
         {/* Media */}
