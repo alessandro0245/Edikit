@@ -159,7 +159,7 @@ const TemplateCard = ({
 
           {/* Button styled div */}
             <Link href={`/customize/${id}`} className="group block">
-          <div className="w-full h-9 rounded-lg bg-primary-gradient text-primary-foreground hover:bg-primary/90 transition-colors font-medium text-sm flex items-center justify-center cursor-pointer">
+          <div className="w-full h-9 rounded-lg bg-primary-gradient text-primary-foreground font-medium text-sm flex items-center justify-center cursor-pointer">
               Customize
           </div>
             </Link>
