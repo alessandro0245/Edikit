@@ -10,7 +10,7 @@ export default function Hero() {
       <main>
         {/* Hero Section - Video/Image on Left, Text on Right */}
         <section className="py-12 md:py-24 bg-background">
-          <div className="container mx-auto px-1">
+          <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Video Section - Left Side */}
               <Video />
