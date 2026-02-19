@@ -77,7 +77,7 @@ const Pricing = () => {
                           }}
                           className={`w-full px-6 py-3 rounded-lg font-medium transition-colors cursor-pointer focus:bg-primary/50 disabled:opacity-60 disabled:cursor-not-allowed ${
                             plan.popular
-                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                              ? "bg-primary-gradient text-primary-foreground hover:bg-primary/90"
                               : "bg-secondary text-secondary-foreground hover:bg-primary/80"
                           }`}
                         >

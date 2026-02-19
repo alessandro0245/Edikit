@@ -34,7 +34,7 @@ export default function Hero() {
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   <Link
                     href="/templates"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all hover:scale-105 shadow-lg shadow-primary/25"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold bg-primary-gradient text-primary-foreground hover:bg-primary/90 rounded-xl transition-all hover:scale-105 shadow-lg shadow-primary/25"
                   >
                     Start Creating
                   </Link>
