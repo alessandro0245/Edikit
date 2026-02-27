@@ -389,3 +389,48 @@ export const templates: Template[] = [
     },
   },
 ];
+
+export const categoriesTemplate = [
+  {
+    title: "Social Media Videos",
+    description:
+      "Create videos optimized for Instagram Reels, TikTok, and YouTube Shorts.",
+    iconName: "instagram" as const,
+    examples: ["Instagram Reels", "TikTok", "YouTube Shorts"],
+  },
+  {
+    title: "Business & Marketing",
+    description:
+      "Professional videos for product promotions, demos, and testimonials.",
+    iconName: "briefcase" as const,
+    examples: ["Product Promo", "App Demo", "Testimonial"],
+  },
+  {
+    title: "Personal Videos",
+    description:
+      "Celebrate special moments with personalized videos for any occasion.",
+    iconName: "heart" as const,
+    examples: ["Birthday", "Wedding", "Travel"],
+  },
+  {
+    title: "Educational Content",
+    description:
+      "Engaging videos for courses, tutorials, and presentations.",
+    iconName: "graduationCap" as const,
+    examples: ["Course Intro", "Tutorial", "Slides"],
+  },
+  {
+    title: "Branding & Logo",
+    description:
+      "Professional animations for logo reveals and brand videos.",
+    iconName: "sparkles" as const,
+    examples: ["Logo Reveal", "Brand Intro", "Outro"],
+  },
+  {
+    title: "Custom Creation",
+    description: "Bring your unique vision to life with custom video templates.",
+    iconName: "custom" as const,
+    examples: ["Your Idea", "Any Style", "Any Length"],
+    isCustom: true,
+  },
+];
