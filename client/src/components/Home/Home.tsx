@@ -2,6 +2,7 @@ import Link from "next/link";
 import { templates } from "@/utils/constant";
 import Card from "./Card";
 import Video from "./Video";
+import Prompt from "./Prompt";
 
 export default function Hero() {
   const featuredTemplates = templates.slice(0, 3);
@@ -43,7 +44,7 @@ export default function Hero() {
             </div>
           </div>
         </section>
-
+<Prompt />
         {/* Templates Section */}
         <section className="py-16 md:py-24 bg-muted/30" id="templates">
           <div className="container mx-auto px-4">
