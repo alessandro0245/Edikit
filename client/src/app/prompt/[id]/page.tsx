@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, Loader2, CheckCircle2, Menu, X } from "lucide-react";
+import api from "@/lib/auth";
 
 type ProgressStep = "idle" | "processing" | "complete";
 
 export default function PromptPage() {
   const params = useParams();
+  const router = useRouter();
   const categoryId = params.id as string;
   
   const [prompt, setPrompt] = useState("");
   const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
   const [progress, setProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const steps = [
     { label: "Analyzing prompt", duration: 2000 },
@@ -21,8 +25,31 @@ export default function PromptPage() {
     { label: "Finalizing", duration: 1500 },
   ];
 
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await api.get("/auth/me", {
+          withCredentials: true,
+        });
+        localStorage.setItem("user", JSON.stringify(data));
+        setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(false);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLoggedIn) {
+      router.push("/login");
+      return;
+    }
     
     if (!prompt.trim()) return;
 
@@ -85,7 +112,7 @@ export default function PromptPage() {
         } lg:block w-full lg:w-96 bg-card border-b lg:border-b-0 lg:border-r border-border flex flex-col overflow-y-auto max-h-[calc(100vh-73px)] lg:max-h-screen`}
       >
         {/* Desktop Header */}
-        <div className="hidden lg:block p-6 lg:p-8 border-b border-border">
+        <div className="hidden lg:block p-6 lg:p-12 border-b border-border">
           <h2 className="text-xl font-semibold text-foreground">Create Video</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Category: {categoryId.replace(/-/g, " ")}
@@ -111,11 +138,25 @@ export default function PromptPage() {
 
               <button
                 type="submit"
-                disabled={!prompt.trim()}
+                disabled={!prompt.trim() || authLoading || !isLoggedIn}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Generate Video
-                <ArrowRight className="w-4 h-4" />
+                {authLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : isLoggedIn ? (
+                  <>
+                    Generate Video
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Login to Generate
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           ) : (
@@ -204,7 +245,7 @@ export default function PromptPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full flex flex-col overflow-y-auto">
+      <main className="flex-1 w-full flex flex-col overflow-y-hidden">
         {/* Video Preview Section */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8 space-y-6">
           <div className="w-full max-w-4xl aspect-video bg-linear-to-br from-muted to-muted/50 border border-border rounded-lg lg:rounded-xl flex items-center justify-center">
