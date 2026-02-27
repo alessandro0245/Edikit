@@ -392,6 +392,7 @@ export const templates: Template[] = [
 
 export const categoriesTemplate = [
   {
+    id: "social-media-videos",
     title: "Social Media Videos",
     description:
       "Create videos optimized for Instagram Reels, TikTok, and YouTube Shorts.",
@@ -399,6 +400,7 @@ export const categoriesTemplate = [
     examples: ["Instagram Reels", "TikTok", "YouTube Shorts"],
   },
   {
+    id: "business-marketing",
     title: "Business & Marketing",
     description:
       "Professional videos for product promotions, demos, and testimonials.",
@@ -406,6 +408,7 @@ export const categoriesTemplate = [
     examples: ["Product Promo", "App Demo", "Testimonial"],
   },
   {
+    id: "personal-videos",
     title: "Personal Videos",
     description:
       "Celebrate special moments with personalized videos for any occasion.",
@@ -413,6 +416,7 @@ export const categoriesTemplate = [
     examples: ["Birthday", "Wedding", "Travel"],
   },
   {
+    id: "educational-content",
     title: "Educational Content",
     description:
       "Engaging videos for courses, tutorials, and presentations.",
@@ -420,6 +424,7 @@ export const categoriesTemplate = [
     examples: ["Course Intro", "Tutorial", "Slides"],
   },
   {
+    id: "branding-logo",
     title: "Branding & Logo",
     description:
       "Professional animations for logo reveals and brand videos.",
@@ -427,6 +432,7 @@ export const categoriesTemplate = [
     examples: ["Logo Reveal", "Brand Intro", "Outro"],
   },
   {
+    id: "custom-creation",
     title: "Custom Creation",
     description: "Bring your unique vision to life with custom video templates.",
     iconName: "custom" as const,

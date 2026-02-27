@@ -8,6 +8,7 @@ import {
   Sparkles,
   Wand2,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const iconMap = {
@@ -22,6 +23,7 @@ const iconMap = {
 type IconName = keyof typeof iconMap;
 
 interface CategoryCardProps {
+    id: string;
   title: string;
   description: string;
   iconName: IconName;
@@ -30,6 +32,7 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({
+  id,
   title,
   description,
   iconName,
@@ -40,6 +43,7 @@ export default function CategoryCard({
   const Icon = iconMap[iconName];
 
   return (
+    <Link href={`/prompt/${id}`}>
     <div
       className="group h-full p-8 border border-border rounded-xl hover:border-foreground/30 hover:shadow-md transition-all duration-300 bg-card hover:bg-card/80"
       onMouseEnter={() => setIsHovered(true)}
@@ -79,5 +83,6 @@ export default function CategoryCard({
         </div>
       </div>
     </div>
+    </Link>
   );
 }
