@@ -1,88 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, Loader2, CheckCircle2, Menu, X } from "lucide-react";
-import api from "@/lib/auth";
-
-type ProgressStep = "idle" | "processing" | "complete";
+import { usePromptLogic } from "./usePromptLogic";
 
 export default function PromptPage() {
-  const params = useParams();
-  const router = useRouter();
-  const categoryId = params.id as string;
-  
-  const [prompt, setPrompt] = useState("");
-  const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
-  const [progress, setProgress] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
-
-  const steps = [
-    { label: "Analyzing prompt", duration: 2000 },
-    { label: "Processing video", duration: 3000 },
-    { label: "Finalizing", duration: 1500 },
-  ];
-
-  // Check authentication
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await api.get("/auth/me", {
-          withCredentials: true,
-        });
-        localStorage.setItem("user", JSON.stringify(data));
-        setIsLoggedIn(true);
-      } catch {
-        setIsLoggedIn(false);
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-    
-    if (!prompt.trim()) return;
-
-    setProgressStep("processing");
-    setProgress(0);
-
-    // Simulate progress animation
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + Math.random() * 20;
-      });
-    }, 500);
-
-    // Simulate completion after duration
-    setTimeout(() => {
-      clearInterval(interval);
-      setProgress(100);
-      setProgressStep("complete");
-    }, 6500);
-  };
-
-  const handleReset = () => {
-    setPrompt("");
-    setProgressStep("idle");
-    setProgress(0);
-  };
+  const {
+    categoryId,
+    prompt,
+    setPrompt,
+    progressStep,
+    progress,
+    sidebarOpen,
+    setSidebarOpen,
+    isLoggedIn,
+    authLoading,
+    steps,
+    handleSubmit,
+    handleReset,
+    handleDownload
+  } = usePromptLogic();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
+    <div className="h-fit overflow-hidden bg-background flex flex-col lg:flex-row">
       {/* Mobile Header */}
       <div className="lg:hidden sticky top-0 z-50 bg-card border-b border-border px-4 py-4">
         <div className="flex items-center justify-between">
@@ -109,7 +48,7 @@ export default function PromptPage() {
       <aside
         className={`${
           sidebarOpen ? "block" : "hidden"
-        } lg:block w-full lg:w-96 bg-card border-b lg:border-b-0 lg:border-r border-border flex flex-col overflow-y-auto max-h-[calc(100vh-73px)] lg:max-h-screen`}
+        } lg:block w-full lg:w-96 bg-card border-b lg:border-b-0 lg:border-r border-border h-screen flex flex-col overflow-y-auto max-h-[calc(100vh-73px)] lg:max-h-screen`}
       >
         {/* Desktop Header */}
         <div className="hidden lg:block p-6 lg:p-12 border-b border-border">
@@ -139,7 +78,7 @@ export default function PromptPage() {
               <button
                 type="submit"
                 disabled={!prompt.trim() || authLoading || !isLoggedIn}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
               >
                 {authLoading ? (
                   <>
@@ -227,7 +166,7 @@ export default function PromptPage() {
               {progressStep === "complete" && (
                 <button
                   onClick={handleReset}
-                  className="w-full px-4 py-3 bg-muted text-foreground font-medium rounded-lg hover:bg-muted/80 transition-colors"
+                  className="w-full px-4 py-3 bg-muted text-foreground font-medium rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
                 >
                   Create Another
                 </button>
@@ -275,10 +214,10 @@ export default function PromptPage() {
           {/* Actions - shown when complete */}
           {progressStep === "complete" && (
             <div className="flex flex-col sm:flex-row gap-3 w-full max-w-4xl">
-              <button className="flex-1 px-6 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors text-sm lg:text-base">
+              <button onClick={handleDownload} className="flex-1 px-6 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors text-sm lg:text-base cursor-pointer">
                 Download Video
               </button>
-              <button className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base">
+              <button onClick={handleReset} className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base cursor-pointer">
                 Try Again
               </button>
             </div>
