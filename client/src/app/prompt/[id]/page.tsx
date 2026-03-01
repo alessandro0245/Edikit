@@ -17,7 +17,7 @@ export default function PromptPage() {
     steps,
     handleSubmit,
     handleReset,
-    handleDownload
+    handleDownload,
   } = usePromptLogic();
 
   return (

@@ -48,6 +48,7 @@ export interface NexrenderFont {
   id: string;
   familyName: string;
   fileName: string;
+  styleName?: string;
   createdAt: string;
 }
 
@@ -209,6 +210,82 @@ export class RenderService {
   }
 
   /**
+   * Delete a font from Nexrender Cloud
+   */
+  async deleteFontFromNexrender(fontId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.httpService.delete(`${this.nexrenderApiUrl}/fonts/${fontId}`, {
+          headers: {
+            Authorization: `Bearer ${this.nexrenderApiKey}`,
+          },
+        }),
+      );
+
+      this.logger.log(`Deleted font from Nexrender: ${fontId}`);
+    } catch (error) {
+      this.logger.error(`Failed to delete font ${fontId}`, error);
+      throw new BadRequestException(
+        `Failed to delete font: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+    }
+  }
+
+  /**
+   * Upload all fonts from local animations/fonts directory to Nexrender Cloud
+   */
+  async uploadAllLocalFonts(): Promise<{
+    uploaded: NexrenderFont[];
+    skipped: string[];
+    errors: Array<{ fileName: string; error: string }>;
+  }> {
+    const localFonts = await this.listLocalFonts();
+
+    if (localFonts.length === 0) {
+      this.logger.warn('No local fonts found to upload.');
+      return { uploaded: [], skipped: [], errors: [] };
+    }
+
+    this.logger.log(`Found ${localFonts.length} local font(s) to process`);
+
+    const existingFonts = await this.listNexrenderFonts();
+    const existingNames = new Set(
+      existingFonts.map((font) => font.fileName.toLowerCase()),
+    );
+
+    const uploaded: NexrenderFont[] = [];
+    const skipped: string[] = [];
+    const errors: Array<{ fileName: string; error: string }> = [];
+
+    for (const font of localFonts) {
+      try {
+        // Check if already uploaded
+        if (existingNames.has(font.fileName.toLowerCase())) {
+          this.logger.log(`Font already exists: ${font.fileName}`);
+          skipped.push(font.fileName);
+          continue;
+        }
+
+        // Upload the font
+        const uploadedFont = await this.uploadFontToNexrender(font.fullPath);
+        uploaded.push(uploadedFont);
+        this.logger.log(
+          `✓ Uploaded: ${uploadedFont.fileName} (Family: "${uploadedFont.familyName}", Style: "${uploadedFont.styleName || 'Regular'}")`,
+        );
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown error';
+        this.logger.error(`Failed to upload font ${font.fileName}`, error);
+        errors.push({ fileName: font.fileName, error: errorMessage });
+      }
+    }
+
+    return { uploaded, skipped, errors };
+  }
+
+  /**
    * Ensure local fonts are uploaded to Nexrender Cloud and return the file names to reference in jobs
    */
   private async ensureFontsUploaded(): Promise<string[]> {
@@ -237,6 +314,16 @@ export class RenderService {
       if (alreadyUploaded) {
         this.logger.log(`Font already uploaded: ${font.fileName}`);
         fontsToReference.push(font.fileName);
+
+        // Find the uploaded font and log its family name for debugging
+        const uploadedFont = existingFonts.find(
+          (f) => f.fileName.toLowerCase() === font.fileName.toLowerCase(),
+        );
+        if (uploadedFont) {
+          this.logger.log(
+            `  ↳ Family: "${uploadedFont.familyName}", Style: "${uploadedFont.styleName || 'Regular'}"`,
+          );
+        }
         continue;
       }
 
@@ -244,6 +331,9 @@ export class RenderService {
         const uploaded = await this.uploadFontToNexrender(font.fullPath);
         fontsToReference.push(uploaded.fileName);
         existingNames.add(uploaded.fileName.toLowerCase());
+        this.logger.log(
+          `Uploaded font: ${uploaded.fileName} (Family: "${uploaded.familyName}", Style: "${uploaded.styleName || 'Regular'}")`,
+        );
       } catch (error) {
         this.logger.error(`Failed to upload font ${font.fileName}`, error);
         throw new BadRequestException(
@@ -252,6 +342,9 @@ export class RenderService {
       }
     }
 
+    this.logger.log(
+      `Fonts ready for render job: ${JSON.stringify(fontsToReference)}`,
+    );
     return fontsToReference;
   }
 
@@ -1557,14 +1650,16 @@ export class RenderService {
     // Build assets array (only includes assets if frontend provides them)
     const assets = await this.buildNexrenderAssets(dto, templateId);
 
-    // Ensure fonts are uploaded and capture filenames to reference in job
+    // Ensure fonts are uploaded to Nexrender Cloud
+    // Note: Nexrender automatically adds fonts as static assets when referenced in the fonts array
     const fonts = await this.ensureFontsUploaded();
 
     // Log assets being sent for debugging
     this.logger.log(
-      `Submitting render job with ${assets.length} assets:`,
-      JSON.stringify(assets, null, 2),
+      `Submitting render job with ${assets.length} assets and ${fonts.length} fonts`,
     );
+    this.logger.log(`Fonts: ${JSON.stringify(fonts)}`);
+    this.logger.log(`Assets:`, JSON.stringify(assets, null, 2));
 
     // Submit job to Nexrender
     const nexrenderJob = await this.submitNexrenderJob(

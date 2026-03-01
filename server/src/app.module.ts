@@ -12,9 +12,11 @@ import { StripeModule } from './stripe/stripe.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { RenderModule } from './modules/render/render.module';
 import { CreditsModule } from './modules/credits/credits.module';
+import { VideoModule } from './modules/video/video.module';
 
 @Module({
   imports: [
+    VideoModule,
     ConfigModule,
     PrismaModule,
     AuthModule,

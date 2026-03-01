@@ -271,6 +271,82 @@ export class RenderController {
     };
   }
 
+  @Delete('fonts/:fontId')
+  @ApiOperation({ summary: 'Delete a font from Nexrender Cloud' })
+  @ApiCookieAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Font deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        fontId: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Font not found',
+  })
+  async deleteFont(
+    @CurrentUser('userId') userId: string,
+    @Param('fontId') fontId: string,
+  ) {
+    await this.renderService.deleteFontFromNexrender(fontId);
+
+    return {
+      message: 'Font deleted successfully',
+      fontId,
+    };
+  }
+
+  @Post('fonts/upload-local')
+  @ApiOperation({
+    summary: 'Upload all fonts from server animations/fonts directory',
+  })
+  @ApiCookieAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Local fonts upload completed',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        uploaded: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              familyName: { type: 'string' },
+              fileName: { type: 'string' },
+            },
+          },
+        },
+        skipped: { type: 'array', items: { type: 'string' } },
+        errors: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              fileName: { type: 'string' },
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+  })
+  async uploadLocalFonts(@CurrentUser('userId') userId: string) {
+    const result = await this.renderService.uploadAllLocalFonts();
+
+    return {
+      message: 'Font upload process completed',
+      ...result,
+    };
+  }
+
   @Get('templates')
   @ApiOperation({ summary: 'Get all templates' })
   @ApiCookieAuth()
