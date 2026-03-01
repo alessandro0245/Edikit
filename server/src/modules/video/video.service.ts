@@ -9,20 +9,20 @@ export class VideoService {
     return {
       category: categoryId,
       originalPrompt: prompt,
-      title: "AI Generated Video",
-      style: "Cinematic",
+      title: 'AI Generated Video',
+      style: 'Cinematic',
       scenes: [
         {
-          type: "intro",
-          text: "Welcome to the Future",
+          type: 'intro',
+          text: 'Welcome to the Future',
         },
         {
-          type: "main",
+          type: 'main',
           text: prompt,
         },
         {
-          type: "cta",
-          text: "Get Started Today",
+          type: 'cta',
+          text: 'Get Started Today',
         },
       ],
     };
