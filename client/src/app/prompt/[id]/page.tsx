@@ -26,7 +26,9 @@ export default function PromptPage() {
       <div className="lg:hidden sticky top-0 z-50 bg-card border-b border-border px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-foreground">Create Video</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              Create Video
+            </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               {categoryId.replace(/-/g, " ")}
             </p>
@@ -52,7 +54,9 @@ export default function PromptPage() {
       >
         {/* Desktop Header */}
         <div className="hidden lg:block p-6 lg:p-12 border-b border-border">
-          <h2 className="text-xl font-semibold text-foreground">Create Video</h2>
+          <h2 className="text-xl font-semibold text-foreground">
+            Create Video
+          </h2>
           <p className="text-sm text-muted-foreground mt-1">
             Category: {categoryId.replace(/-/g, " ")}
           </p>
@@ -63,7 +67,10 @@ export default function PromptPage() {
           {progressStep === "idle" ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="prompt" className="block text-sm font-medium text-foreground mb-3">
+                <label
+                  htmlFor="prompt"
+                  className="block text-sm font-medium text-foreground mb-3"
+                >
                   Describe Your Video
                 </label>
                 <textarea
@@ -103,7 +110,9 @@ export default function PromptPage() {
               {/* Progress Section */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-foreground">Progress</h3>
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Progress
+                  </h3>
                   <span className="text-xs font-medium text-muted-foreground">
                     {Math.round(progress)}%
                   </span>
@@ -158,7 +167,9 @@ export default function PromptPage() {
 
               {/* Prompt Display */}
               <div className="p-4 bg-background rounded-lg border border-border">
-                <p className="text-xs text-muted-foreground font-medium mb-2">Your Prompt</p>
+                <p className="text-xs text-muted-foreground font-medium mb-2">
+                  Your Prompt
+                </p>
                 <p className="text-sm text-foreground line-clamp-4">{prompt}</p>
               </div>
 
@@ -178,7 +189,9 @@ export default function PromptPage() {
         {/* Footer Info */}
         <div className="p-4 border-t border-border bg-muted/30">
           <p className="text-xs text-muted-foreground text-center">
-            {progressStep === "idle" ? "One prompt at a time" : "Processing your request..."}
+            {progressStep === "idle"
+              ? "One prompt at a time"
+              : "Processing your request..."}
           </p>
         </div>
       </aside>
@@ -191,13 +204,19 @@ export default function PromptPage() {
             {progressStep === "processing" ? (
               <div className="flex flex-col items-center space-y-4">
                 <Loader2 className="w-10 lg:w-12 h-10 lg:h-12 text-primary animate-spin" />
-                <p className="text-sm text-muted-foreground">Generating your video...</p>
+                <p className="text-sm text-muted-foreground">
+                  Generating your video...
+                </p>
               </div>
             ) : progressStep === "complete" ? (
               <div className="flex flex-col items-center space-y-4">
                 <CheckCircle2 className="w-10 lg:w-12 h-10 lg:h-12 text-primary" />
-                <p className="text-sm font-medium text-foreground">Video Ready!</p>
-                <p className="text-xs text-muted-foreground">Your video preview will appear here</p>
+                <p className="text-sm font-medium text-foreground">
+                  Video Ready!
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your video preview will appear here
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center space-y-4 px-4 text-center">
@@ -214,16 +233,21 @@ export default function PromptPage() {
           {/* Actions - shown when complete */}
           {progressStep === "complete" && (
             <div className="flex flex-col sm:flex-row gap-3 w-full max-w-4xl">
-              <button onClick={handleDownload} className="flex-1 px-6 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors text-sm lg:text-base cursor-pointer">
+              <button
+                onClick={handleDownload}
+                className="flex-1 px-6 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors text-sm lg:text-base cursor-pointer"
+              >
                 Download Video
               </button>
-              <button onClick={handleReset} className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base cursor-pointer">
+              <button
+                onClick={handleReset}
+                className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base cursor-pointer"
+              >
                 Try Again
               </button>
             </div>
           )}
         </div>
-   
       </main>
     </div>
   );
