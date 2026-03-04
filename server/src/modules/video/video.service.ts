@@ -99,7 +99,7 @@ export class VideoService {
         if (hasS3) {
           presignedUrl = await this.s3Service.generatePresignedUrl(s3Key);
         } else {
-          presignedUrl = `/videos/serve/${jobId}`;
+          presignedUrl = `/video/serve/${jobId}`;
         }
 
         await this.prisma.renderJob.update({
@@ -309,6 +309,11 @@ export class VideoService {
       throw new BadRequestException('Video is not ready for download');
     }
 
+    // Local mode: s3OutputKey is the full disk path
+    if (!this.isS3Available()) {
+      return { downloadUrl: `/video/serve/${job.id}` };
+    }
+
     const presignedUrl = await this.s3Service.generatePresignedUrl(
       job.s3OutputKey,
     );
@@ -319,5 +324,14 @@ export class VideoService {
     });
 
     return { downloadUrl: presignedUrl };
+  }
+
+  /** Returns the disk path for a locally-rendered video (used by the serve endpoint). */
+  async getLocalVideoPath(jobId: string): Promise<string | null> {
+    const job = await this.prisma.renderJob.findUnique({
+      where: { id: jobId },
+    });
+    if (!job || !job.s3OutputKey) return null;
+    return job.s3OutputKey; // local mode stores the full disk path here
   }
 }

@@ -221,20 +221,21 @@ export class RemotionLambdaService {
     this.logger.log(`Storing output for job ${jobId}`);
 
     if (this.renderMethod === 'local') {
-      const buffer = await fs.readFile(outputUrl);
-
       if (this.hasS3Configured()) {
+        const buffer = await fs.readFile(outputUrl);
         const s3Key = `ai-videos/${jobId}/output.mp4`;
         await this.s3Service.uploadBuffer(buffer, s3Key, 'video/mp4');
+        // Clean up the temp render file
+        await fs.unlink(outputUrl).catch(() => {});
         this.logger.log(`Uploaded to S3: ${s3Key}`);
         return s3Key;
       } else {
-        const videosDir = path.join(process.cwd(), './videos');
-        const fileName = `${jobId}.mp4`;
-        const localPath = path.join(videosDir, fileName);
-        await fs.writeFile(localPath, buffer);
-        this.logger.log(`Stored locally: ${localPath}`);
-        return localPath;
+        // Rename the temp file -> <videosDir>/<jobId>.mp4  (no buffer copy)
+        const videosDir = path.dirname(outputUrl);
+        const finalPath = path.join(videosDir, `${jobId}.mp4`);
+        await fs.rename(outputUrl, finalPath);
+        this.logger.log(`Stored locally: ${finalPath}`);
+        return finalPath;
       }
     } else {
       const response = await fetch(outputUrl);
