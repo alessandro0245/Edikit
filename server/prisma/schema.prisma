@@ -34,6 +34,11 @@ enum CreditType {
   SUBSCRIPTION
 }
 
+enum RenderType {
+  TEMPLATE
+  AI_PROMPT
+}
+
 model NexrenderTemplate {
   id           String @id @default(uuid())
   templateId   Int    @unique
@@ -53,14 +58,22 @@ model NexrenderTemplate {
 model RenderJob {
   id                 String       @id @default(uuid())
   userId             String
-  templateId         Int
+  templateId         Int?
+  renderType         RenderType   @default(TEMPLATE)
   status             RenderStatus @default(PENDING)
   nexrenderJobId     String?      @unique
   creditsUsed        Int          @default(1)
   outputUrl          String?
   nexrenderOutputUrl String?
   error              String?
-  customizations     Json
+  customizations     Json?
+
+  // AI Video fields
+  remotionRenderId   String?
+  remotionBucketName String?
+  s3OutputKey        String?
+  promptText         String?
+  aiConfig           Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

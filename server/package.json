@@ -20,6 +20,10 @@
     "vercel-build": "pnpm build"
   },
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.1000.0",
+    "@aws-sdk/client-s3": "^3.1000.0",
+    "@aws-sdk/s3-request-presigner": "^3.1000.0",
+    "@google/genai": "^1.43.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -29,8 +33,12 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.1.0",
     "@nestjs/swagger": "^11.2.3",
+    "@nestjs/throttler": "^6.5.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "@remotion/bundler": "4.0.432",
+    "@remotion/lambda": "4.0.432",
+    "@remotion/renderer": "^4.0.432",
     "apple-signin-auth": "^2.0.0",
     "argon2": "^0.44.0",
     "axios": "^1.13.2",
