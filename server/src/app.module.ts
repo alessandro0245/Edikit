@@ -13,6 +13,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { RenderModule } from './modules/render/render.module';
 import { CreditsModule } from './modules/credits/credits.module';
 import { VideoModule } from './modules/video/video.module';
+import { S3Module } from './modules/s3/s3.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { VideoModule } from './modules/video/video.module';
     CloudinaryModule,
     RenderModule,
     CreditsModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService, KeepAliveService],
