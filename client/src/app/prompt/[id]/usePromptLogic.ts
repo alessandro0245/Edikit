@@ -34,7 +34,7 @@ export function usePromptLogic() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { canRender, refreshCredits } = useCredits();
+  const { canUseAiPrompt, refreshCredits } = useCredits();
 
   const steps = [
     { label: "Analyzing prompt with AI", key: "analyzing" },
@@ -133,8 +133,8 @@ export function usePromptLogic() {
 
     if (!prompt.trim()) return;
 
-    if (canRender === false) {
-      toast.error("Insufficient credits. Please purchase more.");
+    if (canUseAiPrompt === false) {
+      toast.error("Insufficient AI prompt credits. Please purchase more.");
       router.push("/pricing");
       return;
     }
@@ -217,7 +217,7 @@ export function usePromptLogic() {
     outputUrl,
     errorMessage,
     isSubmitting,
-    canRender,
+    canUseAiPrompt,
     handleSubmit,
     handleReset,
     handleDownload,

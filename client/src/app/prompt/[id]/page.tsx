@@ -28,7 +28,7 @@ export default function PromptPage() {
     outputUrl,
     errorMessage,
     isSubmitting,
-    canRender,
+    canUseAiPrompt,
     handleSubmit,
     handleReset,
     handleDownload,
@@ -109,11 +109,11 @@ export default function PromptPage() {
               </div>
 
               {/* Credits warning */}
-              {isLoggedIn && canRender === false && (
+              {isLoggedIn && canUseAiPrompt === false && (
                 <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                   <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
                   <p className="text-xs text-destructive">
-                    You don&apos;t have enough credits.{" "}
+                    You don&apos;t have enough AI prompt credits.{" "}
                     <a href="/pricing" className="underline font-medium">
                       Get more credits
                     </a>
@@ -128,7 +128,7 @@ export default function PromptPage() {
                   authLoading ||
                   !isLoggedIn ||
                   isSubmitting ||
-                  canRender === false
+                  canUseAiPrompt === false
                 }
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
               >
