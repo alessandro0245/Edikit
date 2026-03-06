@@ -88,7 +88,7 @@ export default function CategoryCard({
 
           {/* Examples Tags */}
           {examples.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               {examples.map((example, index) => (
                 <span
                   key={index}
