@@ -4,16 +4,14 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { creditsApi, type CreditTransaction } from "@/lib/credits";
-import { Coins, Clock, TrendingDown, TrendingUp, RefreshCw, Gift, CreditCard, Sparkles } from "lucide-react";
+import { Coins, Clock, TrendingDown, TrendingUp, RefreshCw, Gift, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 export default function Credits() {
-  const templateCredits = useSelector((state: RootState) => state.credits.templateCredits);
-  const aiPromptCredits = useSelector((state: RootState) => state.credits.aiPromptCredits);
+  const credits = useSelector((state: RootState) => state.credits.credits);
   const limit = useSelector((state: RootState) => state.credits.limit);
   const planType = useSelector((state: RootState) => state.credits.planType);
   const canRender = useSelector((state: RootState) => state.credits.canRender);
-  const canUseAiPrompt = useSelector((state: RootState) => state.credits.canUseAiPrompt);
   
   const [history, setHistory] = useState<CreditTransaction[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -33,10 +31,8 @@ export default function Credits() {
     fetchHistory();
   }, []);
 
-  const templatePercentage = limit && templateCredits !== undefined ? (templateCredits / limit) * 100 : 0;
-  const aiPercentage = limit && aiPromptCredits !== undefined ? (aiPromptCredits / limit) * 100 : 0;
-  const templateIsLow = templatePercentage < 20;
-  const aiIsLow = aiPercentage < 20;
+  const percentage = limit && credits !== undefined ? (credits / limit) * 100 : 0;
+  const isLow = percentage < 20;
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -66,88 +62,15 @@ export default function Credits() {
 
       {/* Credits Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Template Credits Card */}
-        <div className="bg-card border border-border rounded-lg p-6">
+        {/* Current Credits Card */}
+        <div className="col-span-1 md:col-span-2 bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Coins className="w-6 h-6 text-primary" />
-              <h2 className="text-lg font-semibold">Template Credits</h2>
+              <h2 className="text-xl font-semibold">Available Credits</h2>
             </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex items-baseline gap-2">
-              <span className={`text-4xl font-bold ${templateIsLow ? "text-red-500" : ""}`}>
-                {templateCredits ?? 0}
-              </span>
-              <span className="text-xl text-muted-foreground">/ {limit ?? 0}</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              {canRender
-                ? "Available for template renders"
-                : "No credits available"}
-            </p>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                templateIsLow
-                  ? "bg-red-500"
-                  : templatePercentage < 50
-                  ? "bg-yellow-500"
-                  : "bg-green-500"
-              }`}
-              style={{ width: `${Math.min(templatePercentage, 100)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* AI Prompt Credits Card */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-500" />
-              <h2 className="text-lg font-semibold">AI Prompt Credits</h2>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex items-baseline gap-2">
-              <span className={`text-4xl font-bold ${aiIsLow ? "text-red-500" : ""}`}>
-                {aiPromptCredits ?? 0}
-              </span>
-              <span className="text-xl text-muted-foreground">/ {limit ?? 0}</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              {canUseAiPrompt
-                ? "Available for AI generation"
-                : "No credits available"}
-            </p>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                aiIsLow
-                  ? "bg-red-500"
-                  : aiPercentage < 50
-                  ? "bg-yellow-500"
-                  : "bg-green-500"
-              }`}
-              style={{ width: `${Math.min(aiPercentage, 100)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Quick Actions Card */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="flex flex-col gap-2 text-sm text-muted-foreground">
             <span
-              className={`text-xs font-semibold px-3 py-1 rounded-full w-fit ${
+              className={`text-xs font-semibold px-3 py-1 rounded-full ${
                 planType === "PRO"
                   ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
                   : planType === "BASIC"
@@ -157,9 +80,52 @@ export default function Credits() {
             >
               {planType} Plan
             </span>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex items-baseline gap-2">
+              <span className={`text-5xl font-bold ${isLow ? "text-red-500" : ""}`}>
+                {credits ?? 0}
+              </span>
+              <span className="text-2xl text-muted-foreground">/ {limit ?? 0}</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              {canRender
+                ? "You have credits available for rendering"
+                : "No credits available - please upgrade or purchase more"}
+            </p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4">
+            <div
+              className={`h-3 rounded-full transition-all ${
+                isLow
+                  ? "bg-red-500"
+                  : percentage < 50
+                  ? "bg-yellow-500"
+                  : "bg-green-500"
+              }`}
+              style={{ width: `${Math.min(percentage, 100)}%` }}
+            />
+          </div>
+
+          {isLow && planType === "FREE" && (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                ⚠️ Running low on credits! Upgrade your plan to get more credits.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Actions Card */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <div className="space-y-3">
             <Link
               href="/pricing"
-              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground mt-2"
+              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground"
             >
               Upgrade Plan
             </Link>
@@ -170,14 +136,6 @@ export default function Credits() {
               Browse Templates
             </Link>
           </div>
-          
-          {(templateIsLow || aiIsLow) && planType === "FREE" && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4">
-              <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                ⚠️ Running low on credits! Upgrade your plan to get more.
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
@@ -275,10 +233,8 @@ export default function Credits() {
       <div className="mt-8 bg-muted/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-2">About Credits</h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
-          <li>• <strong>Template Credits:</strong> Used when you render videos from templates</li>
-          <li>• <strong>AI Prompt Credits:</strong> Used when you generate videos with AI prompts</li>
-          <li>• Each video render (template or AI) costs 1 credit</li>
-          <li>• Both credit types have the same limit based on your subscription plan</li>
+          <li>• Credits are used when you render videos from templates</li>
+          <li>• Each video render costs 1 credit</li>
           <li>• Credits reset monthly based on your subscription plan</li>
           <li>• Upgrade your plan to get more credits per month</li>
           <li>• Failed renders will automatically refund your credits</li>

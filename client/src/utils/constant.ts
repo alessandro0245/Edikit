@@ -8,12 +8,7 @@ export const plans = [
     price: "$0",
     period: "forever",
     description: "Perfect for trying out Edikit",
-    features: [
-      "5 template renders per month",
-      "5 AI prompt generations per month",
-      "720p resolution",
-      ".mp4 format",
-    ],
+    features: ["5 video renders per month", "720p resolution", ".mp4 format"],
     cta: "Start Free Trial",
     popular: false,
   },
@@ -25,8 +20,7 @@ export const plans = [
     period: "per month",
     description: "For professionals and content creators",
     features: [
-      "50 template renders per month",
-      "50 AI prompt generations per month",
+      "50 video renders per month",
       "1080p HD resolution",
       ".mp4 and .mov formats",
       "with transparent background",
@@ -42,8 +36,7 @@ export const plans = [
     period: "per month",
     description: "For teams and agencies",
     features: [
-      "500 template renders per month",
-      "500 AI prompt generations per month",
+      "500 video renders per month",
       "4K resolution",
       ".mp4 and .mov formats",
       "with transparent background",

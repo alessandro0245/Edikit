@@ -7,12 +7,10 @@ interface CreditsState extends Partial<CreditsData> {
 }
 
 const initialState: CreditsState = {
-  templateCredits: undefined,
-  aiPromptCredits: undefined,
+  credits: undefined,
   planType: undefined,
   limit: undefined,
   canRender: undefined,
-  canUseAiPrompt: undefined,
   isLoading: true,
   error: null,
 };
@@ -22,17 +20,15 @@ const creditsSlice = createSlice({
   initialState,
   reducers: {
     setCredits: (state, action: PayloadAction<CreditsData>) => {
-      state.templateCredits = action.payload.templateCredits;
-      state.aiPromptCredits = action.payload.aiPromptCredits;
+      state.credits = action.payload.credits;
       state.planType = action.payload.planType;
       state.limit = action.payload.limit;
       state.canRender = action.payload.canRender;
-      state.canUseAiPrompt = action.payload.canUseAiPrompt;
       state.isLoading = false;
       state.error = null;
     },
     updateCredits: (state, action: PayloadAction<number>) => {
-      state.templateCredits = action.payload;
+      state.credits = action.payload;
       state.canRender = action.payload > 0;
     },
     setCreditsLoading: (state, action: PayloadAction<boolean>) => {
@@ -43,12 +39,10 @@ const creditsSlice = createSlice({
       state.isLoading = false;
     },
     clearCredits: (state) => {
-      state.templateCredits = undefined;
-      state.aiPromptCredits = undefined;
+      state.credits = undefined;
       state.planType = undefined;
       state.limit = undefined;
       state.canRender = undefined;
-      state.canUseAiPrompt = undefined;
       state.isLoading = false;
       state.error = null;
     },

@@ -2,12 +2,10 @@ import axios from 'axios';
 import { baseUrl } from '@/utils/constant';
 
 export interface CreditsData {
-  templateCredits: number;
-  aiPromptCredits: number;
+  credits: number;
   planType: 'FREE' | 'BASIC' | 'PRO';
   limit: number;
   canRender: boolean;
-  canUseAiPrompt: boolean;
 }
 
 export interface CreditTransaction {

@@ -93,7 +93,6 @@ model User {
   role     Role     @default(USER)
   avatar   String?  @default("")
   credits  Int      @default(5)
-  aiPromptCredits Int @default(5)
   planType PlanType @default(FREE)
   provider String   @default("email")
   googleId String?  @unique
