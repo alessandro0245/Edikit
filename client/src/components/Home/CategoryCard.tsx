@@ -7,9 +7,10 @@ import {
   GraduationCap,
   Sparkles,
   Wand2,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
 
 const iconMap = {
   instagram: Instagram,
@@ -23,11 +24,12 @@ const iconMap = {
 type IconName = keyof typeof iconMap;
 
 interface CategoryCardProps {
-    id: string;
+  id: string;
   title: string;
   description: string;
   iconName: IconName;
   examples: string[];
+  imageUrl?: string;
   isCustom?: boolean;
 }
 
@@ -37,52 +39,68 @@ export default function CategoryCard({
   description,
   iconName,
   examples,
+  imageUrl,
   isCustom = false,
 }: CategoryCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const Icon = iconMap[iconName];
 
   return (
-    <Link href={`/prompt/${id}`}>
-    <div
-      className="group h-full p-8 border border-border rounded-xl hover:border-foreground/30 hover:shadow-md transition-all duration-300 bg-card hover:bg-card/80"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="flex flex-col h-full space-y-4">
-        {/* Icon Container */}
-        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
-          <Icon
-            className={`w-6 h-6 transition-colors ${
-              isCustom ? "text-primary" : "text-foreground"
-            } group-hover:text-primary`}
-            strokeWidth={1.5}
-          />
-        </div>
+    <Link href={`/prompt/${id}`} className="group h-full">
+      <div className="relative h-full overflow-hidden rounded-lg border border-border transition-all duration-300 hover:border-foreground/20 hover:shadow-lg bg-card">
+        {/* Background Image */}
+        {imageUrl && (
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-card via-card/60 to-transparent" />
+          </div>
+        )}
 
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-foreground group-hover:text-foreground transition-colors">
-          {title}
-        </h3>
+        {/* Content */}
+        <div className="relative h-full p-6 flex flex-col justify-between">
+          {/* Icon & Title Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-background/80 backdrop-blur-sm group-hover:bg-primary/20 transition-colors duration-300">
+                <Icon
+                  className={`w-5 h-5 transition-colors duration-300 ${
+                    isCustom ? "text-primary" : "text-foreground"
+                  } group-hover:text-primary`}
+                  strokeWidth={2}
+                />
+              </div>
+              <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
+            </div>
 
-        {/* Description */}
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {description}
-        </p>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground group-hover:text-foreground transition-colors">
+                {title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+                {description}
+              </p>
+            </div>
+          </div>
 
-        {/* Examples */}
-        <div className="flex flex-wrap gap-2 pt-2">
-          {examples.map((example, index) => (
-            <span
-              key={index}
-              className="inline-block text-xs px-3 py-1 bg-muted text-muted-foreground rounded-full group-hover:bg-primary/10 group-hover:text-primary transition-colors"
-            >
-              {example}
-            </span>
-          ))}
+          {/* Examples Tags */}
+          {examples.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {examples.map((example, index) => (
+                <span
+                  key={index}
+                  className="inline-block text-xs px-2.5 py-1 bg-background/60 backdrop-blur-sm text-foreground/70 rounded-full group-hover:bg-primary/20 group-hover:text-primary transition-colors duration-300"
+                >
+                  {example}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
     </Link>
   );
 }
