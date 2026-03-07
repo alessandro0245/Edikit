@@ -10,8 +10,9 @@ datasource db {
 
 enum PlanType {
   FREE
-  BASIC
-  PRO
+  STARTER
+  CREATOR
+  STUDIO
 }
 
 enum Role {
@@ -47,7 +48,7 @@ model NexrenderTemplate {
   status       String
   compositions Json
   layers       Json?
-  layerMapping Json?  // Stores mapping: { "text1": "actual layer name", ... }
+  layerMapping Json? // Stores mapping: { "text1": "actual layer name", ... }
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -62,7 +63,7 @@ model RenderJob {
   renderType         RenderType   @default(TEMPLATE)
   status             RenderStatus @default(PENDING)
   nexrenderJobId     String?      @unique
-  creditsUsed        Int          @default(1)
+  creditsUsed        Int          @default(0)
   outputUrl          String?
   nexrenderOutputUrl String?
   error              String?
@@ -92,7 +93,7 @@ model User {
   password String?
   role     Role     @default(USER)
   avatar   String?  @default("")
-  credits  Int      @default(5)
+  credits  Int      @default(0)
   planType PlanType @default(FREE)
   provider String   @default("email")
   googleId String?  @unique
@@ -106,7 +107,6 @@ model User {
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
 
- 
   renderJobs         RenderJob[]
   creditTransactions CreditTransaction[]
 

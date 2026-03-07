@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { PlanType } from '@generated/prisma/enums';
 
 @Injectable()
 export class CreditsService {
@@ -7,13 +8,14 @@ export class CreditsService {
   constructor(private prisma: PrismaService) {}
 
   // Get subscription credit limits
-  private getCreditLimitForSubscription(planType: string): number {
-    const limits = {
-      FREE: 5,
-      BASIC: 50,
-      PRO: 500,
+  private getCreditLimitForSubscription(planType: PlanType): number {
+    const limits: Record<PlanType, number> = {
+      FREE: 0,
+      STARTER: 80,
+      CREATOR: 300,
+      STUDIO: 600,
     };
-    return limits[planType] || 5;
+    return limits[planType] || 0;
   }
 
   // Get user credits
@@ -145,7 +147,7 @@ export class CreditsService {
   // Upgrade subscription and reset credits
   async upgradeSubscription(
     userId: string,
-    newplanType: 'FREE' | 'BASIC' | 'PRO',
+    newplanType: PlanType,
   ) {
     const creditLimits = this.getCreditLimitForSubscription(newplanType);
     const user = await this.prisma.user.update({

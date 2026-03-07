@@ -2,42 +2,42 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthResponseDto {
   @ApiProperty({ description: 'User ID' })
-  userId: string;
+  userId!: string;
 
   @ApiProperty({ description: 'User email' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ description: 'User full name' })
-  fullName: string;
+  fullName!: string;
 
   @ApiProperty({ description: 'User role', enum: ['USER', 'ADMIN'] })
-  role: string;
+  role!: string;
 
   @ApiProperty({
     description: 'User plan type',
-    enum: ['FREE', 'BASIC', 'PRO'],
+    enum: ['FREE', 'STARTER', 'CREATOR', 'STUDIO'],
   })
-  planType: string;
+  planType!: string;
 }
 
 export class UserResponseDto {
   @ApiProperty({ description: 'User ID' })
-  id: string;
+  id!: string;
 
   @ApiProperty({ description: 'User email' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ description: 'User full name' })
-  fullName: string;
+  fullName!: string;
 
   @ApiProperty({ description: 'User role', enum: ['USER', 'ADMIN'] })
-  role: string;
+  role!: string;
 
   @ApiProperty({
     description: 'User plan type',
-    enum: ['FREE', 'BASIC', 'PRO'],
+    enum: ['FREE', 'STARTER', 'CREATOR', 'STUDIO'],
   })
-  planType: string;
+  planType!: string;
 
   @ApiProperty({ description: 'User avatar URL', required: false })
   avatar?: string;
@@ -46,11 +46,11 @@ export class UserResponseDto {
     description: 'Authentication provider',
     enum: ['email', 'google', 'apple'],
   })
-  provider: string;
+  provider!: string;
 
   @ApiProperty({ description: 'Created at timestamp' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty({ description: 'Updated at timestamp' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

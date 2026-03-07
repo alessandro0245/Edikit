@@ -84,10 +84,12 @@ export class StripeService {
       let planType: PlanType = PlanType.FREE;
       const planName = session.metadata?.planName || '';
 
-      if (planName.includes('Basic')) {
-        planType = PlanType.BASIC;
-      } else if (planName.includes('Pro')) {
-        planType = PlanType.PRO;
+      if (planName.includes('Starter')) {
+        planType = PlanType.STARTER;
+      } else if (planName.includes('Creator')) {
+        planType = PlanType.CREATOR;
+      } else if (planName.includes('Studio')) {
+        planType = PlanType.STUDIO;
       }
 
       if (userId) {
@@ -154,8 +156,9 @@ export class StripeService {
         webhookSecret, // Your webhook secret from Stripe dashboard
       );
     } catch (err) {
-      console.error('⚠️ Webhook signature verification failed:', err.message);
-      throw new Error(`Webhook signature verification failed: ${err.message}`);
+      const error = err as Error;
+      console.error('⚠️ Webhook signature verification failed:', error.message);
+      throw new Error(`Webhook signature verification failed: ${error.message}`);
     }
 
     console.log('✅ Webhook verified:', event.type);
@@ -371,7 +374,7 @@ export class StripeService {
 
   /**
    * HELPER: Determine plan type from subscription
-   * Looks at the price to figure out if it's BASIC or PRO
+   * Looks at the price to figure out if it's Starter, Creator, or Studio
    */
   private determinePlanType(subscription: Stripe.Subscription): PlanType {
     const price = subscription.items.data[0].price;
@@ -380,11 +383,13 @@ export class StripeService {
     // Convert cents to dollars
     const dollars = amount / 100;
 
-    // Match based on amount
-    if (dollars >= 30) {
-      return PlanType.PRO; // $39.99 or higher = PRO
+    // Match based on amount: Studio ($44), Creator ($22), Starter ($8)
+    if (dollars >= 40) {
+      return PlanType.STUDIO; // $44 = Studio
+    } else if (dollars >= 20) {
+      return PlanType.CREATOR; // $22 = Creator
     } else if (dollars >= 5) {
-      return PlanType.BASIC; // $5.99-$29.99 = BASIC
+      return PlanType.STARTER; // $8 = Starter
     } else {
       return PlanType.FREE; // $0 = FREE
     }

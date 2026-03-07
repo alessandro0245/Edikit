@@ -77,8 +77,9 @@ export class StripeController {
       await this.stripeService.handleWebhook(signature, request.rawBody);
       return { received: true };
     } catch (error) {
-      console.error('Webhook error:', error.message);
-      throw new BadRequestException(`Webhook Error: ${error.message}`);
+      const err = error as Error;
+      console.error('Webhook error:', err.message);
+      throw new BadRequestException(`Webhook Error: ${err.message}`);
     }
   }
 }

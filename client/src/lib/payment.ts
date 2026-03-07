@@ -14,20 +14,20 @@ const pricingPlans: Record<
   }
 > = {
   prod_TffitWtEKT88s6: {
-    amount: 0,
-    productName: "Free Plan",
+    amount: 8,
+    productName: "Starter Plan",
     interval: "month",
     currency: "usd",
   },
   prod_Tffkh0QPN6G92B: {
-    amount: 5.99,
-    productName: "Basic Plan",
+    amount: 22,
+    productName: "Creator Plan",
     interval: "month",
     currency: "usd",
   },
   prod_TffnEJPkjRMHpY: {
-    amount: 39.99,
-    productName: "Pro Plan",
+    amount: 44,
+    productName: "Studio Plan",
     interval: "month",
     currency: "usd",
   },
@@ -35,11 +35,6 @@ const pricingPlans: Record<
 
 export const handlePayment = (planId: string, userId?: string) => {
   const plan = pricingPlans[planId];
-
-  if (planId === "prod_TffitWtEKT88s6") {
-    console.log("Selected Free Plan. No payment required.");
-    return;
-  }
 
   if (!plan) {
     console.log(`Invalid plan ID: ${planId}`);
