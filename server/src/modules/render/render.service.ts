@@ -55,6 +55,7 @@ export interface NexrenderFont {
 @Injectable()
 export class RenderService {
   private readonly logger = new Logger(RenderService.name);
+  private static readonly TEMPLATE_CREDIT_COST = 8;
   private readonly nexrenderApiUrl: string;
   private readonly nexrenderApiKey: string;
   private readonly animationsPath: string;
@@ -1620,7 +1621,10 @@ export class RenderService {
     );
 
     // Ensure template is uploaded
-    const hasCredits = await this.creditsService.hasEnoughCredits(userId, 1);
+    const hasCredits = await this.creditsService.hasEnoughCredits(
+      userId,
+      RenderService.TEMPLATE_CREDIT_COST,
+    );
 
     if (!hasCredits) {
       throw new BadRequestException(
@@ -1678,15 +1682,19 @@ export class RenderService {
         nexrenderJobId: nexrenderJob.id,
         status: RenderStatus.PENDING,
         customizations: dto as any,
-        creditsUsed: 1,
+        creditsUsed: RenderService.TEMPLATE_CREDIT_COST,
       },
     });
 
     // Deduct credit
     try {
-      await this.creditsService.deductCredits(userId, 1, job.id);
+      await this.creditsService.deductCredits(
+        userId,
+        RenderService.TEMPLATE_CREDIT_COST,
+        job.id,
+      );
       this.logger.log(
-        `Deducted 1 credit from user ${userId} for job ${job.id}`,
+        `Deducted ${RenderService.TEMPLATE_CREDIT_COST} credits from user ${userId} for job ${job.id}`,
       );
     } catch (error) {
       await this.prisma.renderJob.delete({ where: { id: job.id } });

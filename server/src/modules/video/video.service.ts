@@ -16,6 +16,7 @@ import { RemotionLambdaService } from './remotion-lambda.service';
 @Injectable()
 export class VideoService {
   private readonly logger = new Logger(VideoService.name);
+  private static readonly AI_VIDEO_CREDIT_COST = 5;
 
   constructor(
     private readonly promptService: PromptService,
@@ -28,7 +29,10 @@ export class VideoService {
   async generatePrompt(dto: GeneratePromptDto, userId: string) {
     const { prompt, categoryId } = dto;
 
-    const hasCredits = await this.creditsService.hasEnoughCredits(userId, 1);
+    const hasCredits = await this.creditsService.hasEnoughCredits(
+      userId,
+      VideoService.AI_VIDEO_CREDIT_COST,
+    );
     if (!hasCredits) {
       throw new BadRequestException(
         'Insufficient credits. Please purchase more credits to generate videos.',
@@ -51,11 +55,15 @@ export class VideoService {
         status: 'PENDING',
         promptText: prompt,
         aiConfig: videoConfig as any,
-        creditsUsed: 1,
+        creditsUsed: VideoService.AI_VIDEO_CREDIT_COST,
       },
     });
 
-    await this.creditsService.deductCredits(userId, 1, renderJob.id);
+    await this.creditsService.deductCredits(
+      userId,
+      VideoService.AI_VIDEO_CREDIT_COST,
+      renderJob.id,
+    );
 
     this.triggerAsyncRender(renderJob.id, userId, videoConfig).catch((err) => {
       this.logger.error(
@@ -133,7 +141,11 @@ export class VideoService {
       );
 
       try {
-        await this.creditsService.refundCredits(userId, 1, jobId);
+        await this.creditsService.refundCredits(
+          userId,
+          VideoService.AI_VIDEO_CREDIT_COST,
+          jobId,
+        );
       } catch (refundErr) {
         this.logger.error(
           'Failed to refund credits',
