@@ -28,6 +28,8 @@ const Navbar = () => {
   const user = useSelector((state: RootState) => state.user.user);
   const isLoading = useSelector((state: RootState) => state.user.isLoading);
 
+  const isFreePlan = user?.planType !== "FREE";
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinLoadingTime(false);
@@ -108,7 +110,7 @@ const Navbar = () => {
             <ToogleTheme />
 
             {/* Credits Display - Visible on all devices */}
-            {!isLoading && !minLoadingTime && user && (
+            {!isLoading && !minLoadingTime && user && isFreePlan &&  (
               <CreditsDisplay />
             )}
 

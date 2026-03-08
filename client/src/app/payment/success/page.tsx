@@ -81,7 +81,7 @@ function SuccessContent() {
       <div className="w-full max-w-md">
         {/* Success Card */}
         <div className="relative">
-          <div className="absolute inset-0 bg-linear-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl" />
+          <div className="absolute " />
           <div className="relative bg-card border border-border rounded-2xl p-8 shadow-lg">
             {/* Success Icon */}
             <div className="flex justify-center mb-6">
