@@ -12,12 +12,15 @@ import {
 import { usePromptLogic } from "./usePromptLogic";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import VideoDownloadButton from "@/components/Video/VideoDownloadButton";
+import { PalettePicker } from "./PalettePicker";
 
 export default function PromptPage() {
   const {
     categoryId,
     prompt,
     setPrompt,
+    selectedPaletteId,      // ← NEW
+    setSelectedPaletteId,   // ← NEW
     progressStep,
     progress,
     sidebarOpen,
@@ -79,7 +82,8 @@ export default function PromptPage() {
         {/* Prompt Section */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
           {progressStep === "idle" ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Prompt textarea */}
               <div>
                 <label
                   htmlFor="prompt"
@@ -107,6 +111,15 @@ export default function PromptPage() {
                   </span>
                 </div>
               </div>
+
+              {/* ── Palette Picker ── */}
+              <div className="border-t border-border pt-5">
+                <PalettePicker
+                  selectedId={selectedPaletteId}
+                  onSelect={setSelectedPaletteId}
+                />
+              </div>
+              {/* ────────────────── */}
 
               {/* Credits warning */}
               {isLoggedIn && canRender === false && (
@@ -238,15 +251,26 @@ export default function PromptPage() {
                 </div>
               )}
 
-              {/* Prompt Display */}
-              <div className="p-4 bg-background rounded-lg border border-border">
-                <p className="text-xs text-muted-foreground font-medium mb-2">
-                  Your Prompt
-                </p>
-                <p className="text-sm text-foreground line-clamp-4">{prompt}</p>
+              {/* Prompt + Palette Display */}
+              <div className="p-4 bg-background rounded-lg border border-border space-y-3">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium mb-1">
+                    Your Prompt
+                  </p>
+                  <p className="text-sm text-foreground line-clamp-4">{prompt}</p>
+                </div>
+                {/* Show selected palette during render */}
+                {selectedPaletteId && (
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                      Palette
+                    </p>
+                    <p className="text-xs text-foreground">{selectedPaletteId}</p>
+                  </div>
+                )}
               </div>
 
-              {/* Reset / Try Again Button */}
+              {/* Reset / Try Again */}
               {(progressStep === "complete" || progressStep === "error") && (
                 <button
                   onClick={handleReset}
@@ -282,9 +306,7 @@ export default function PromptPage() {
 
       {/* Main Content */}
       <main className="flex-1 w-full flex flex-col overflow-y-hidden">
-        {/* Video Preview Section */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8 space-y-6">
-          {/* Video Player or Placeholder */}
           {progressStep === "complete" && outputUrl ? (
             <div className="w-full max-w-4xl">
               <VideoPlayer
@@ -310,8 +332,7 @@ export default function PromptPage() {
                     Generation Failed
                   </p>
                   <p className="text-xs text-muted-foreground max-w-md">
-                    {errorMessage ||
-                      "An error occurred during video generation."}
+                    {errorMessage || "An error occurred during video generation."}
                   </p>
                 </div>
               ) : (
@@ -327,7 +348,6 @@ export default function PromptPage() {
             </div>
           )}
 
-          {/* Actions - shown when complete */}
           {progressStep === "complete" && outputUrl && (
             <div className="flex flex-col sm:flex-row gap-3 w-full max-w-4xl">
               <VideoDownloadButton
@@ -338,12 +358,7 @@ export default function PromptPage() {
                 className="flex-1"
               />
               <button
-                onClick={async () => {
-                  const freshUrl = await handleDownload();
-                  if (freshUrl) {
-                    // URL refreshed, VideoPlayer will use outputUrl from state
-                  }
-                }}
+                onClick={async () => { await handleDownload(); }}
                 className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base cursor-pointer"
               >
                 Refresh Link

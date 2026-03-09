@@ -23,6 +23,7 @@ export function usePromptLogic() {
   const categoryId = params.id as string;
 
   const [prompt, setPrompt] = useState("");
+  const [selectedPaletteId, setSelectedPaletteId] = useState<string | null>(null); // ← NEW: null = Surprise Me
   const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
   const [progress, setProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -45,9 +46,7 @@ export function usePromptLogic() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data } = await api.get("/auth/me", {
-          withCredentials: true,
-        });
+        const { data } = await api.get("/auth/me", { withCredentials: true });
         localStorage.setItem("user", JSON.stringify(data));
         setIsLoggedIn(true);
       } catch {
@@ -70,9 +69,7 @@ export function usePromptLogic() {
 
   const startPolling = useCallback(
     (id: string) => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-      }
+      if (pollRef.current) clearInterval(pollRef.current);
 
       const poll = async () => {
         try {
@@ -92,22 +89,14 @@ export function usePromptLogic() {
               setOutputUrl(data.outputUrl);
               setProgressStep("complete");
               refreshCredits();
-              if (pollRef.current) {
-                clearInterval(pollRef.current);
-                pollRef.current = null;
-              }
+              if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
               toast.success("Video generated successfully!");
               break;
             case "FAILED":
               setProgressStep("error");
-              setErrorMessage(
-                data.error || "Video generation failed. Credits refunded.",
-              );
+              setErrorMessage(data.error || "Video generation failed. Credits refunded.");
               refreshCredits();
-              if (pollRef.current) {
-                clearInterval(pollRef.current);
-                pollRef.current = null;
-              }
+              if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
               toast.error(data.error || "Video generation failed");
               break;
           }
@@ -117,7 +106,6 @@ export function usePromptLogic() {
       };
 
       poll();
-
       pollRef.current = setInterval(poll, POLL_INTERVAL);
     },
     [refreshCredits],
@@ -126,13 +114,8 @@ export function usePromptLogic() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-
+    if (!isLoggedIn) { router.push("/login"); return; }
     if (!prompt.trim()) return;
-
     if (canRender === false) {
       toast.error("Insufficient credits. Please purchase more.");
       router.push("/pricing");
@@ -151,19 +134,17 @@ export function usePromptLogic() {
         {
           categoryId,
           prompt,
+          paletteId: selectedPaletteId ?? undefined, // ← NEW: undefined = AI picks
         },
         { withCredentials: true },
       );
 
       setJobId(data.jobId);
       setProgress(10);
-
       startPolling(data.jobId);
     } catch (err: any) {
       setProgressStep("error");
-      const message =
-        err?.response?.data?.message ||
-        "Something went wrong. Please try again.";
+      const message = err?.response?.data?.message || "Something went wrong. Please try again.";
       setErrorMessage(message);
       toast.error(message);
     } finally {
@@ -172,11 +153,9 @@ export function usePromptLogic() {
   };
 
   const handleReset = () => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     setPrompt("");
+    setSelectedPaletteId(null); // ← NEW: reset palette on new video
     setProgressStep("idle");
     setProgress(0);
     setJobId(null);
@@ -186,16 +165,9 @@ export function usePromptLogic() {
 
   const handleDownload = async () => {
     if (!jobId) return;
-
     try {
-      const { data } = await api.get(`/video/job/${jobId}/download`, {
-        withCredentials: true,
-      });
-
-      if (data.downloadUrl) {
-        setOutputUrl(data.downloadUrl);
-        return data.downloadUrl as string;
-      }
+      const { data } = await api.get(`/video/job/${jobId}/download`, { withCredentials: true });
+      if (data.downloadUrl) { setOutputUrl(data.downloadUrl); return data.downloadUrl as string; }
     } catch {
       toast.error("Failed to get download link. Please try again.");
     }
@@ -206,6 +178,8 @@ export function usePromptLogic() {
     categoryId,
     prompt,
     setPrompt,
+    selectedPaletteId,        // ← NEW
+    setSelectedPaletteId,     // ← NEW
     progressStep,
     progress,
     sidebarOpen,
