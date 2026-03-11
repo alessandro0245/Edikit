@@ -168,8 +168,10 @@ export class RemotionLambdaService {
       composition: 'AIVideoComposition',
       inputProps: config as unknown as Record<string, unknown>,
       codec: 'h264',
-      maxRetries: 2,
+      maxRetries: 1,
       privacy: 'no-acl',
+      concurrencyPerLambda: 1,
+      framesPerLambda: 999999,
       downloadBehavior: {
         type: 'download',
         fileName: `${config.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`,
