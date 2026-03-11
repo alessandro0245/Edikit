@@ -4,7 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, LogOut, ChevronDown, Coins } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  ChevronDown,
+  Coins,
+  Settings,
+  Trash2,
+} from "lucide-react";
 import ToogleTheme from "../Theme/theme-toogle";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -29,7 +37,7 @@ const Navbar = () => {
   const isLoading = useSelector((state: RootState) => state.user.isLoading);
 
   const isFreePlan = user?.planType !== "FREE";
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinLoadingTime(false);
@@ -87,7 +95,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between relative">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.svg"
@@ -100,7 +108,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-6">
             <NavLink href="/templates">Templates</NavLink>
             <NavLink href="/pricing">Pricing</NavLink>
           </nav>
@@ -110,7 +118,7 @@ const Navbar = () => {
             <ToogleTheme />
 
             {/* Credits Display - Visible on all devices */}
-            {!isLoading && !minLoadingTime && user && isFreePlan &&  (
+            {!isLoading && !minLoadingTime && user && isFreePlan && (
               <CreditsDisplay />
             )}
 
@@ -124,107 +132,116 @@ const Navbar = () => {
               ) : user ? (
                 <>
                   <div className="relative" ref={userMenuRef}>
-                  <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                  >
-                    {user.avatar?.startsWith("http") ? (
-                      <Image
-                        src={user.avatar}
-                        alt={user.fullName}
-                        width={32}
-                        height={32}
-                        className="w-8 h-8 rounded-full object-cover"
+                    <button
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                      className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    >
+                      {user.avatar?.startsWith("http") ? (
+                        <Image
+                          src={user.avatar}
+                          alt={user.fullName}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center font-bold text-xs">
+                          {user.avatar || getInitialsAvatar(user.fullName)}
+                        </div>
+                      )}
+                      <span>{user.fullName}</span>
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform ${
+                          isUserMenuOpen ? "rotate-180" : ""
+                        }`}
                       />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center font-bold text-xs">
-                        {user.avatar || getInitialsAvatar(user.fullName)}
+                    </button>
+
+                    {/* User Dropdown Menu */}
+                    {isUserMenuOpen && (
+                      <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg z-50">
+                        <div className="py-2">
+                          <div className="px-4 py-2 border-b border-border">
+                            <p className="text-sm font-medium text-foreground">
+                              {user.fullName}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {user.email}
+                            </p>
+                            <span
+                              className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                user.planType === "PRO"
+                                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                                  : user.planType === "BASIC"
+                                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                                    : user.planType === "STARTER"
+                                      ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                                      : user.planType === "CREATOR"
+                                        ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
+                                        : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              }`}
+                            >
+                              {user.planType} Plan
+                            </span>
+                          </div>
+
+                          {/* Credits Link */}
+                          <Link
+                            href="/credits"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors border-b border-border/50"
+                          >
+                            <Coins size={16} />
+                            View Credits
+                          </Link>
+
+                          {/* Upgrade/Manage Plan Button */}
+                          <div className="">
+                            {user.planType === "FREE" ? (
+                              <Link
+                                href="/pricing"
+                                onClick={() => setIsUserMenuOpen(false)}
+                                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium  bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                              >
+                                Upgrade Plan
+                              </Link>
+                            ) : (
+                              <div className="flex flex-col ">
+                                <Link
+                                  href="/pricing"
+                                  onClick={() => setIsUserMenuOpen(false)}
+                                  className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium  border-b hover:bg-accent transition-colors"
+                                >
+                                  <Settings size={16} />
+                                  Manage Plan
+                                </Link>
+                                <button
+                                  onClick={handleCancelPlan}
+                                  disabled={isCanceling}
+                                  className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                                >
+                                  <Trash2 size={16} />
+                                  {isCanceling
+                                    ? "Cancelling..."
+                                    : "Cancel Plan"}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Logout Button */}
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors border-t border-border -mb-2 cursor-pointer"
+                          >
+                            <LogOut size={16} />
+                            Logout
+                          </button>
+                        </div>
                       </div>
                     )}
-                    <span>{user.fullName}</span>
-                    <ChevronDown
-                      size={16}
-                      className={`transition-transform ${
-                        isUserMenuOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {/* User Dropdown Menu */}
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg z-50">
-                      <div className="py-2">
-                        <div className="px-4 py-2 border-b border-border">
-                          <p className="text-sm font-medium text-foreground">
-                            {user.fullName}
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {user.email}
-                          </p>
-                          <span
-                            className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                              user.planType === "PRO"
-                                ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                                : user.planType === "BASIC"
-                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                                : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                            }`}
-                          >
-                            {user.planType} Plan
-                          </span>
-                        </div>
-
-                        {/* Credits Link */}
-                        <Link
-                          href="/credits"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                        >
-                          <Coins size={16} />
-                          View Credits
-                        </Link>
-
-                        {/* Upgrade/Manage Plan Button */}
-                        {user.planType === "FREE" ? (
-                          <Link
-                            href="/pricing"
-                            onClick={() => setIsUserMenuOpen(false)}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 mx-2 my-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                            style={{ width: "calc(100% - 1rem)" }}
-                          >
-                            Upgrade Plan
-                          </Link>
-                        ) : (
-                          <div className="flex flex-col gap-2 px-2">
-                            <Link
-                              href="/pricing"
-                              onClick={() => setIsUserMenuOpen(false)}
-                              className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-border hover:bg-accent transition-colors"
-                            >
-                              Manage Plan
-                            </Link>
-                            <button
-                              onClick={handleCancelPlan}
-                              disabled={isCanceling}
-                              className="w-full cursor-pointer flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                              {isCanceling ? "Cancelling..." : "Cancel Plan"}
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Logout Button */}
-                        <button
-                          onClick={handleLogout}
-                          className="w-full cursor-pointer flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors border-t border-border"
-                        >
-                          <LogOut size={16} />
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </div>
                 </>
               ) : (
                 <div>
@@ -306,8 +323,12 @@ const Navbar = () => {
                           user.planType === "PRO"
                             ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
                             : user.planType === "BASIC"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                            : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                              : user.planType === "STARTER"
+                                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                                : user.planType === "CREATOR"
+                                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
+                                  : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                         }`}
                       >
                         {user.planType}
@@ -327,13 +348,14 @@ const Navbar = () => {
                   )}
 
                   {/* Manage Subscription for paid users */}
-                  {(user.planType === "BASIC" || user.planType === "PRO") && (
+                  {user.planType !== "FREE" && (
                     <>
                       <Link
                         href="/pricing"
                         onClick={() => setIsOpen(false)}
-                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-accent text-center"
+                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-accent text-center flex items-center justify-center gap-2"
                       >
+                        <Settings size={14} />
                         Manage Plan
                       </Link>
                       <button
@@ -342,8 +364,9 @@ const Navbar = () => {
                           setIsOpen(false);
                         }}
                         disabled={isCanceling}
-                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
+                        <Trash2 size={14} />
                         {isCanceling ? "Cancelling..." : "Cancel Plan"}
                       </button>
                     </>
@@ -354,7 +377,7 @@ const Navbar = () => {
                       handleLogout();
                       setIsOpen(false);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                    className="flex items-center  justify-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
                   >
                     <LogOut size={16} />
                     Logout
