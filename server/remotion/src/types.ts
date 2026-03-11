@@ -1,4 +1,3 @@
-
 export type AnimationType =
   | 'fade'
   | 'slide'
@@ -8,6 +7,8 @@ export type AnimationType =
   | 'slide-down';
 
 export type SceneType = 'intro' | 'content' | 'cta';
+
+export type MoodType = 'energetic' | 'cinematic' | 'corporate' | 'chill';
 
 export interface Scene {
   type: SceneType;
@@ -20,18 +21,26 @@ export interface Scene {
   fontSize: number;
 }
 
+export interface AudioConfig {
+  trackUrl: any;
+  mood: MoodType;
+  trackIndex: number;
+  volume: number;
+  sfxVolume: number;
+}
+
 export interface VideoConfig {
   title: string;
   scenes: Scene[];
   fps: number;
   width: number;
   height: number;
+  audio?: AudioConfig; // optional — gracefully skipped if missing
 }
 
 export const DEFAULT_FPS = 30;
 export const DEFAULT_WIDTH = 1920;
 export const DEFAULT_HEIGHT = 1080;
-
 export const TRANSITION_FRAMES = 15;
 
 export const DEFAULT_SCENE: Scene = {
@@ -44,11 +53,7 @@ export const DEFAULT_SCENE: Scene = {
   fontSize: 64,
 };
 
-
-export function getTotalDurationInFrames(
-  scenes: Scene[],
-  fps: number,
-): number {
+export function getTotalDurationInFrames(scenes: Scene[], fps: number): number {
   const totalFrames = scenes.reduce(
     (sum, scene) => sum + Math.ceil(scene.duration * fps),
     0,
