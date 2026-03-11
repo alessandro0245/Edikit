@@ -11,7 +11,6 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-background">
       <main>
-        {/* Hero Section */}
         <section className="relative py-16 md:py-22 bg-background overflow-hidden">
           {/* Background SVG Decorations */}
           <div
@@ -39,13 +38,13 @@ export default function Hero() {
             </svg>
 
             {/* Primary glow - top right */}
-            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px] animate-hero-glow" />
+            <div className="absolute -top-40 -right-40 w-150 h-150 rounded-full bg-primary/10 blur-[120px] animate-hero-glow" />
 
             {/* Secondary glow - bottom left */}
-            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-purple-600/8 blur-[100px] animate-hero-glow-delayed" />
+            <div className="absolute -bottom-40 -left-40 w-125 h-125 rounded-full bg-purple-600/8 blur-[100px] animate-hero-glow-delayed" />
 
             {/* Center accent glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full bg-primary/5 blur-[150px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-100 rounded-full bg-primary/5 blur-[150px]" />
 
             {/* Floating decorative elements */}
             <svg
@@ -132,7 +131,6 @@ export default function Hero() {
 
           <div className="container mx-auto px-6 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-stretch">
-              {/* Video Section - Left Side */}
               <div className="order-2 lg:order-1 relative h-full">
                 <div
                   className="absolute -inset-4 bg-primary/5 rounded-3xl blur-2xl"
