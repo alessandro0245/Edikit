@@ -19,8 +19,8 @@ export default function PromptPage() {
     categoryId,
     prompt,
     setPrompt,
-    selectedPaletteId,      // ← NEW
-    setSelectedPaletteId,   // ← NEW
+    selectedPaletteId, // ← NEW
+    setSelectedPaletteId, // ← NEW
     progressStep,
     progress,
     sidebarOpen,
@@ -257,7 +257,9 @@ export default function PromptPage() {
                   <p className="text-xs text-muted-foreground font-medium mb-1">
                     Your Prompt
                   </p>
-                  <p className="text-sm text-foreground line-clamp-4">{prompt}</p>
+                  <p className="text-sm text-foreground line-clamp-4">
+                    {prompt}
+                  </p>
                 </div>
                 {/* Show selected palette during render */}
                 {selectedPaletteId && (
@@ -265,7 +267,9 @@ export default function PromptPage() {
                     <p className="text-xs text-muted-foreground font-medium mb-1">
                       Palette
                     </p>
-                    <p className="text-xs text-foreground">{selectedPaletteId}</p>
+                    <p className="text-xs text-foreground">
+                      {selectedPaletteId}
+                    </p>
                   </div>
                 )}
               </div>
@@ -332,7 +336,8 @@ export default function PromptPage() {
                     Generation Failed
                   </p>
                   <p className="text-xs text-muted-foreground max-w-md">
-                    {errorMessage || "An error occurred during video generation."}
+                    {errorMessage ||
+                      "An error occurred during video generation."}
                   </p>
                 </div>
               ) : (
@@ -358,7 +363,9 @@ export default function PromptPage() {
                 className="flex-1"
               />
               <button
-                onClick={async () => { await handleDownload(); }}
+                onClick={async () => {
+                  await handleDownload();
+                }}
                 className="flex-1 px-6 py-2 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors text-sm lg:text-base cursor-pointer"
               >
                 Refresh Link
