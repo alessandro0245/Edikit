@@ -1,14 +1,14 @@
 export type AnimationType =
-  | 'fade'
-  | 'slide'
-  | 'scale'
-  | 'typewriter'
-  | 'slide-up'
-  | 'slide-down';
+  | "fade"
+  | "slide"
+  | "scale"
+  | "typewriter"
+  | "slide-up"
+  | "slide-down";
 
-export type SceneType = 'intro' | 'content' | 'cta';
+export type SceneType = "intro" | "content" | "cta";
 
-export type MoodType = 'energetic' | 'cinematic' | 'corporate' | 'chill';
+export type MoodType = "energetic" | "cinematic" | "corporate" | "chill";
 
 export interface Scene {
   type: SceneType;
@@ -44,11 +44,11 @@ export const DEFAULT_HEIGHT = 1080;
 export const TRANSITION_FRAMES = 15;
 
 export const DEFAULT_SCENE: Scene = {
-  type: 'content',
-  text: 'Default Text',
-  backgroundColor: '#1a1a2e',
-  textColor: '#ffffff',
-  animation: 'fade',
+  type: "content",
+  text: "Default Text",
+  backgroundColor: "#1a1a2e",
+  textColor: "#ffffff",
+  animation: "fade",
   duration: 3,
   fontSize: 64,
 };

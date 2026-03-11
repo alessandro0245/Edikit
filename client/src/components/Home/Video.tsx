@@ -31,15 +31,14 @@ const Video = () => {
   };
 
   return (
-    <div className="order-2 lg:order-1">
-      <div className="relative aspect-video rounded-2xl bg-linear-to-br from-primary/20 to-purple-600/20 border-2 border-primary/30 overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
-
+    <div className="h-full">
+      <div className="relative h-full min-h-[400px] rounded-2xl bg-black border-2 border-primary/30 overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
         {/* Video */}
         {isPlaying && (
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-contain bg-black"
-            src="/previews/animation-10.mp4"
+            src="/previews/animation-6.mp4"
             playsInline
             onLoadedData={handleLoaded}
             onEnded={handleEnded}
@@ -49,10 +48,10 @@ const Video = () => {
         {/* Poster Image */}
         {!isPlaying && (
           <Image
-            src="/previews/hero image.png"
+            src="/previews/cyan-hero-img.png"
             alt="Hero Image"
             fill
-            className="object-cover"
+            className="object-contain"
             priority
           />
         )}
@@ -68,10 +67,18 @@ const Video = () => {
         {!isPlaying && !isLoading && (
           <div
             onClick={handlePlay}
-            className="absolute inset-0 flex items-center justify-center cursor-pointer bg-linear-to-b from-transparent via-transparent to-black/20"
+            className="absolute inset-0 flex items-center justify-center cursor-pointer "
           >
-            <div className="w-20 h-20 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/40 flex items-center justify-center hover:bg-primary/30 transition-colors">
-              <Play className="w-10 h-10 text-primary" />
+            <div className="relative flex items-center justify-center">
+              {/* Pulse ring */}
+              <span className="absolute w-24 h-24 rounded-full bg-primary/30 animate-ping" />
+              {/* Button */}
+              <div
+                className="relative w-20 h-20 rounded-full bg-primary/90 shadow-lg shadow-primary/50 flex items-center justify-center group-hover:scale-110 group-hover:shadow-xl
+              border border-gray-700 group-hover:shadow-primary/60 transition-all duration-200"
+              >
+                <Play className="w-8 h-8 text-white fill-white ml-1" />
+              </div>
             </div>
           </div>
         )}
