@@ -50,13 +50,13 @@ const CustomizePage = () => {
   const [renderJob, setRenderJob] = useState<RenderJob | null>(null);
   const [formData, setFormData] = useState<FormDataState>({});
   const [filePreviews, setFilePreviews] = useState<{ [key: string]: string }>(
-    {}
+    {},
   );
   const [uploadedAssets, setUploadedAssets] = useState<{
     [key: string]: string;
   }>({});
   const [uploadingAssets, setUploadingAssets] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // Video & image preview state
@@ -145,7 +145,7 @@ const CustomizePage = () => {
       } catch (error) {
         console.error("Failed to poll job status:", error);
       }
-    }, 3000);
+    }, 8000);
 
     return () => clearInterval(pollInterval);
   }, [renderJob]);
@@ -215,7 +215,7 @@ const CustomizePage = () => {
   const validateImageDimensions = (
     file: File,
     requiredWidth: number,
-    requiredHeight: number
+    requiredHeight: number,
   ): Promise<boolean> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -225,7 +225,7 @@ const CustomizePage = () => {
           const isValid =
             img.width === requiredWidth && img.height === requiredHeight;
           console.log(
-            `Image validation: ${img.width}x${img.height} vs required ${requiredWidth}x${requiredHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`
+            `Image validation: ${img.width}x${img.height} vs required ${requiredWidth}x${requiredHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`,
           );
           resolve(isValid);
         };
@@ -249,8 +249,12 @@ const CustomizePage = () => {
     minWidth: number,
     minHeight: number,
     maxWidth: number,
-    maxHeight: number
-  ): Promise<{ isValid: boolean; actualWidth: number; actualHeight: number }> => {
+    maxHeight: number,
+  ): Promise<{
+    isValid: boolean;
+    actualWidth: number;
+    actualHeight: number;
+  }> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -262,9 +266,13 @@ const CustomizePage = () => {
             img.height >= minHeight &&
             img.height <= maxHeight;
           console.log(
-            `Image range validation: ${img.width}x${img.height} vs range ${minWidth}x${minHeight} to ${maxWidth}x${maxHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`
+            `Image range validation: ${img.width}x${img.height} vs range ${minWidth}x${minHeight} to ${maxWidth}x${maxHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`,
           );
-          resolve({ isValid, actualWidth: img.width, actualHeight: img.height });
+          resolve({
+            isValid,
+            actualWidth: img.width,
+            actualHeight: img.height,
+          });
         };
         img.onerror = () => {
           console.error("Failed to load image for validation");
@@ -284,7 +292,7 @@ const CustomizePage = () => {
   const validateVideoDimensions = (
     file: File,
     requiredWidth: number,
-    requiredHeight: number
+    requiredHeight: number,
   ): Promise<boolean> => {
     return new Promise((resolve) => {
       const video = document.createElement("video");
@@ -296,7 +304,7 @@ const CustomizePage = () => {
           video.videoWidth === requiredWidth &&
           video.videoHeight === requiredHeight;
         console.log(
-          `Video validation: ${video.videoWidth}x${video.videoHeight} vs required ${requiredWidth}x${requiredHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`
+          `Video validation: ${video.videoWidth}x${video.videoHeight} vs required ${requiredWidth}x${requiredHeight} - ${isValid ? "✓ PASS" : "✗ FAIL"}`,
         );
         resolve(isValid);
       };
@@ -311,7 +319,11 @@ const CustomizePage = () => {
     });
   };
 
-  const handleFileUpload = async (fieldKey: string, file: File | null, inputElement?: HTMLInputElement) => {
+  const handleFileUpload = async (
+    fieldKey: string,
+    file: File | null,
+    inputElement?: HTMLInputElement,
+  ) => {
     if (!file) return;
 
     if (file.type.startsWith("image/")) {
@@ -336,11 +348,11 @@ const CustomizePage = () => {
                 minWidth,
                 minHeight,
                 maxWidth,
-                maxHeight
+                maxHeight,
               );
               if (!result.isValid) {
                 showErrorToast(
-                  `❌ Invalid dimensions! Required: ${field.dimensions} (Got: ${result.actualWidth}x${result.actualHeight})`
+                  `❌ Invalid dimensions! Required: ${field.dimensions} (Got: ${result.actualWidth}x${result.actualHeight})`,
                 );
                 // Clear the file input so user can try again
                 if (inputElement) {
@@ -365,10 +377,14 @@ const CustomizePage = () => {
 
           if (width && height) {
             try {
-              const isValid = await validateImageDimensions(file, width, height);
+              const isValid = await validateImageDimensions(
+                file,
+                width,
+                height,
+              );
               if (!isValid) {
                 showErrorToast(
-                  `❌ Invalid dimensions! Required: ${field.dimensions}`
+                  `❌ Invalid dimensions! Required: ${field.dimensions}`,
                 );
                 // Clear the file input so user can try again
                 if (inputElement) {
@@ -411,7 +427,7 @@ const CustomizePage = () => {
             const isValid = await validateVideoDimensions(file, width, height);
             if (!isValid) {
               showErrorToast(
-                `❌ Invalid video dimensions! Required: ${field.dimensions}`
+                `❌ Invalid video dimensions! Required: ${field.dimensions}`,
               );
               // Clear the file input so user can try again
               if (inputElement) {
@@ -489,50 +505,50 @@ const CustomizePage = () => {
 
   const deleteAsset = async (fieldKey: string) => {
     if (!uploadedAssets[fieldKey]) return;
-    
+
     try {
       const assetUrl = uploadedAssets[fieldKey];
-      
+
       // Extract publicId and resourceType from the URL
       // Cloudinary URLs are in format: https://res.cloudinary.com/{cloud_name}/{type}/upload/v{version}/{folder}/{path}/{filename}
       // We need the full path: edikit/uploads/{userId}/{filename}
       const resourceType = assetUrl.includes("/video/") ? "video" : "image";
-      
+
       // Extract everything after /upload/v{version}/
       const uploadMatch = assetUrl.match(/\/upload\/v\d+\/(.+?)(?:\?|$)/);
       if (!uploadMatch) {
         throw new Error("Invalid Cloudinary URL format");
       }
-      
+
       const fullPath = uploadMatch[1];
       // Remove the file extension
       const publicId = fullPath.substring(0, fullPath.lastIndexOf("."));
-      
+
       console.log(`Deleting asset: ${publicId} (${resourceType})`);
-      
+
       // Call the delete endpoint
       await api.delete("/render/delete-asset", {
-        data: { 
+        data: {
           publicId,
-          resourceType 
+          resourceType,
         },
         withCredentials: true,
       });
-      
+
       // Remove from state
       setUploadedAssets((prev) => {
         const newAssets = { ...prev };
         delete newAssets[fieldKey];
         return newAssets;
       });
-      
+
       // Remove preview
       setFilePreviews((prev) => {
         const newPreviews = { ...prev };
         delete newPreviews[fieldKey];
         return newPreviews;
       });
-      
+
       showSuccessToast(`${fieldKey} deleted successfully`);
     } catch (error) {
       console.error("Failed to delete asset:", error);
@@ -600,7 +616,7 @@ const CustomizePage = () => {
         renderDto,
         {
           withCredentials: true,
-        }
+        },
       );
 
       setRenderJob(data);
@@ -608,7 +624,7 @@ const CustomizePage = () => {
     } catch (error: any) {
       console.error("Failed to create render job:", error);
       showErrorToast(
-        error.response?.data?.message || "Failed to create render job"
+        error.response?.data?.message || "Failed to create render job",
       );
     } finally {
       setIsGenerating(false);
@@ -758,7 +774,7 @@ const CustomizePage = () => {
                           handleFileUpload(
                             fieldKey,
                             e.target.files?.[0] || null,
-                            e.target
+                            e.target,
                           )
                         }
                         className="hidden"
@@ -785,7 +801,11 @@ const CustomizePage = () => {
                               }}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
                               type="button"
-                              title={uploadedAssets[fieldKey] ? "Delete from server" : "Remove file"}
+                              title={
+                                uploadedAssets[fieldKey]
+                                  ? "Delete from server"
+                                  : "Remove file"
+                              }
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -829,7 +849,7 @@ const CustomizePage = () => {
                           handleFileUpload(
                             fieldKey,
                             e.target.files?.[0] || null,
-                            e.target
+                            e.target,
                           )
                         }
                         className="hidden"
@@ -856,7 +876,11 @@ const CustomizePage = () => {
                               }}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
                               type="button"
-                              title={uploadedAssets[fieldKey] ? "Delete from server" : "Remove file"}
+                              title={
+                                uploadedAssets[fieldKey]
+                                  ? "Delete from server"
+                                  : "Remove file"
+                              }
                             >
                               <X className="w-4 h-4" />
                             </button>
