@@ -32,7 +32,7 @@ const Video = () => {
 
   return (
     <div className="h-full">
-      <div className="relative h-full min-h-[400px] rounded-2xl bg-black border-2 border-primary/30 overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
+      <div className="relative h-full min-h-100 rounded-2xl bg-black border-2 border-primary/30 overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
         {/* Video */}
         {isPlaying && (
           <video

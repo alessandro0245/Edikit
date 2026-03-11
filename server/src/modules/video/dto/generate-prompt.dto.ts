@@ -1,4 +1,7 @@
-import { IsString, IsNotEmpty, MinLength, MaxLength, IsOptional } from 'class-validator';
+import {
+  IsString, IsNotEmpty, MinLength,
+  MaxLength, IsOptional, IsIn,
+} from 'class-validator';
 
 export class GeneratePromptDto {
   @IsString()
@@ -13,5 +16,17 @@ export class GeneratePromptDto {
 
   @IsOptional()
   @IsString()
-  paletteId?: string; // ← null/undefined = AI picks, string = user's palette choice
+  paletteId?: string;
+
+  @IsOptional()
+  @IsIn(['energetic', 'cinematic', 'corporate', 'chill', 'none'])
+  soundtrackMood?: string; // undefined = auto
+
+  @IsOptional()
+  @IsIn(['subtle', 'dynamic', 'intense'])
+  animationIntensity?: string; // undefined = dynamic
+
+  @IsOptional()
+  @IsIn(['16:9', '9:16', '1:1'])
+  aspectRatio?: string; // undefined = 16:9
 }

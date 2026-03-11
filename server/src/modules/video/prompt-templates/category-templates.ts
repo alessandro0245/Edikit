@@ -1,11 +1,16 @@
 import { selectPalette, getSceneColors, ColorPalette, MoodType } from '../color.system';
 
+export type AnimationIntensity = 'subtle' | 'dynamic' | 'intense';
+export type AspectRatio        = '16:9' | '9:16' | '1:1';
+
 export interface VisualSeed {
   palette: ColorPalette;
   layoutStyle: string;
   motionRhythm: string;
   typographyMood: string;
   sceneStructure: string;
+  animationIntensity: AnimationIntensity;
+  aspectRatio: AspectRatio;
 }
 
 export interface CategoryTemplate {
@@ -50,26 +55,49 @@ const SCENE_STRUCTURES = [
   'Wow Opener → Context → Payoff → CTA',
 ];
 
+// Animation sets per intensity level
+const ANIMATION_RULES: Record<AnimationIntensity, string> = {
+  subtle:  'Use ONLY: fade, slide-up. No scale or aggressive motion. Max duration 5s. Smooth, understated transitions.',
+  dynamic: 'Use any animation freely: fade, slide, scale, typewriter, slide-up, slide-down. Duration 2-5s. Balanced energy.',
+  intense: 'Prefer: scale, slide, slide-down. Use fade sparingly — only on CTA. Min duration 2s, max 3s. Fast, punchy, high-energy cuts.',
+};
+
+// Dimensions per aspect ratio
+const DIMENSIONS: Record<AspectRatio, { width: number; height: number }> = {
+  '16:9': { width: 1920, height: 1080 },
+  '9:16': { width: 1080, height: 1920 },
+  '1:1':  { width: 1080, height: 1080 },
+};
+
 function pick<T>(arr: T[], seed: number): T {
   return arr[seed % arr.length];
 }
 
 // ─── Seed Generator ───────────────────────────────────────────────────────────
 
-export function generateVisualSeed(mood: MoodType, numericSeed: number, resolvedPalette?: ColorPalette): VisualSeed {
+export function generateVisualSeed(
+  mood: MoodType,
+  numericSeed: number,
+  resolvedPalette?: ColorPalette,
+  animationIntensity: AnimationIntensity = 'dynamic',
+  aspectRatio: AspectRatio = '16:9',
+): VisualSeed {
   return {
-    palette: resolvedPalette ?? selectPalette(mood, numericSeed),
-    layoutStyle: pick(LAYOUT_STYLES, numericSeed),
-    motionRhythm: pick(MOTION_RHYTHMS, numericSeed + 1),
-    typographyMood: pick(TYPOGRAPHY_MOODS, numericSeed + 2),
-    sceneStructure: pick(SCENE_STRUCTURES, numericSeed + 3),
+    palette:            resolvedPalette ?? selectPalette(mood, numericSeed),
+    layoutStyle:        pick(LAYOUT_STYLES,    numericSeed),
+    motionRhythm:       pick(MOTION_RHYTHMS,   numericSeed + 1),
+    typographyMood:     pick(TYPOGRAPHY_MOODS, numericSeed + 2),
+    sceneStructure:     pick(SCENE_STRUCTURES, numericSeed + 3),
+    animationIntensity,
+    aspectRatio,
   };
 }
 
 // ─── Prompt Builder ───────────────────────────────────────────────────────────
 
 function buildPrompt(categoryInstructions: string, seed: VisualSeed): string {
-  const p = seed.palette;
+  const p   = seed.palette;
+  const dim = DIMENSIONS[seed.aspectRatio];
 
   return `
 You are an expert motion-graphics director. Return ONLY valid JSON — no markdown, no explanation.
@@ -90,8 +118,8 @@ SCHEMA:
     }
   ],
   "fps": 30,
-  "width": 1920,
-  "height": 1080
+  "width": ${dim.width},
+  "height": ${dim.height}
 }
 
 HARD RULES:
@@ -101,9 +129,13 @@ HARD RULES:
 - NO two consecutive scenes use the same backgroundColor.
 - You MUST use ONLY the exact hex colors listed in the Color Palette below.
 - Each scene's textColor MUST be the paired text color for that background (see pairs below).
+- Output width MUST be ${dim.width}, height MUST be ${dim.height}. Do not change these.
 
 ${categoryInstructions}
 
+═══ ANIMATION INTENSITY: ${seed.animationIntensity.toUpperCase()} ═══
+${ANIMATION_RULES[seed.animationIntensity]}
+${seed.animationIntensity === 'intense' ? '- Prefer shorter durations (2-3s). Make every frame count.\n' : ''}${seed.animationIntensity === 'subtle' ? '- Prefer longer durations (4-5s). Let content breathe.\n' : ''}
 ═══ COLOR PALETTE: ${p.name} ═══
 Use ONLY these exact hex values — no other colors allowed:
 
@@ -114,10 +146,12 @@ Scene backgrounds and their REQUIRED text color pairs:
   CTA scene:            bg="${p.bgCta}" textColor="${p.textOnCta}"
   Accent color (for subtext or highlights): "${p.accent}"
 
-Layout Style: ${seed.layoutStyle}
-Motion Rhythm: ${seed.motionRhythm}
-Typography Mood: ${seed.typographyMood}
-Scene Structure: ${seed.sceneStructure}
+═══ VISUAL DIRECTION ═══
+Layout Style:     ${seed.layoutStyle}
+Motion Rhythm:    ${seed.motionRhythm}
+Typography Mood:  ${seed.typographyMood}
+Scene Structure:  ${seed.sceneStructure}
+Aspect Ratio:     ${seed.aspectRatio} (${dim.width}×${dim.height})
 ═══════════════════════════════
 `;
 }
@@ -208,6 +242,5 @@ export function getCategoryTemplate(categoryId: string): CategoryTemplate {
   return CATEGORY_TEMPLATES[categoryId] ?? CATEGORY_TEMPLATES['default'];
 }
 
-// Re-export for use in prompt.service.ts
 export { getSceneColors };
 export type { ColorPalette };
