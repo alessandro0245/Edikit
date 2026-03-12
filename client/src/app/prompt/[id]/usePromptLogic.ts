@@ -1,8 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/auth";
 import toast from "react-hot-toast";
 import { useCredits } from "@/hooks/useCredits";
+import {
+  VideoSettings,
+  DEFAULT_SETTINGS,
+} from "@/components/VideoSettingsModal/VideoSettingsModal";
 
 export type ProgressStep = "idle" | "processing" | "complete" | "error";
 
@@ -23,9 +27,8 @@ export function usePromptLogic() {
   const categoryId = params.id as string;
 
   const [prompt, setPrompt] = useState("");
-  const [selectedPaletteId, setSelectedPaletteId] = useState<string | null>(
-    null,
-  );
+  const [settings, setSettings] = useState<VideoSettings>(DEFAULT_SETTINGS);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
   const [progress, setProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -120,7 +123,6 @@ export function usePromptLogic() {
         }
       };
 
-      // Set interval first so pollRef.current is valid inside poll()
       pollRef.current = setInterval(poll, POLL_INTERVAL);
       poll();
     },
@@ -129,7 +131,6 @@ export function usePromptLogic() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!isLoggedIn) {
       router.push("/login");
       return;
@@ -153,7 +154,17 @@ export function usePromptLogic() {
         {
           categoryId,
           prompt,
-          paletteId: selectedPaletteId ?? undefined, // ← NEW: undefined = AI picks
+          paletteId: settings.paletteId ?? undefined,
+          soundtrackMood:
+            settings.soundtrackMood !== "auto"
+              ? settings.soundtrackMood
+              : undefined,
+          animationIntensity:
+            settings.animationIntensity !== "dynamic"
+              ? settings.animationIntensity
+              : undefined,
+          aspectRatio:
+            settings.aspectRatio !== "16:9" ? settings.aspectRatio : undefined,
         },
         { withCredentials: true },
       );
@@ -180,7 +191,7 @@ export function usePromptLogic() {
     }
     hasCompletedRef.current = false;
     setPrompt("");
-    setSelectedPaletteId(null); // ← NEW: reset palette on new video
+    setSettings(DEFAULT_SETTINGS);
     setProgressStep("idle");
     setProgress(0);
     setJobId(null);
@@ -189,7 +200,7 @@ export function usePromptLogic() {
   };
 
   const handleDownload = async () => {
-    if (!jobId) return;
+    if (!jobId) return null;
     try {
       const { data } = await api.get(`/video/job/${jobId}/download`, {
         withCredentials: true,
@@ -208,8 +219,10 @@ export function usePromptLogic() {
     categoryId,
     prompt,
     setPrompt,
-    selectedPaletteId, // ← NEW
-    setSelectedPaletteId, // ← NEW
+    settings,
+    setSettings,
+    settingsOpen,
+    setSettingsOpen,
     progressStep,
     progress,
     sidebarOpen,

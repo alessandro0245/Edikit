@@ -17,6 +17,8 @@ import { RemotionLambdaService } from './remotion-lambda.service';
 export class VideoService {
   private readonly logger = new Logger(VideoService.name);
   private static readonly AI_VIDEO_CREDIT_COST = 5;
+  /** Deduplicates concurrent downloadAndStoreOutput calls for the same job */
+  private readonly downloadInProgress = new Map<string, Promise<string>>();
 
   constructor(
     private readonly promptService: PromptService,
@@ -27,7 +29,14 @@ export class VideoService {
   ) {}
 
   async generatePrompt(dto: GeneratePromptDto, userId: string) {
-    const { prompt, categoryId, paletteId } = dto; // ← destructure paletteId
+    const {
+      prompt,
+      categoryId,
+      paletteId,
+      soundtrackMood,
+      animationIntensity,
+      aspectRatio,
+    } = dto;
 
     const hasCredits = await this.creditsService.hasEnoughCredits(
       userId,
@@ -40,13 +49,16 @@ export class VideoService {
     }
 
     this.logger.log(
-      `Processing prompt for user ${userId}: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI picks'}`,
+      `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'}`,
     );
 
     const videoConfig = await this.promptService.processPrompt(
       prompt,
       categoryId,
-      paletteId, // ← pass it through
+      paletteId,
+      soundtrackMood,
+      animationIntensity,
+      aspectRatio,
     );
 
     const renderJob = await this.prisma.renderJob.create({
@@ -73,11 +85,7 @@ export class VideoService {
       );
     });
 
-    return {
-      jobId: renderJob.id,
-      status: renderJob.status,
-      videoConfig,
-    };
+    return { jobId: renderJob.id, status: renderJob.status, videoConfig };
   }
 
   private async triggerAsyncRender(
@@ -101,15 +109,10 @@ export class VideoService {
           result.outputPath,
           jobId,
         );
-
-        let presignedUrl = s3Key;
         const hasS3 = this.isS3Available();
-
-        if (hasS3) {
-          presignedUrl = await this.s3Service.generatePresignedUrl(s3Key);
-        } else {
-          presignedUrl = `/video/serve/${jobId}`;
-        }
+        const presignedUrl = hasS3
+          ? await this.s3Service.generatePresignedUrl(s3Key)
+          : `/video/serve/${jobId}`;
 
         await this.prisma.renderJob.update({
           where: { id: jobId },
@@ -119,7 +122,6 @@ export class VideoService {
             outputUrl: presignedUrl,
           },
         });
-
         this.logger.log(`Render completed locally: jobId=${jobId}`);
       } else {
         await this.prisma.renderJob.update({
@@ -130,7 +132,6 @@ export class VideoService {
             remotionBucketName: result.bucketName,
           },
         });
-
         this.logger.log(
           `Lambda render queued: jobId=${jobId}, renderId=${result.renderId}`,
         );
@@ -140,7 +141,6 @@ export class VideoService {
         `Render failed for job ${jobId}`,
         (error as Error).stack,
       );
-
       try {
         await this.creditsService.refundCredits(
           userId,
@@ -153,13 +153,9 @@ export class VideoService {
           (refundErr as Error).stack,
         );
       }
-
       await this.prisma.renderJob.update({
         where: { id: jobId },
-        data: {
-          status: 'FAILED',
-          error: (error as Error).message,
-        },
+        data: { status: 'FAILED', error: (error as Error).message },
       });
     }
   }
@@ -172,7 +168,6 @@ export class VideoService {
     const job = await this.prisma.renderJob.findUnique({
       where: { id: jobId },
     });
-
     if (!job) throw new NotFoundException('Render job not found');
     if (job.userId !== userId) throw new ForbiddenException('Access denied');
 
@@ -236,7 +231,7 @@ export class VideoService {
         }
 
         if (progress.done && progress.outputUrl) {
-          // Re-check DB to avoid duplicate downloads if two polls arrive simultaneously
+          // Re-check DB first (fast path: already completed by a previous poll)
           const freshJob = await this.prisma.renderJob.findUnique({
             where: { id: job.id },
             select: { status: true, outputUrl: true },
@@ -252,19 +247,28 @@ export class VideoService {
             };
           }
 
-          const s3Key = await this.remotionLambdaService.downloadAndStoreOutput(
-            progress.outputUrl,
-            job.id,
-          );
-          const presignedUrl = await this.s3Service.generatePresignedUrl(s3Key);
-          await this.prisma.renderJob.update({
-            where: { id: job.id },
-            data: {
-              status: 'COMPLETED',
-              s3OutputKey: s3Key,
-              outputUrl: presignedUrl,
-            },
-          });
+          // Dedup: reuse an in-flight download promise if one already exists
+          if (!this.downloadInProgress.has(job.id)) {
+            const dlPromise = this.remotionLambdaService
+              .downloadAndStoreOutput(progress.outputUrl, job.id)
+              .then(async (s3Key) => {
+                const presignedUrl =
+                  await this.s3Service.generatePresignedUrl(s3Key);
+                await this.prisma.renderJob.update({
+                  where: { id: job.id },
+                  data: {
+                    status: 'COMPLETED',
+                    s3OutputKey: s3Key,
+                    outputUrl: presignedUrl,
+                  },
+                });
+                return presignedUrl;
+              })
+              .finally(() => this.downloadInProgress.delete(job.id));
+            this.downloadInProgress.set(job.id, dlPromise);
+          }
+
+          const presignedUrl = await this.downloadInProgress.get(job.id)!;
           return {
             jobId: job.id,
             status: 'COMPLETED' as RenderStatus,

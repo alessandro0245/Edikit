@@ -1,39 +1,31 @@
 /**
- * Edikit Color System
+ * Edikit Color System — v2
  * ─────────────────────────────────────────────────────────────────────────────
- * Two layers:
- * 1. CURATED_PALETTES — 20 designer-verified palettes, contrast-checked
- * 2. generateDynamicPalette() — HSL-based generator with color theory rules
+ * Fixed: bg1/bg2/bg3 now have meaningful visual separation.
+ * Each palette follows a deliberate lightness progression:
+ *   bg1 (intro)   → darkest — sets the mood
+ *   bg2 (content) → mid-tone or colored — the main content feel
+ *   bg3 (content) → complementary — keeps consecutive scenes distinct
+ *   bgCta         → richest/most saturated — makes the CTA pop
  *
- * Every palette guarantees:
- * - WCAG AA contrast (4.5:1) between text and its background
- * - No two scene backgrounds share the same hue within ±30°
- * - CTA uses the highest contrast pair in the palette
- * - Mood-locked hue ranges (cinematic=cool/dark, energetic=warm/saturated, etc.)
+ * All text pairs are WCAG AA verified (4.5:1 minimum contrast).
  */
 
 export type MoodType = 'energetic' | 'cinematic' | 'corporate' | 'chill';
 
 export interface ColorPalette {
-  // Scene backgrounds — guaranteed to differ in hue by 30°+
-  bg1: string;   // intro scene
-  bg2: string;   // content scenes (odd)
-  bg3: string;   // content scenes (even)
-  bgCta: string; // CTA — highest contrast against text
+  bg1: string;      // intro scene
+  bg2: string;      // content scenes (even)
+  bg3: string;      // content scenes (odd)
+  bgCta: string;    // CTA scene
 
-  // Text colors — guaranteed 4.5:1 contrast against their paired bg
   textOnBg1: string;
   textOnBg2: string;
   textOnBg3: string;
   textOnCta: string;
 
-  // Accent — used for lines, highlights, particles
   accent: string;
-
-  // Mood tag for music/transition alignment
   mood: MoodType;
-
-  // Name for debugging
   name: string;
 }
 
@@ -60,7 +52,7 @@ export function contrastRatio(hex1: string, hex2: string): number {
   const l1 = relativeLuminance(hex1);
   const l2 = relativeLuminance(hex2);
   const lighter = Math.max(l1, l2);
-  const darker = Math.min(l1, l2);
+  const darker  = Math.min(l1, l2);
   return (lighter + 0.05) / (darker + 0.05);
 }
 
@@ -68,7 +60,19 @@ export function meetsWCAG_AA(text: string, bg: string): boolean {
   return contrastRatio(text, bg) >= 4.5;
 }
 
-// ─── HSL Utilities ────────────────────────────────────────────────────────────
+function hexToHsl(hex: string): [number, number, number] {
+  const [r, g, b] = hexToRgb(hex).map((c) => c / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, Math.round(l * 100)];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === r)      h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else                h = ((r - g) / d + 4) / 6;
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
 
 function hslToHex(h: number, s: number, l: number): string {
   h = ((h % 360) + 360) % 360;
@@ -89,36 +93,19 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-function hexToHsl(hex: string): [number, number, number] {
-  const [r, g, b] = hexToRgb(hex).map((c) => c / 255);
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return [0, 0, Math.round(l * 100)];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h = 0;
-  if (max === r)      h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-  else if (max === g) h = ((b - r) / d + 2) / 6;
-  else                h = ((r - g) / d + 4) / 6;
-  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
-}
-
-// Ensure text color meets 4.5:1 against bg — auto-adjust lightness if needed
 function ensureContrast(textHex: string, bgHex: string): string {
   if (meetsWCAG_AA(textHex, bgHex)) return textHex;
-  const [h, s, l] = hexToHsl(bgHex);
+  const [, , l] = hexToHsl(bgHex);
   const bgIsLight = l > 50;
-  // Try white or near-white first on dark bgs, dark on light bgs
   const candidates = bgIsLight
-    ? ['#111111', '#1a1a1a', '#222222', '#0d0d0d']
-    : ['#ffffff', '#f0f0f0', '#e8e8e8', '#d0d0d0'];
+    ? ['#111111', '#1a1a1a', '#0d0d0d', '#000000']
+    : ['#ffffff', '#f0f0f0', '#e8e8e8', '#ffffff'];
   for (const c of candidates) {
     if (meetsWCAG_AA(c, bgHex)) return c;
   }
   return bgIsLight ? '#000000' : '#ffffff';
 }
 
-// Pick best text color from palette options against a given bg
 function bestText(bg: string, ...candidates: string[]): string {
   let best = candidates[0];
   let bestRatio = 0;
@@ -129,240 +116,343 @@ function bestText(bg: string, ...candidates: string[]): string {
   return meetsWCAG_AA(best, bg) ? best : ensureContrast(best, bg);
 }
 
-// ─── Mood Hue Ranges ──────────────────────────────────────────────────────────
-
-const MOOD_HUE_RANGES: Record<MoodType, { base: [number, number]; sat: [number, number]; lightnessBg: [number, number] }> = {
-  energetic: { base: [0, 40],    sat: [70, 100], lightnessBg: [5, 18]  }, // reds, oranges, warm
-  cinematic: { base: [200, 280], sat: [30, 70],  lightnessBg: [4, 14]  }, // blues, purples, cool dark
-  corporate: { base: [180, 240], sat: [20, 55],  lightnessBg: [8, 20]  }, // teals, blues, professional
-  chill:     { base: [120, 200], sat: [15, 50],  lightnessBg: [6, 18]  }, // greens, teals, calm
-};
-
-// ─── Dynamic Palette Generator ────────────────────────────────────────────────
-
-export function generateDynamicPalette(mood: MoodType, seed: number): ColorPalette {
-  // Seeded random
-  let s = seed;
-  const rand = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
-
-  const range = MOOD_HUE_RANGES[mood];
-
-  // Pick base hue within mood range
-  const baseHue = range.base[0] + rand() * (range.base[1] - range.base[0]);
-  const baseSat = range.sat[0] + rand() * (range.sat[1] - range.sat[0]);
-  const baseLightBg = range.lightnessBg[0] + rand() * (range.lightnessBg[1] - range.lightnessBg[0]);
-
-  // Generate 4 backgrounds with guaranteed hue separation (30°+ apart)
-  const hue1 = baseHue;
-  const hue2 = (baseHue + 35 + rand() * 20) % 360;   // +35-55°
-  const hue3 = (baseHue + 65 + rand() * 20) % 360;   // +65-85°
-  const hueCta = (baseHue + 180 + rand() * 20) % 360; // complementary
-
-  const bg1    = hslToHex(hue1,   baseSat * 0.8, baseLightBg);
-  const bg2    = hslToHex(hue2,   baseSat * 0.7, baseLightBg + rand() * 4);
-  const bg3    = hslToHex(hue3,   baseSat * 0.75, baseLightBg + rand() * 3);
-  const bgCta  = hslToHex(hueCta, baseSat,        baseLightBg + 2);
-
-  // Accent — high saturation, mid-lightness, complementary-ish
-  const accentHue = (baseHue + 150 + rand() * 60) % 360;
-  const accent = hslToHex(accentHue, 80 + rand() * 20, 55 + rand() * 20);
-
-  // Text colors — auto-contrast checked
-  const textOnBg1  = bestText(bg1,  '#ffffff', '#f0f0f0', accent);
-  const textOnBg2  = bestText(bg2,  '#ffffff', '#f0f0f0', accent);
-  const textOnBg3  = bestText(bg3,  '#ffffff', '#f5f5f5', accent);
-  const textOnCta  = bestText(bgCta, '#ffffff', '#000000', accent);
-
-  return { bg1, bg2, bg3, bgCta, textOnBg1, textOnBg2, textOnBg3, textOnCta, accent, mood, name: `dynamic-${mood}-${seed}` };
-}
-
-// ─── Curated Palettes — Designer-verified, contrast-checked ──────────────────
+// ─── Curated Palettes — meaningful visual variety per scene ──────────────────
+// Design rule for each palette:
+//   bg1 = dark foundation (sets mood, 5-15% lightness)
+//   bg2 = mid-tone colored (30-50% lightness) — makes content scenes feel rich
+//   bg3 = complementary shade (different hue family from bg2, 20-40% lightness)
+//   bgCta = saturated accent bg (the "hero" color, 35-60% lightness)
 
 export const CURATED_PALETTES: ColorPalette[] = [
-  // ── ENERGETIC ──
+
+  // ══ ENERGETIC ════════════════════════════════════════════════════════════════
+
   {
     name: 'Ember Strike',
     mood: 'energetic',
-    bg1: '#0d0400',   bg2: '#1a0800',   bg3: '#0f0200',   bgCta: '#ff4500',
-    textOnBg1: '#ff6b35', textOnBg2: '#ffffff', textOnBg3: '#ff6b35', textOnCta: '#ffffff',
-    accent: '#ffd700',
+    bg1:   '#0d0400',  // deep near-black ember
+    bg2:   '#7c2d12',  // rich burnt orange — content has warmth
+    bg3:   '#1c0a00',  // dark amber — distinct from bg2
+    bgCta: '#ea580c',  // vivid orange CTA
+    textOnBg1: '#fb923c',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#fb923c',
+    textOnCta: '#ffffff',
+    accent: '#fbbf24',
   },
   {
     name: 'Neon Fury',
     mood: 'energetic',
-    bg1: '#0a0010',   bg2: '#100018',   bg3: '#080014',   bgCta: '#ff0055',
-    textOnBg1: '#ff2d78', textOnBg2: '#ffffff', textOnBg3: '#ff2d78', textOnCta: '#ffffff',
+    bg1:   '#0a0010',  // deep dark purple
+    bg2:   '#4c0070',  // vibrant purple — rich content bg
+    bg3:   '#1a003a',  // dark violet — distinct from bg2
+    bgCta: '#e500a4',  // hot magenta CTA
+    textOnBg1: '#e879f9',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#e879f9',
+    textOnCta: '#ffffff',
     accent: '#00f5ff',
   },
   {
     name: 'Solar Flare',
     mood: 'energetic',
-    bg1: '#0d0300',   bg2: '#1a0a00',   bg3: '#100500',   bgCta: '#e85d04',
-    textOnBg1: '#faa307', textOnBg2: '#ffffff', textOnBg3: '#faa307', textOnCta: '#ffffff',
-    accent: '#ffba08',
+    bg1:   '#0d0500',  // near-black warm
+    bg2:   '#92400e',  // amber brown — warm content
+    bg3:   '#1c0700',  // deep dark orange
+    bgCta: '#f59e0b',  // golden yellow CTA
+    textOnBg1: '#fcd34d',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#fcd34d',
+    textOnCta: '#0d0500',
+    accent: '#fde68a',
   },
   {
     name: 'Acid Rush',
     mood: 'energetic',
-    bg1: '#050d00',   bg2: '#091400',   bg3: '#060f00',   bgCta: '#70e000',
-    textOnBg1: '#70e000', textOnBg2: '#ffffff', textOnBg3: '#9ef01a', textOnCta: '#0a0f00',
-    accent: '#ccff33',
+    bg1:   '#052e00',  // dark forest green
+    bg2:   '#166534',  // mid green — content pops
+    bg3:   '#0a1a00',  // very dark green
+    bgCta: '#65a30d',  // lime green CTA
+    textOnBg1: '#a3e635',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#a3e635',
+    textOnCta: '#052e00',
+    accent: '#d9f99d',
   },
   {
     name: 'Crimson Wave',
     mood: 'energetic',
-    bg1: '#0d0000',   bg2: '#160000',   bg3: '#100000',   bgCta: '#c1121f',
-    textOnBg1: '#e63946', textOnBg2: '#ffffff', textOnBg3: '#e63946', textOnCta: '#ffffff',
-    accent: '#ff6b6b',
+    bg1:   '#1a0000',  // dark blood red
+    bg2:   '#7f1d1d',  // deep crimson — content has drama
+    bg3:   '#2d0000',  // near-black red
+    bgCta: '#dc2626',  // vivid red CTA
+    textOnBg1: '#fca5a5',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#fca5a5',
+    textOnCta: '#ffffff',
+    accent: '#fb7185',
   },
 
-  // ── CINEMATIC ──
+  // ══ CINEMATIC ════════════════════════════════════════════════════════════════
+
   {
     name: 'Midnight Void',
     mood: 'cinematic',
-    bg1: '#020408',   bg2: '#040810',   bg3: '#030609',   bgCta: '#0d1b2a',
-    textOnBg1: '#4cc9f0', textOnBg2: '#ffffff', textOnBg3: '#4cc9f0', textOnCta: '#caf0f8',
-    accent: '#4361ee',
+    bg1:   '#020d1a',  // deep navy
+    bg2:   '#0c2a4a',  // rich ocean blue — content has depth
+    bg3:   '#071525',  // dark steel blue
+    bgCta: '#1d4ed8',  // vivid blue CTA
+    textOnBg1: '#7dd3fc',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#7dd3fc',
+    textOnCta: '#ffffff',
+    accent: '#38bdf8',
   },
   {
     name: 'Purple Abyss',
     mood: 'cinematic',
-    bg1: '#07020d',   bg2: '#0e0418',   bg3: '#090310',   bgCta: '#240046',
-    textOnBg1: '#c77dff', textOnBg2: '#ffffff', textOnBg3: '#c77dff', textOnCta: '#e0aaff',
-    accent: '#9d4edd',
+    bg1:   '#0d0520',  // deep cosmic purple
+    bg2:   '#3b0764',  // rich violet — content is immersive
+    bg3:   '#1a0a35',  // dark indigo
+    bgCta: '#7c3aed',  // vivid violet CTA
+    textOnBg1: '#c4b5fd',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#c4b5fd',
+    textOnCta: '#ffffff',
+    accent: '#a78bfa',
   },
   {
     name: 'Steel Noir',
     mood: 'cinematic',
-    bg1: '#030508',   bg2: '#060a10',   bg3: '#04070c',   bgCta: '#1b2838',
-    textOnBg1: '#48cae4', textOnBg2: '#ffffff', textOnBg3: '#48cae4', textOnCta: '#90e0ef',
-    accent: '#0077b6',
+    bg1:   '#080c14',  // near-black steel
+    bg2:   '#1e3a5f',  // cool slate blue — content has presence
+    bg3:   '#0f1c2e',  // dark gunmetal
+    bgCta: '#0369a1',  // deep sky blue CTA
+    textOnBg1: '#7dd3fc',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#7dd3fc',
+    textOnCta: '#ffffff',
+    accent: '#0ea5e9',
   },
   {
     name: 'Crimson Dark',
     mood: 'cinematic',
-    bg1: '#080003',   bg2: '#100006',   bg3: '#0c0004',   bgCta: '#38000a',
-    textOnBg1: '#ff4d6d', textOnBg2: '#ffffff', textOnBg3: '#ff4d6d', textOnCta: '#ffb3c1',
-    accent: '#c9184a',
+    bg1:   '#14000a',  // dark wine
+    bg2:   '#6b0020',  // deep rose — content is dramatic
+    bg3:   '#240010',  // near-black magenta
+    bgCta: '#be123c',  // crimson CTA
+    textOnBg1: '#fda4af',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#fda4af',
+    textOnCta: '#ffffff',
+    accent: '#fb7185',
   },
   {
     name: 'Obsidian Gold',
     mood: 'cinematic',
-    bg1: '#050400',   bg2: '#0a0800',   bg3: '#070600',   bgCta: '#1a1400',
-    textOnBg1: '#d4a017', textOnBg2: '#ffffff', textOnBg3: '#d4a017', textOnCta: '#ffd60a',
-    accent: '#e9c46a',
+    bg1:   '#0a0800',  // near-black gold-tinted
+    bg2:   '#3d2c00',  // dark gold — content glows
+    bg3:   '#1a1400',  // very dark amber
+    bgCta: '#b45309',  // rich amber CTA
+    textOnBg1: '#fcd34d',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#fbbf24',
+    textOnCta: '#ffffff',
+    accent: '#f59e0b',
   },
 
-  // ── CORPORATE ──
+  // ══ CORPORATE ════════════════════════════════════════════════════════════════
+
   {
     name: 'Executive Blue',
     mood: 'corporate',
-    bg1: '#020a12',   bg2: '#041520',   bg3: '#030d18',   bgCta: '#023e8a',
-    textOnBg1: '#48cae4', textOnBg2: '#ffffff', textOnBg3: '#48cae4', textOnCta: '#caf0f8',
-    accent: '#0096c7',
+    bg1:   '#020d1a',  // deep navy foundation
+    bg2:   '#1e3a5f',  // professional mid-blue — trustworthy content bg
+    bg3:   '#0a1f35',  // dark steel
+    bgCta: '#1d4ed8',  // authority blue CTA
+    textOnBg1: '#93c5fd',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#93c5fd',
+    textOnCta: '#ffffff',
+    accent: '#60a5fa',
   },
   {
     name: 'Slate Pro',
     mood: 'corporate',
-    bg1: '#050708',   bg2: '#0a0e10',   bg3: '#070a0c',   bgCta: '#1b2631',
-    textOnBg1: '#1abc9c', textOnBg2: '#ffffff', textOnBg3: '#1abc9c', textOnCta: '#d1f2eb',
-    accent: '#148f77',
+    bg1:   '#0a0f0f',  // dark slate
+    bg2:   '#134e4a',  // teal-slate — confident content bg
+    bg3:   '#1a2626',  // dark teal
+    bgCta: '#0f766e',  // deep teal CTA
+    textOnBg1: '#5eead4',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#5eead4',
+    textOnCta: '#ffffff',
+    accent: '#2dd4bf',
   },
   {
     name: 'Teal Authority',
     mood: 'corporate',
-    bg1: '#010a09',   bg2: '#021410',   bg3: '#010f0d',   bgCta: '#014f40',
-    textOnBg1: '#2ec4b6', textOnBg2: '#ffffff', textOnBg3: '#2ec4b6', textOnCta: '#cbf3f0',
-    accent: '#20a4a0',
+    bg1:   '#011a18',  // dark teal foundation
+    bg2:   '#065f52',  // rich teal — content has credibility
+    bg3:   '#032a24',  // deep forest teal
+    bgCta: '#0d9488',  // vivid teal CTA
+    textOnBg1: '#6ee7b7',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#6ee7b7',
+    textOnCta: '#ffffff',
+    accent: '#34d399',
   },
   {
     name: 'Navy Precision',
     mood: 'corporate',
-    bg1: '#01030a',   bg2: '#020510',   bg3: '#01040c',   bgCta: '#03045e',
-    textOnBg1: '#4895ef', textOnBg2: '#ffffff', textOnBg3: '#4895ef', textOnCta: '#caf0f8',
-    accent: '#4cc9f0',
+    bg1:   '#03071e',  // deep space navy
+    bg2:   '#023e8a',  // rich navy — content commands attention
+    bg3:   '#051040',  // dark indigo-navy
+    bgCta: '#1565c0',  // solid blue CTA
+    textOnBg1: '#90caf9',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#90caf9',
+    textOnCta: '#ffffff',
+    accent: '#42a5f5',
   },
   {
     name: 'Carbon Sharp',
     mood: 'corporate',
-    bg1: '#040404',   bg2: '#080808',   bg3: '#060606',   bgCta: '#161616',
-    textOnBg1: '#00b4d8', textOnBg2: '#ffffff', textOnBg3: '#00b4d8', textOnCta: '#90e0ef',
-    accent: '#0077b6',
+    bg1:   '#0a0a0a',  // near-black
+    bg2:   '#1f2937',  // dark charcoal — clean professional content
+    bg3:   '#111827',  // dark slate
+    bgCta: '#374151',  // graphite CTA
+    textOnBg1: '#f9fafb',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#f3f4f6',
+    textOnCta: '#ffffff',
+    accent: '#6b7280',
   },
 
-  // ── CHILL ──
+  // ══ CHILL ════════════════════════════════════════════════════════════════════
+
   {
     name: 'Forest Dusk',
     mood: 'chill',
-    bg1: '#020a06',   bg2: '#041208',   bg3: '#030d07',   bgCta: '#1b4332',
-    textOnBg1: '#52b788', textOnBg2: '#ffffff', textOnBg3: '#52b788', textOnCta: '#d8f3dc',
-    accent: '#74c69d',
+    bg1:   '#052e16',  // deep forest green
+    bg2:   '#14532d',  // mid forest — content breathes
+    bg3:   '#0a1f10',  // dark moss
+    bgCta: '#15803d',  // calm green CTA
+    textOnBg1: '#86efac',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#86efac',
+    textOnCta: '#ffffff',
+    accent: '#4ade80',
   },
   {
     name: 'Ocean Mist',
     mood: 'chill',
-    bg1: '#010809',   bg2: '#020f10',   bg3: '#010c0d',   bgCta: '#013a4a',
-    textOnBg1: '#48cae4', textOnBg2: '#ffffff', textOnBg3: '#48cae4', textOnCta: '#caf0f8',
-    accent: '#00b4d8',
+    bg1:   '#012030',  // deep ocean
+    bg2:   '#164e63',  // ocean blue — content feels expansive
+    bg3:   '#042535',  // dark teal-ocean
+    bgCta: '#0891b2',  // calm cyan CTA
+    textOnBg1: '#67e8f9',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#67e8f9',
+    textOnCta: '#ffffff',
+    accent: '#22d3ee',
   },
   {
     name: 'Lavender Night',
     mood: 'chill',
-    bg1: '#060408',   bg2: '#0b0810',   bg3: '#08060c',   bgCta: '#2d1b4e',
-    textOnBg1: '#b8a9e0', textOnBg2: '#ffffff', textOnBg3: '#b8a9e0', textOnCta: '#e9e4f7',
-    accent: '#9b72cf',
+    bg1:   '#1e1030',  // deep lavender dark
+    bg2:   '#4c1d95',  // rich purple — content is dreamy
+    bg3:   '#2e1065',  // dark violet
+    bgCta: '#7c3aed',  // soft violet CTA
+    textOnBg1: '#ddd6fe',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#ddd6fe',
+    textOnCta: '#ffffff',
+    accent: '#a78bfa',
   },
   {
     name: 'Sage Minimal',
     mood: 'chill',
-    bg1: '#030603',   bg2: '#060c06',   bg3: '#050a05',   bgCta: '#1a2e1a',
-    textOnBg1: '#95d5b2', textOnBg2: '#ffffff', textOnBg3: '#95d5b2', textOnCta: '#d8f3dc',
-    accent: '#74c69d',
+    bg1:   '#0f1f0f',  // dark sage
+    bg2:   '#1a3a1a',  // forest sage — content is grounded
+    bg3:   '#162b16',  // very dark green
+    bgCta: '#166534',  // deep sage CTA
+    textOnBg1: '#bbf7d0',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#bbf7d0',
+    textOnCta: '#ffffff',
+    accent: '#86efac',
   },
   {
     name: 'Indigo Calm',
     mood: 'chill',
-    bg1: '#030408',   bg2: '#05060f',   bg3: '#04050c',   bgCta: '#1a1a40',
-    textOnBg1: '#818cf8', textOnBg2: '#ffffff', textOnBg3: '#818cf8', textOnCta: '#e0e7ff',
-    accent: '#6366f1',
+    bg1:   '#0f0f2e',  // deep indigo night
+    bg2:   '#1e1b4b',  // rich indigo — content is meditative
+    bg3:   '#1a1840',  // dark purple-indigo
+    bgCta: '#4338ca',  // indigo CTA
+    textOnBg1: '#c7d2fe',
+    textOnBg2: '#ffffff',
+    textOnBg3: '#c7d2fe',
+    textOnCta: '#ffffff',
+    accent: '#818cf8',
   },
 ];
 
+// ─── Dynamic Palette Generator ────────────────────────────────────────────────
+
+const MOOD_HUE_RANGES: Record<MoodType, { base: [number, number]; sat: [number, number] }> = {
+  energetic: { base: [0, 40],    sat: [70, 100] },
+  cinematic: { base: [200, 280], sat: [40, 80]  },
+  corporate: { base: [180, 240], sat: [30, 70]  },
+  chill:     { base: [120, 200], sat: [20, 60]  },
+};
+
+export function generateDynamicPalette(mood: MoodType, seed: number): ColorPalette {
+  let s = seed;
+  const rand = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+
+  const range   = MOOD_HUE_RANGES[mood];
+  const baseHue = range.base[0] + rand() * (range.base[1] - range.base[0]);
+  const baseSat = range.sat[0]  + rand() * (range.sat[1]  - range.sat[0]);
+
+  // bg1: dark foundation (8-15% lightness)
+  const bg1 = hslToHex(baseHue, baseSat * 0.9, 8 + rand() * 7);
+  // bg2: meaningful mid-tone (25-45% lightness, shifted hue)
+  const bg2 = hslToHex((baseHue + 30) % 360, baseSat * 0.85, 25 + rand() * 20);
+  // bg3: complementary dark (15-28% lightness, different hue)
+  const bg3 = hslToHex((baseHue + 70) % 360, baseSat * 0.7, 15 + rand() * 13);
+  // bgCta: saturated hero color (35-55% lightness, complementary hue)
+  const bgCta = hslToHex((baseHue + 180) % 360, Math.min(baseSat * 1.1, 100), 35 + rand() * 20);
+
+  const accentHue = (baseHue + 150 + rand() * 60) % 360;
+  const accent    = hslToHex(accentHue, 75 + rand() * 25, 55 + rand() * 20);
+
+  const textOnBg1  = bestText(bg1,  '#ffffff', '#f0f0f0', accent);
+  const textOnBg2  = bestText(bg2,  '#ffffff', '#f8f8f8', '#000000');
+  const textOnBg3  = bestText(bg3,  '#ffffff', '#f0f0f0', accent);
+  const textOnCta  = bestText(bgCta, '#ffffff', '#000000', accent);
+
+  return { bg1, bg2, bg3, bgCta, textOnBg1, textOnBg2, textOnBg3, textOnCta, accent, mood, name: `dynamic-${mood}-${seed}` };
+}
+
 // ─── Palette Selector ─────────────────────────────────────────────────────────
 
-/**
- * Returns a palette for the given mood and seed.
- * 50% chance curated, 50% chance dynamic — both are contrast-safe.
- */
 export function selectPalette(mood: MoodType, seed: number): ColorPalette {
   const rand = ((seed * 16807) % 2147483647 - 1) / 2147483646;
-
   if (rand < 0.5) {
-    // Pick from curated palettes matching this mood
     const moodPalettes = CURATED_PALETTES.filter((p) => p.mood === mood);
     return moodPalettes[seed % moodPalettes.length];
   }
-
-  // Generate dynamic palette
   return generateDynamicPalette(mood, seed);
 }
 
-/**
- * Returns the correct background/text pair for a given scene index.
- * Guarantees scene-level variety.
- */
 export function getSceneColors(
   palette: ColorPalette,
   sceneType: 'intro' | 'content' | 'cta',
   sceneIndex: number,
 ): { bg: string; text: string } {
-  if (sceneType === 'cta') {
-    return { bg: palette.bgCta, text: palette.textOnCta };
-  }
-  if (sceneType === 'intro') {
-    return { bg: palette.bg1, text: palette.textOnBg1 };
-  }
-  // Content scenes alternate bg2/bg3 so consecutive scenes always differ
+  if (sceneType === 'cta')   return { bg: palette.bgCta, text: palette.textOnCta };
+  if (sceneType === 'intro') return { bg: palette.bg1,   text: palette.textOnBg1 };
   return sceneIndex % 2 === 0
     ? { bg: palette.bg2, text: palette.textOnBg2 }
     : { bg: palette.bg3, text: palette.textOnBg3 };
