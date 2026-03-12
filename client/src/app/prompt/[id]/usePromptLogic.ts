@@ -15,7 +15,7 @@ export interface JobStatus {
   videoConfig: Record<string, unknown> | null;
 }
 
-const POLL_INTERVAL = 3000;
+const POLL_INTERVAL = 2000;
 
 export function usePromptLogic() {
   const params = useParams();
@@ -23,7 +23,9 @@ export function usePromptLogic() {
   const categoryId = params.id as string;
 
   const [prompt, setPrompt] = useState("");
-  const [selectedPaletteId, setSelectedPaletteId] = useState<string | null>(null); // ← NEW: null = Surprise Me
+  const [selectedPaletteId, setSelectedPaletteId] = useState<string | null>(
+    null,
+  );
   const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
   const [progress, setProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,6 +37,7 @@ export function usePromptLogic() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasCompletedRef = useRef(false);
   const { canRender, refreshCredits } = useCredits();
 
   const steps = [
@@ -70,8 +73,10 @@ export function usePromptLogic() {
   const startPolling = useCallback(
     (id: string) => {
       if (pollRef.current) clearInterval(pollRef.current);
+      hasCompletedRef.current = false;
 
       const poll = async () => {
+        if (hasCompletedRef.current) return;
         try {
           const { data } = await api.get<JobStatus>(`/video/job/${id}`, {
             withCredentials: true,
@@ -85,19 +90,29 @@ export function usePromptLogic() {
               setProgress(15 + data.progress * 70);
               break;
             case "COMPLETED":
-              setProgress(100);
-              setOutputUrl(data.outputUrl);
-              setProgressStep("complete");
-              refreshCredits();
-              if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-              toast.success("Video generated successfully!");
+              if (!hasCompletedRef.current) {
+                hasCompletedRef.current = true;
+                clearInterval(pollRef.current!);
+                pollRef.current = null;
+                setProgress(100);
+                setOutputUrl(data.outputUrl);
+                setProgressStep("complete");
+                refreshCredits();
+                toast.success("Video generated successfully!");
+              }
               break;
             case "FAILED":
-              setProgressStep("error");
-              setErrorMessage(data.error || "Video generation failed. Credits refunded.");
-              refreshCredits();
-              if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-              toast.error(data.error || "Video generation failed");
+              if (!hasCompletedRef.current) {
+                hasCompletedRef.current = true;
+                clearInterval(pollRef.current!);
+                pollRef.current = null;
+                setProgressStep("error");
+                setErrorMessage(
+                  data.error || "Video generation failed. Credits refunded.",
+                );
+                refreshCredits();
+                toast.error(data.error || "Video generation failed");
+              }
               break;
           }
         } catch (err) {
@@ -105,8 +120,9 @@ export function usePromptLogic() {
         }
       };
 
-      poll();
+      // Set interval first so pollRef.current is valid inside poll()
       pollRef.current = setInterval(poll, POLL_INTERVAL);
+      poll();
     },
     [refreshCredits],
   );
@@ -114,7 +130,10 @@ export function usePromptLogic() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isLoggedIn) { router.push("/login"); return; }
+    if (!isLoggedIn) {
+      router.push("/login");
+      return;
+    }
     if (!prompt.trim()) return;
     if (canRender === false) {
       toast.error("Insufficient credits. Please purchase more.");
@@ -144,7 +163,9 @@ export function usePromptLogic() {
       startPolling(data.jobId);
     } catch (err: any) {
       setProgressStep("error");
-      const message = err?.response?.data?.message || "Something went wrong. Please try again.";
+      const message =
+        err?.response?.data?.message ||
+        "Something went wrong. Please try again.";
       setErrorMessage(message);
       toast.error(message);
     } finally {
@@ -153,7 +174,11 @@ export function usePromptLogic() {
   };
 
   const handleReset = () => {
-    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    hasCompletedRef.current = false;
     setPrompt("");
     setSelectedPaletteId(null); // ← NEW: reset palette on new video
     setProgressStep("idle");
@@ -166,8 +191,13 @@ export function usePromptLogic() {
   const handleDownload = async () => {
     if (!jobId) return;
     try {
-      const { data } = await api.get(`/video/job/${jobId}/download`, { withCredentials: true });
-      if (data.downloadUrl) { setOutputUrl(data.downloadUrl); return data.downloadUrl as string; }
+      const { data } = await api.get(`/video/job/${jobId}/download`, {
+        withCredentials: true,
+      });
+      if (data.downloadUrl) {
+        setOutputUrl(data.downloadUrl);
+        return data.downloadUrl as string;
+      }
     } catch {
       toast.error("Failed to get download link. Please try again.");
     }
@@ -178,8 +208,8 @@ export function usePromptLogic() {
     categoryId,
     prompt,
     setPrompt,
-    selectedPaletteId,        // ← NEW
-    setSelectedPaletteId,     // ← NEW
+    selectedPaletteId, // ← NEW
+    setSelectedPaletteId, // ← NEW
     progressStep,
     progress,
     sidebarOpen,
