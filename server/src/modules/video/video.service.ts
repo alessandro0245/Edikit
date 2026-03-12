@@ -236,6 +236,22 @@ export class VideoService {
         }
 
         if (progress.done && progress.outputUrl) {
+          // Re-check DB to avoid duplicate downloads if two polls arrive simultaneously
+          const freshJob = await this.prisma.renderJob.findUnique({
+            where: { id: job.id },
+            select: { status: true, outputUrl: true },
+          });
+          if (freshJob?.status === 'COMPLETED') {
+            return {
+              jobId: job.id,
+              status: 'COMPLETED' as RenderStatus,
+              progress: 1,
+              outputUrl: freshJob.outputUrl,
+              error: null,
+              videoConfig: job.aiConfig,
+            };
+          }
+
           const s3Key = await this.remotionLambdaService.downloadAndStoreOutput(
             progress.outputUrl,
             job.id,
