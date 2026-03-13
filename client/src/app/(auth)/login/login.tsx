@@ -99,7 +99,7 @@ const Login = () => {
             {/* Header */}
             <div className="text-center space-y-5 mb-8">
               <div className="w-30 h-12 rounded-lg flex items-center justify-center mx-auto">
-                <Image src="/Logo.svg" alt="Logo" width={120} height={50} />
+                <Image src="/Logo.png" alt="Logo" width={120} height={50} />
               </div>
               <h1 className="text-2xl font-bold text-foreground">
                 Welcome back
