@@ -12,6 +12,9 @@ interface VideoDownloadButtonProps {
   size?: "sm" | "md" | "lg";
   className?: string;
   showLabel?: boolean;
+  onError?: (error: string) => void;
+  tooltip?: string;
+  disabled?: boolean;
 }
 
 export default function VideoDownloadButton({
@@ -21,6 +24,9 @@ export default function VideoDownloadButton({
   size = "md",
   className = "",
   showLabel = true,
+  onError,
+  tooltip,
+  disabled = false,
 }: VideoDownloadButtonProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -38,6 +44,7 @@ export default function VideoDownloadButton({
         },
         onError: (error) => {
           showErrorToast(error);
+          onError?.(error);
         },
       });
     } catch (error) {
@@ -74,7 +81,8 @@ export default function VideoDownloadButton({
     <div className="space-y-3">
       <button
         onClick={handleDownload}
-        disabled={isDownloading}
+        disabled={isDownloading || disabled}
+        title={tooltip}
         className={`inline-flex items-center justify-center rounded-lg font-medium transition-all disabled:opacity-60 disabled:cursor-not-allowed ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
       >
         {isDownloading ? (
