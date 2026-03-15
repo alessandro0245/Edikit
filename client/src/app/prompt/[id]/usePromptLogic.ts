@@ -3,50 +3,50 @@ import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/auth";
 import toast from "react-hot-toast";
 import { useCredits } from "@/hooks/useCredits";
-import {
-  VideoSettings,
-  DEFAULT_SETTINGS,
-} from "@/components/VideoSettingsModal/VideoSettingsModal";
+import { VideoSettings, DEFAULT_SETTINGS } from "@/components/VideoSettingsModal/VideoSettingsModal";
+import type { UploadedAssets } from "@/components/Home/AssetUploadStep";
 
 export type ProgressStep = "idle" | "processing" | "complete" | "error";
+export type PageStep     = "assets" | "prompt"; // ← step 1 = asset upload, step 2 = prompt
 
 export interface JobStatus {
-  jobId: string;
-  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  progress: number;
-  outputUrl: string | null;
-  error: string | null;
+  jobId:       string;
+  status:      "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+  progress:    number;
+  outputUrl:   string | null;
+  error:       string | null;
   videoConfig: Record<string, unknown> | null;
 }
 
-const POLL_INTERVAL = 2000;
+const POLL_INTERVAL = 3000;
 
 export function usePromptLogic() {
-  const params = useParams();
-  const router = useRouter();
+  const params     = useParams();
+  const router     = useRouter();
   const categoryId = params.id as string;
 
-  const [prompt, setPrompt] = useState("");
-  const [settings, setSettings] = useState<VideoSettings>(DEFAULT_SETTINGS);
+  const [pageStep, setPageStep]         = useState<PageStep>("assets"); // ← starts on assets
+  const [assets, setAssets]             = useState<UploadedAssets>({});
+  const [prompt, setPrompt]             = useState("");
+  const [settings, setSettings]         = useState<VideoSettings>(DEFAULT_SETTINGS);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [progressStep, setProgressStep] = useState<ProgressStep>("idle");
-  const [progress, setProgress] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [outputUrl, setOutputUrl] = useState<string | null>(null);
+  const [progress, setProgress]         = useState(0);
+  const [sidebarOpen, setSidebarOpen]   = useState(false);
+  const [isLoggedIn, setIsLoggedIn]     = useState(false);
+  const [authLoading, setAuthLoading]   = useState(true);
+  const [jobId, setJobId]               = useState<string | null>(null);
+  const [outputUrl, setOutputUrl]       = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const hasCompletedRef = useRef(false);
   const { canRender, refreshCredits } = useCredits();
 
   const steps = [
     { label: "Analyzing prompt with AI", key: "analyzing" },
-    { label: "Rendering video", key: "rendering" },
-    { label: "Finalizing & uploading", key: "finalizing" },
+    { label: "Rendering video",          key: "rendering"  },
+    { label: "Finalizing & uploading",   key: "finalizing" },
   ];
 
   useEffect(() => {
@@ -66,75 +66,57 @@ export function usePromptLogic() {
 
   useEffect(() => {
     return () => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     };
   }, []);
 
-  const startPolling = useCallback(
-    (id: string) => {
-      if (pollRef.current) clearInterval(pollRef.current);
-      hasCompletedRef.current = false;
+  const startPolling = useCallback((id: string) => {
+    if (pollRef.current) clearInterval(pollRef.current);
 
-      const poll = async () => {
-        if (hasCompletedRef.current) return;
-        try {
-          const { data } = await api.get<JobStatus>(`/video/job/${id}`, {
-            withCredentials: true,
-          });
-
-          switch (data.status) {
-            case "PENDING":
-              setProgress(15);
-              break;
-            case "PROCESSING":
-              setProgress(15 + data.progress * 70);
-              break;
-            case "COMPLETED":
-              if (!hasCompletedRef.current) {
-                hasCompletedRef.current = true;
-                clearInterval(pollRef.current!);
-                pollRef.current = null;
-                setProgress(100);
-                setOutputUrl(data.outputUrl);
-                setProgressStep("complete");
-                refreshCredits();
-                toast.success("Video generated successfully!");
-              }
-              break;
-            case "FAILED":
-              if (!hasCompletedRef.current) {
-                hasCompletedRef.current = true;
-                clearInterval(pollRef.current!);
-                pollRef.current = null;
-                setProgressStep("error");
-                setErrorMessage(
-                  data.error || "Video generation failed. Credits refunded.",
-                );
-                refreshCredits();
-                toast.error(data.error || "Video generation failed");
-              }
-              break;
-          }
-        } catch (err) {
-          console.error("Polling error:", err);
+    const poll = async () => {
+      try {
+        const { data } = await api.get<JobStatus>(`/video/job/${id}`, { withCredentials: true });
+        switch (data.status) {
+          case "PENDING":
+            setProgress(15);
+            break;
+          case "PROCESSING":
+            setProgress(15 + data.progress * 70);
+            break;
+          case "COMPLETED":
+            setProgress(100);
+            setOutputUrl(data.outputUrl);
+            setProgressStep("complete");
+            refreshCredits();
+            if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+            toast.success("Video generated successfully!");
+            break;
+          case "FAILED":
+            setProgressStep("error");
+            setErrorMessage(data.error || "Video generation failed. Credits refunded.");
+            refreshCredits();
+            if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+            toast.error(data.error || "Video generation failed");
+            break;
         }
-      };
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    };
 
-      pollRef.current = setInterval(poll, POLL_INTERVAL);
-      poll();
-    },
-    [refreshCredits],
-  );
+    poll();
+    pollRef.current = setInterval(poll, POLL_INTERVAL);
+  }, [refreshCredits]);
 
+  const handleAssetsComplete = (uploadedAssets: UploadedAssets) => {
+    setAssets(uploadedAssets);
+    setPageStep("prompt"); // advance to prompt step
+  };
+
+  console.log('Assets at submit time:', assets);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
+    if (!isLoggedIn) { router.push("/login"); return; }
     if (!prompt.trim()) return;
     if (canRender === false) {
       toast.error("Insufficient credits. Please purchase more.");
@@ -154,17 +136,14 @@ export function usePromptLogic() {
         {
           categoryId,
           prompt,
-          paletteId: settings.paletteId ?? undefined,
-          soundtrackMood:
-            settings.soundtrackMood !== "auto"
-              ? settings.soundtrackMood
-              : undefined,
-          animationIntensity:
-            settings.animationIntensity !== "dynamic"
-              ? settings.animationIntensity
-              : undefined,
-          aspectRatio:
-            settings.aspectRatio !== "16:9" ? settings.aspectRatio : undefined,
+          paletteId:          settings.paletteId          ?? undefined,
+          soundtrackMood:     settings.soundtrackMood     !== "auto"    ? settings.soundtrackMood    : undefined,
+          animationIntensity: settings.animationIntensity !== "dynamic" ? settings.animationIntensity : undefined,
+          aspectRatio:        settings.aspectRatio        !== "16:9"    ? settings.aspectRatio        : undefined,
+          // Asset URLs — only send if user uploaded them
+          logoUrl:       assets.logoUrl       ?? undefined,
+          bgImageUrl:    assets.bgImageUrl    ?? undefined,
+          watermarkUrl:  assets.watermarkUrl  ?? undefined,
         },
         { withCredentials: true },
       );
@@ -174,9 +153,7 @@ export function usePromptLogic() {
       startPolling(data.jobId);
     } catch (err: any) {
       setProgressStep("error");
-      const message =
-        err?.response?.data?.message ||
-        "Something went wrong. Please try again.";
+      const message = err?.response?.data?.message || "Something went wrong. Please try again.";
       setErrorMessage(message);
       toast.error(message);
     } finally {
@@ -185,13 +162,11 @@ export function usePromptLogic() {
   };
 
   const handleReset = () => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-    hasCompletedRef.current = false;
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     setPrompt("");
+    setAssets({});
     setSettings(DEFAULT_SETTINGS);
+    setPageStep("assets"); // go back to asset upload on reset
     setProgressStep("idle");
     setProgress(0);
     setJobId(null);
@@ -200,15 +175,10 @@ export function usePromptLogic() {
   };
 
   const handleDownload = async () => {
-    if (!jobId) return null;
+    if (!jobId) return;
     try {
-      const { data } = await api.get(`/video/job/${jobId}/download`, {
-        withCredentials: true,
-      });
-      if (data.downloadUrl) {
-        setOutputUrl(data.downloadUrl);
-        return data.downloadUrl as string;
-      }
+      const { data } = await api.get(`/video/job/${jobId}/download`, { withCredentials: true });
+      if (data.downloadUrl) { setOutputUrl(data.downloadUrl); return data.downloadUrl as string; }
     } catch {
       toast.error("Failed to get download link. Please try again.");
     }
@@ -217,18 +187,16 @@ export function usePromptLogic() {
 
   return {
     categoryId,
-    prompt,
-    setPrompt,
-    settings,
-    setSettings,
-    settingsOpen,
-    setSettingsOpen,
+    pageStep,
+    assets,
+    handleAssetsComplete,
+    prompt, setPrompt,
+    settings, setSettings,
+    settingsOpen, setSettingsOpen,
     progressStep,
     progress,
-    sidebarOpen,
-    setSidebarOpen,
-    isLoggedIn,
-    authLoading,
+    sidebarOpen, setSidebarOpen,
+    isLoggedIn, authLoading,
     steps,
     jobId,
     outputUrl,
@@ -238,5 +206,6 @@ export function usePromptLogic() {
     handleSubmit,
     handleReset,
     handleDownload,
+    setPageStep,
   };
 }

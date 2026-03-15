@@ -7,6 +7,7 @@ import {
   spring,
 } from 'remotion';
 import { BackgroundLayer } from './BackgroundLayer';
+import { LogoLayer } from './LogoLayer';
 import { WordByWord } from './WordByWord';
 import { ParticleLayer } from './ParticleLayer';
 import { GrainOverlay } from './GrainOverlay';
@@ -123,7 +124,8 @@ export const CTAScene: React.FC<{
   sceneIndex?: number;
   audio?: AudioConfig;
   previousBgColor?: string;
-}> = ({ scene, sceneIndex = 2, audio, previousBgColor }) => {
+  logoUrl?: string; // ← NEW
+}> = ({ scene, sceneIndex = 2, audio, previousBgColor, logoUrl }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
@@ -268,8 +270,18 @@ export const CTAScene: React.FC<{
       />
       <ParticleLayer color={scene.textColor} seed={sceneIndex * 11 + 5} density="high" />
       {renderLayout()}
+      {/* Logo — top-right on CTA, smaller than intro */}
+      {logoUrl && (
+        <LogoLayer
+          logoUrl={logoUrl}
+          position="top-right"
+          size={isNarrow(width, height) ? 70 : 100}
+          delay={20}
+          scene="cta"
+        />
+      )}
       <GrainOverlay opacity={0.04} />
-      {audio && <SceneAudio animation={scene.animation} sfxVolume={audio.sfxVolume} delay={5} />}
+      {audio && <SceneAudio animation={scene.animation} sfxVolume={audio.sfxVolume} sceneIndex={sceneIndex} delay={5} />}
     </AbsoluteFill>
   );
 };

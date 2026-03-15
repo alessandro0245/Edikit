@@ -28,65 +28,84 @@ export class VideoService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async generatePrompt(dto: GeneratePromptDto, userId: string) {
-    const {
-      prompt,
-      categoryId,
-      paletteId,
-      soundtrackMood,
-      animationIntensity,
-      aspectRatio,
-    } = dto;
+  // ─── REPLACE only the generatePrompt method in your video.service.ts ─────────
+// Everything else (triggerAsyncRender, getJobStatus, etc.) stays exactly the same.
 
-    const hasCredits = await this.creditsService.hasEnoughCredits(
-      userId,
-      VideoService.AI_VIDEO_CREDIT_COST,
+async generatePrompt(dto: GeneratePromptDto, userId: string) {
+  const {
+    prompt,
+    categoryId,
+    paletteId,
+    soundtrackMood,
+    animationIntensity,
+    aspectRatio,
+    logoUrl,
+    bgImageUrl,
+    watermarkUrl,
+  } = dto;
+
+  const hasCredits = await this.creditsService.hasEnoughCredits(
+    userId,
+    VideoService.AI_VIDEO_CREDIT_COST,
+  );
+  if (!hasCredits) {
+    throw new BadRequestException(
+      'Insufficient credits. Please purchase more credits to generate videos.',
     );
-    if (!hasCredits) {
-      throw new BadRequestException(
-        'Insufficient credits. Please purchase more credits to generate videos.',
-      );
-    }
-
-    this.logger.log(
-      `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'}`,
-    );
-
-    const videoConfig = await this.promptService.processPrompt(
-      prompt,
-      categoryId,
-      paletteId,
-      soundtrackMood,
-      animationIntensity,
-      aspectRatio,
-    );
-
-    const renderJob = await this.prisma.renderJob.create({
-      data: {
-        userId,
-        renderType: 'AI_PROMPT',
-        status: 'PENDING',
-        promptText: prompt,
-        aiConfig: videoConfig as any,
-        creditsUsed: VideoService.AI_VIDEO_CREDIT_COST,
-      },
-    });
-
-    await this.creditsService.deductCredits(
-      userId,
-      VideoService.AI_VIDEO_CREDIT_COST,
-      renderJob.id,
-    );
-
-    this.triggerAsyncRender(renderJob.id, userId, videoConfig).catch((err) => {
-      this.logger.error(
-        `Async render job ${renderJob.id} failed:`,
-        (err as Error).stack,
-      );
-    });
-
-    return { jobId: renderJob.id, status: renderJob.status, videoConfig };
   }
+
+  this.logger.log(
+    `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'} | assets: logo=${!!logoUrl} bg=${!!bgImageUrl} watermark=${!!watermarkUrl}`,
+  );
+
+  const videoConfig = await this.promptService.processPrompt(
+    prompt,
+    categoryId,
+    paletteId,
+    soundtrackMood,
+    animationIntensity,
+    aspectRatio,
+  );
+
+  // ── Attach assets to videoConfig if provided ──────────────────────────────
+  if (logoUrl || bgImageUrl || watermarkUrl) {
+    videoConfig.assets = {
+      ...(logoUrl      && { logoUrl      }),
+      ...(bgImageUrl   && { bgImageUrl   }),
+      ...(watermarkUrl && { watermarkUrl }),
+    };
+  }
+
+  const renderJob = await this.prisma.renderJob.create({
+    data: {
+      userId,
+      renderType:  'AI_PROMPT',
+      status:      'PENDING',
+      promptText:  prompt,
+      aiConfig:    videoConfig as any,
+      creditsUsed: VideoService.AI_VIDEO_CREDIT_COST,
+    },
+  });
+
+  await this.creditsService.deductCredits(
+    userId,
+    VideoService.AI_VIDEO_CREDIT_COST,
+    renderJob.id,
+  );
+
+  this.triggerAsyncRender(renderJob.id, userId, videoConfig).catch((err) => {
+    this.logger.error(
+      `Async render job ${renderJob.id} failed:`,
+      (err as Error).stack,
+    );
+  });
+
+  return {
+    jobId:       renderJob.id,
+    status:      renderJob.status,
+    videoConfig,
+  };
+}
 
   private async triggerAsyncRender(
     jobId: string,

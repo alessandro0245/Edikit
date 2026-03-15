@@ -29,13 +29,20 @@ export interface AudioConfig {
   sfxVolume: number;
 }
 
+export interface VideoAssets {
+  logoUrl?:      string; // shown in intro + CTA with spring animation
+  bgImageUrl?:   string; // replaces solid bg on intro scene
+  watermarkUrl?: string; // small fixed overlay on every scene
+}
+
 export interface VideoConfig {
   title: string;
   scenes: Scene[];
   fps: number;
   width: number;
   height: number;
-  audio?: AudioConfig; // optional — gracefully skipped if missing
+  audio?: AudioConfig;
+  assets?: VideoAssets; // ← NEW
 }
 
 export const DEFAULT_FPS = 30;

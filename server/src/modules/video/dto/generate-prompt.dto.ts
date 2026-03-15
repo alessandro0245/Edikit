@@ -1,6 +1,10 @@
 import {
-  IsString, IsNotEmpty, MinLength,
-  MaxLength, IsOptional, IsIn,
+  IsString,
+  IsNotEmpty,
+  MinLength,
+  MaxLength,
+  IsOptional,
+  IsIn,
 } from 'class-validator';
 
 export class GeneratePromptDto {
@@ -20,13 +24,25 @@ export class GeneratePromptDto {
 
   @IsOptional()
   @IsIn(['energetic', 'cinematic', 'corporate', 'chill', 'none'])
-  soundtrackMood?: string; // undefined = auto
+  soundtrackMood?: string;
 
   @IsOptional()
   @IsIn(['subtle', 'dynamic', 'intense'])
-  animationIntensity?: string; // undefined = dynamic
+  animationIntensity?: string;
 
   @IsOptional()
   @IsIn(['16:9', '9:16', '1:1'])
-  aspectRatio?: string; // undefined = 16:9
+  aspectRatio?: string;
+
+  @IsOptional()
+  @IsString()
+  logoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  bgImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  watermarkUrl?: string;
 }

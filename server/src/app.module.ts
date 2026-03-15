@@ -14,9 +14,10 @@ import { RenderModule } from './modules/render/render.module';
 import { CreditsModule } from './modules/credits/credits.module';
 import { VideoModule } from './modules/video/video.module';
 import { S3Module } from './modules/s3/s3.module';
-
+import { AssetsModule } from './modules/assets/assets.module';
 @Module({
   imports: [
+    AssetsModule,
     VideoModule,
     ConfigModule,
     PrismaModule,

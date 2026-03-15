@@ -2,14 +2,21 @@
 
 import { Play, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const Video = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [ismounted, setIsMounted] = useState(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  if (!ismounted) return null;
+  
   const handlePlay = () => {
     setIsPlaying(true);
     setIsLoading(true);

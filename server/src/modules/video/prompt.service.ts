@@ -41,6 +41,11 @@ export interface VideoConfig {
   width: number;
   height: number;
   audio?: AudioConfig;
+  assets?: {
+    logoUrl?: string;
+    bgImageUrl?: string;
+    watermarkUrl?: string;
+  };
 }
 
 // Maps aspect ratio string → pixel dimensions
