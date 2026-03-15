@@ -59,5 +59,5 @@ export const BgImageLayer: React.FC<BgImageLayerProps> = ({
         }}
       />
     </AbsoluteFill>
-  );
+);
 };
