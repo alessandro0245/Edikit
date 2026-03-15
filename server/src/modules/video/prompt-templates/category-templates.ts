@@ -100,7 +100,8 @@ function buildPrompt(categoryInstructions: string, seed: VisualSeed): string {
   const dim = DIMENSIONS[seed.aspectRatio];
 
   return `
-You are an expert motion-graphics director. Return ONLY valid JSON — no markdown, no explanation.
+You are an expert motion-graphics director creating kinetic typography videos.
+Return ONLY valid JSON — no markdown, no explanation.
 
 SCHEMA:
 {
@@ -108,13 +109,13 @@ SCHEMA:
   "scenes": [
     {
       "type": "intro" | "content" | "cta",
-      "text": "string (max 80 chars)",
-      "subtext": "string | undefined (max 120 chars)",
+      "text": "string",
+      "subtext": "string | undefined",
       "backgroundColor": "string (hex)",
       "textColor": "string (hex)",
       "animation": "fade" | "slide" | "scale" | "typewriter" | "slide-up" | "slide-down",
-      "duration": number (2-6),
-      "fontSize": number (48-96)
+      "duration": number,
+      "fontSize": number
     }
   ],
   "fps": 30,
@@ -122,36 +123,63 @@ SCHEMA:
   "height": ${dim.height}
 }
 
+══════════════════════════════════════════════════
+INTRO SCENE RULES (type: "intro"):
+- Style: KINETIC BLOCK REVEAL — short, punchy, bold
+- text: Use pipe | to split into 2 lines. MAX 3 words per line. ALL CAPS.
+  Example: "MEET YOUR|NEW EDITOR" or "INTRODUCING|EDIKIT AI"
+- subtext: ONE punchy line, max 5 words, all caps
+- backgroundColor: "#050505"
+- textColor: "${p.accent}" ← this becomes the first block color
+- duration: 2-2.5 seconds
+- fontSize: 80-96
+- animation: "slide" or "scale"
+
+CONTENT SCENE RULES (type: "content"):
+- Style: CLASSIC — readable, breathing room, informative
+- text: Normal sentence, max 60 chars. Can be mixed case.
+- subtext: Supporting detail, max 100 chars
+- backgroundColor: use alternating "${p.bg2}" and "${p.bg3}"
+- textColor: "${p.textOnBg2}" or "${p.textOnBg3}" matching the bg
+- duration: 3-5 seconds (enough to read)
+- fontSize: 60-72
+- animation: "fade", "slide-up", "typewriter", or "slide"
+
+CTA SCENE RULES (type: "cta"):
+- Style: KINETIC BLOCK REVEAL — maximum energy, drive action
+- text: Use pipe | to split into 2 lines. SHORT action phrase. ALL CAPS.
+  Example: "START NOW|IT'S FREE" or "JOIN TODAY|GET STARTED"
+- subtext: Brand tagline or URL, short
+- backgroundColor: "#050505"
+- textColor: "${p.bgCta}" ← vivid CTA color as block color
+- duration: 2-3 seconds
+- fontSize: 80-96
+- animation: "scale" or "slide"
+══════════════════════════════════════════════════
+
 HARD RULES:
-- Exactly ONE intro scene (first), ONE cta scene (last), rest are content.
-- Total scenes: 3-7.
-- NO two consecutive scenes use the same animation.
-- NO two consecutive scenes use the same backgroundColor.
-- You MUST use ONLY the exact hex colors listed in the Color Palette below.
-- Each scene's textColor MUST be the paired text color for that background (see pairs below).
-- Output width MUST be ${dim.width}, height MUST be ${dim.height}. Do not change these.
+- Exactly ONE intro (first scene), ONE cta (last scene), rest are content
+- Total scenes: 4-7
+- NO two consecutive content scenes use the same backgroundColor
+- Content textColor MUST be the correct pair for its backgroundColor
+- Output width MUST be ${dim.width}, height MUST be ${dim.height}
 
 ${categoryInstructions}
 
 ═══ ANIMATION INTENSITY: ${seed.animationIntensity.toUpperCase()} ═══
-${ANIMATION_RULES[seed.animationIntensity]}
-${seed.animationIntensity === 'intense' ? '- Prefer shorter durations (2-3s). Make every frame count.\n' : ''}${seed.animationIntensity === 'subtle' ? '- Prefer longer durations (4-5s). Let content breathe.\n' : ''}
-═══ COLOR PALETTE: ${p.name} ═══
-Use ONLY these exact hex values — no other colors allowed:
-
-Scene backgrounds and their REQUIRED text color pairs:
-  Intro scene:          bg="${p.bg1}"  textColor="${p.textOnBg1}"
-  Content (even index): bg="${p.bg2}"  textColor="${p.textOnBg2}"
-  Content (odd index):  bg="${p.bg3}"  textColor="${p.textOnBg3}"
-  CTA scene:            bg="${p.bgCta}" textColor="${p.textOnCta}"
-  Accent color (for subtext or highlights): "${p.accent}"
+${
+  seed.animationIntensity === 'subtle'
+    ? 'Content: prefer fade and slide-up. Calm pacing.'
+    : seed.animationIntensity === 'intense'
+    ? 'Content: prefer slide, scale, slide-down. Fast durations (2.5-3.5s).'
+    : 'Content: mix of fade, slide-up, typewriter. Balanced (3-4s).'
+}
 
 ═══ VISUAL DIRECTION ═══
-Layout Style:     ${seed.layoutStyle}
-Motion Rhythm:    ${seed.motionRhythm}
-Typography Mood:  ${seed.typographyMood}
-Scene Structure:  ${seed.sceneStructure}
-Aspect Ratio:     ${seed.aspectRatio} (${dim.width}×${dim.height})
+Layout:    ${seed.layoutStyle}
+Motion:    ${seed.motionRhythm}
+Structure: ${seed.sceneStructure}
+Ratio:     ${seed.aspectRatio} (${dim.width}×${dim.height})
 ═══════════════════════════════
 `;
 }

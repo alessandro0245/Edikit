@@ -10,50 +10,78 @@ import {
 import type { VideoConfig } from './types';
 
 const defaultProps: VideoConfig = {
-  title: 'Demo Video',
+  title: 'Edikit Demo — Option C',
   fps: DEFAULT_FPS,
   width: DEFAULT_WIDTH,
   height: DEFAULT_HEIGHT,
   scenes: [
     {
+      // ── KINETIC intro ──
       type: 'intro',
-      text: 'Welcome to Edikit',
-      subtext: 'AI-Powered Video Generation',
-      backgroundColor: '#0f172a',
-      textColor: '#f8fafc',
-      animation: 'scale',
-      duration: 3,
-      fontSize: 80,
+      text: 'AI VIDEO|CREATION',
+      subtext: 'POWERED BY EDIKIT',
+      backgroundColor: '#050505',
+      textColor: '#7c3aed', // purple → block color
+      animation: 'slide',
+      duration: 2.5,
+      fontSize: 92,
     },
     {
+      // ── CLASSIC content ──
       type: 'content',
-      text: 'Create Videos with AI',
-      subtext: 'Simply describe what you want and watch it come to life',
-      backgroundColor: '#1e293b',
-      textColor: '#e2e8f0',
-      animation: 'slide',
+      text: 'Creating professional videos used to take weeks',
+      subtext: 'Complex tools, expensive teams, endless revisions',
+      backgroundColor: '#0d0520',
+      textColor: '#ffffff',
+      animation: 'slide-up',
       duration: 4,
       fontSize: 64,
     },
     {
-      type: 'cta',
-      text: 'Get Started Today',
-      subtext: 'Try It Free',
-      backgroundColor: '#7c3aed',
+      // ── CLASSIC content ──
+      type: 'content',
+      text: 'Just describe what you want in plain English',
+      subtext: 'Our AI writes the script, designs every scene, picks the music',
+      backgroundColor: '#1a0a35',
+      textColor: '#ffffff',
+      animation: 'typewriter',
+      duration: 4.5,
+      fontSize: 64,
+    },
+    {
+      // ── CLASSIC content ──
+      type: 'content',
+      text: '20 premium color palettes, all contrast-verified',
+      subtext: 'Energetic · Cinematic · Corporate · Chill',
+      backgroundColor: '#0d0520',
       textColor: '#ffffff',
       animation: 'fade',
-      duration: 3,
-      fontSize: 72,
+      duration: 3.5,
+      fontSize: 64,
+    },
+    {
+      // ── KINETIC CTA ──
+      type: 'cta',
+      text: 'START FREE|TODAY',
+      subtext: 'EDIKIT.COM',
+      backgroundColor: '#050505',
+      textColor: '#ea580c', // orange → block color
+      animation: 'scale',
+      duration: 2.5,
+      fontSize: 96,
     },
   ],
+  audio: {
+    mood: 'cinematic',
+    trackUrl: 'https://cdn.freesound.org/previews/612/612094_5674468-lq.mp3',
+    volume: 0.35,
+    sfxVolume: 0.55,
+    trackIndex: 0,
+  },
 };
 
 export const RemotionRoot: React.FC = () => {
-  const calcMetadata = async ({
-    props,
-  }: {
-    props: VideoConfig;
-  }) => ({
+  const calcMetadata = async ({ props }: { props: VideoConfig }) => ({
     durationInFrames: getTotalDurationInFrames(props.scenes, props.fps),
     fps: props.fps,
     width: props.width,
