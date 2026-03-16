@@ -1,19 +1,26 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
 import { BackgroundLayer } from './BackgroundLayer';
+import { BgImageLayer } from './BgImageLayer';
+import { MediaLayer } from './MediaLayer';
 import { WordByWord } from './WordByWord';
 import { ParticleLayer } from './ParticleLayer';
 import { GrainOverlay } from './GrainOverlay';
 import { SceneAudio } from './Sceneaudio';
+import { LogoLayer } from './LogoLayer';
 import type { Scene, AudioConfig } from '../types';
 
 export const ContentScene: React.FC<{
   scene: Scene;
   sceneIndex?: number;
   audio?: AudioConfig;
-}> = ({ scene, sceneIndex = 1, audio }) => {
+  mediaUrl?: string;
+  bgImageUrl?: string;
+  logoUrl?: string;
+}> = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl, logoUrl }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
+  const isNarrow = width < height;
 
   const barWidth = spring({ fps, frame, config: { damping: 180, stiffness: 70 }, from: 0, to: 80, delay: 8 });
   const barOpacity = interpolate(frame, [8, 20], [0, 0.8], { extrapolateRight: 'clamp' });
@@ -26,11 +33,26 @@ export const ContentScene: React.FC<{
 
   return (
     <AbsoluteFill>
-      <BackgroundLayer
-        backgroundColor={scene.backgroundColor}
-        gradientVariant={((sceneIndex + 1) % 3) as 0 | 1 | 2}
-      />
+      {bgImageUrl ? (
+        <BgImageLayer imageUrl={bgImageUrl} />
+      ) : (
+        <BackgroundLayer
+          backgroundColor={scene.backgroundColor}
+          gradientVariant={((sceneIndex + 1) % 3) as 0 | 1 | 2}
+        />
+      )}
+      <MediaLayer mediaUrl={mediaUrl} />
       <ParticleLayer color={scene.textColor} seed={sceneIndex * 17 + 3} density={density} />
+
+      {logoUrl && (
+        <LogoLayer
+          logoUrl={logoUrl}
+          position="top-left"
+          size={isNarrow ? 80 : 120}
+          delay={8}
+          scene="content"
+        />
+      )}
 
       <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 140px', gap: 36 }}>
         <div style={{ width: barWidth, height: 4, backgroundColor: scene.textColor, borderRadius: 2, opacity: barOpacity, alignSelf: 'flex-start', marginLeft: '10%' }} />

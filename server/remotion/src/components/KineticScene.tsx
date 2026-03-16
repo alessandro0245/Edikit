@@ -8,6 +8,8 @@ import {
   random,
 } from 'remotion';
 import { SceneAudio } from './Sceneaudio';
+import { BgImageLayer } from './BgImageLayer';
+import { LogoLayer } from './LogoLayer';
 import type { Scene, AudioConfig } from '../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -336,7 +338,9 @@ export const KineticScene: React.FC<{
   scene:       Scene;
   sceneIndex?: number;
   audio?:      AudioConfig;
-}> = ({ scene, sceneIndex = 0, audio }) => {
+  bgImageUrl?: string;
+  logoUrl?:    string;
+}> = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => {
   const { width, height, fps } = useVideoConfig();
   const frame = useCurrentFrame();
 
@@ -372,17 +376,28 @@ export const KineticScene: React.FC<{
 
   return (
     <AbsoluteFill style={{
-      background:      '#030303',
+      background:      bgImageUrl ? 'transparent' : '#030303',
       transform:       `scale(${sceneScale})`,
       transformOrigin: 'center center',
       overflow:        'hidden',
     }}>
+      {bgImageUrl && <BgImageLayer imageUrl={bgImageUrl} />}
 
       {/* Background glow — color bleeds from left */}
-      <BackgroundGlow color={scene.textColor} frame={frame} />
+      {!bgImageUrl && <BackgroundGlow color={scene.textColor} frame={frame} />}
 
       {/* Scanlines */}
       <Scanlines />
+
+      {logoUrl && (
+        <LogoLayer
+          logoUrl={logoUrl}
+          position="top-left"
+          size={isNarrow ? 80 : 120}
+          delay={8}
+          scene="intro"
+        />
+      )}
 
       {/* Lines — stacked vertically, left-aligned, centered vertically */}
       <AbsoluteFill style={{

@@ -35,6 +35,16 @@ export class VideoController {
     return this.videoService.getJobStatus(jobId, user.userId);
   }
 
+  @Post('job/:id/start-render')
+  @UseGuards(JwtAuthGuard)
+  startRender(
+    @Param('id') jobId: string,
+    @Body('scenes') scenes: any[],
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.videoService.startRender(jobId, user.userId, scenes);
+  }
+
   @Get('job/:id/download')
   @UseGuards(JwtAuthGuard)
   getDownloadUrl(@Param('id') jobId: string, @CurrentUser() user: JwtUser) {

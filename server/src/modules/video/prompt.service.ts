@@ -45,6 +45,7 @@ export interface VideoConfig {
     logoUrl?: string;
     bgImageUrl?: string;
     watermarkUrl?: string;
+    mediaUrls?: string[];
   };
 }
 
@@ -86,6 +87,7 @@ export class PromptService {
     soundtrackMood?: string,   // 'energetic' | 'cinematic' | 'corporate' | 'chill' | 'none' | undefined (=auto)
     animationIntensity?: string, // 'subtle' | 'dynamic' | 'intense' | undefined (=dynamic)
     aspectRatio?: string,        // '16:9' | '9:16' | '1:1' | undefined (=16:9)
+    mediaCount?: number,
   ): Promise<VideoConfig> {
     const template = getCategoryTemplate(categoryId);
 
@@ -131,6 +133,7 @@ export class PromptService {
       palette,
       resolvedIntensity,
       resolvedRatio,
+      mediaCount,
     );
 
     const systemPrompt = template.getSystemPrompt(seed);

@@ -42,6 +42,8 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
     logoUrl,
     bgImageUrl,
     watermarkUrl,
+    mediaUrls,
+    reviewScenes,
   } = dto;
 
   const hasCredits = await this.creditsService.hasEnoughCredits(
@@ -55,7 +57,7 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
   }
 
   this.logger.log(
-    `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'} | assets: logo=${!!logoUrl} bg=${!!bgImageUrl} watermark=${!!watermarkUrl}`,
+    `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'} | assets: logo=${!!logoUrl} bg=${!!bgImageUrl} watermark=${!!watermarkUrl} mediaUrlsCount=${mediaUrls?.length ?? 0}`,
   );
 
   const videoConfig = await this.promptService.processPrompt(
@@ -65,14 +67,16 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
     soundtrackMood,
     animationIntensity,
     aspectRatio,
+    mediaUrls?.length,
   );
 
   // ── Attach assets to videoConfig if provided ──────────────────────────────
-  if (logoUrl || bgImageUrl || watermarkUrl) {
+  if (logoUrl || bgImageUrl || watermarkUrl || (mediaUrls && mediaUrls.length > 0)) {
     videoConfig.assets = {
       ...(logoUrl      && { logoUrl      }),
       ...(bgImageUrl   && { bgImageUrl   }),
       ...(watermarkUrl && { watermarkUrl }),
+      ...((mediaUrls && mediaUrls.length > 0) && { mediaUrls }),
     };
   }
 
@@ -92,6 +96,16 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
     VideoService.AI_VIDEO_CREDIT_COST,
     renderJob.id,
   );
+
+  if (reviewScenes) {
+    // Stop here and return the scenes. The frontend will hit /start-render to resume
+    return {
+      jobId:       renderJob.id,
+      status:      renderJob.status,
+      videoConfig,
+      needsSceneAssignment: true,
+    };
+  }
 
   this.triggerAsyncRender(renderJob.id, userId, videoConfig).catch((err) => {
     this.logger.error(
@@ -338,6 +352,47 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
       outputUrl: null,
       error: null,
       videoConfig: job.aiConfig,
+    };
+  }
+
+  async startRender(jobId: string, userId: string, scenes: any[]) {
+    // 1. Find job and ensure it belongs to the user and is still PENDING
+    const job = await this.prisma.renderJob.findUnique({
+      where: { id: jobId, userId },
+    });
+
+    if (!job) {
+      throw new NotFoundException(`RenderJob not found or unauthorized`);
+    }
+    if (job.status !== 'PENDING') {
+      throw new BadRequestException(`Render job is already ${job.status}`);
+    }
+
+    const aiConfig = job.aiConfig as any;
+    
+    // 2. Overwrite the scenes in the aiConfig
+    if (aiConfig && Array.isArray(scenes)) {
+      aiConfig.scenes = scenes;
+    }
+
+    // 3. Save the new config
+    await this.prisma.renderJob.update({
+      where: { id: jobId },
+      data: { aiConfig },
+    });
+
+    // 4. Trigger the background render
+    this.triggerAsyncRender(job.id, userId, aiConfig).catch((err) => {
+      this.logger.error(
+        `Async render job ${job.id} failed:`,
+        (err as Error).stack,
+      );
+    });
+
+    return {
+      jobId: job.id,
+      status: 'PROCESSING',
+      videoConfig: aiConfig,
     };
   }
 

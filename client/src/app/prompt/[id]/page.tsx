@@ -12,9 +12,10 @@ import { VideoSettingsModal, countChanges } from "@/components/VideoSettingsModa
 import { useRef, useMemo, useState } from "react";
 import api from "@/lib/auth";
 import type { UploadedAssets } from "@/components/Home/AssetUploadStep";
+import { SceneAssignmentCanvas } from "./SceneAssignmentCanvas";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type AssetType = "logo" | "background" | "watermark";
+type AssetType = "logo" | "background" | "watermark" | "media";
 
 interface AssetSlotConfig {
   type:        AssetType;
@@ -28,12 +29,14 @@ const ASSET_SLOTS: AssetSlotConfig[] = [
   { type: "logo",       label: "Logo",             hint: "PNG with transparent bg", icon: <ImagePlus className="w-4 h-4" /> },
   { type: "background", label: "Background Image",  hint: "Replaces intro scene bg",  icon: <Layers    className="w-4 h-4" /> },
   { type: "watermark",  label: "Watermark",         hint: "Subtle corner overlay",    icon: <Stamp     className="w-4 h-4" /> },
+  { type: "media",      label: "Custom Media",     hint: "Any image or video overlay", icon: <ImagePlus className="w-4 h-4" /> },
 ];
 
 const ASSET_KEY_MAP: Record<AssetType, keyof UploadedAssets> = {
   logo:       "logoUrl",
   background: "bgImageUrl",
   watermark:  "watermarkUrl",
+  media:      "mediaUrls" as any, // Not used directly in generic set due to array behavior
 };
 // ─── Asset Upload Step ────────────────────────────────────────────────────────
 function AssetUploadStep({ onComplete }: { onComplete: (assets: UploadedAssets) => void }) {
@@ -42,24 +45,47 @@ function AssetUploadStep({ onComplete }: { onComplete: (assets: UploadedAssets) 
   const [error, setError]         = useState<string | null>(null);
   const inputRefs                 = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const uploadCount = Object.values(assets).filter(Boolean).length;
+  const uploadCount = Object.keys(assets).reduce((acc, key) => {
+    const val = assets[key as keyof UploadedAssets];
+    if (Array.isArray(val)) return acc + val.length;
+    return val ? acc + 1 : acc;
+  }, 0);
 
   const handleUpload = async (type: AssetType, file: File) => {
-    if (!file.type.startsWith("image/")) { setError("Images only — PNG, JPEG, WEBP, SVG"); return; }
-    if (file.size > 5 * 1024 * 1024)    { setError("File too large. Max 5MB."); return; }
-    try {
-      setUploading(type);
-      setError(null);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("assetType", type);
-      const { data } = await api.post("/assets/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+    if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) { throw new Error("Media only — PNG, JPEG, WEBP, SVG, MP4, WEBM"); }
+    if (file.size > 5 * 1024 * 1024)    { throw new Error("File too large. Max 5MB."); }
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("assetType", type);
+    const { data } = await api.post("/assets/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      withCredentials: true,
+    });
+
+    if (type === "media") {
+      setAssets((prev) => ({
+        ...prev,
+        mediaUrls: [...(prev.mediaUrls || []), data.url],
+      }));
+    } else {
       setAssets((prev) => ({ ...prev, [ASSET_KEY_MAP[type]]: data.url }));
+    }
+  };
+
+  const handleFilesArray = async (type: AssetType, files: FileList | File[]) => {
+    setUploading(type);
+    setError(null);
+    try {
+      if (type === "media") {
+        // Run concurrent uploads logic internally within the same lifecycle bound
+        await Promise.all(Array.from(files).map((f) => handleUpload(type, f)));
+      } else {
+        // Single file
+        await handleUpload(type, Array.from(files)[0]);
+      }
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? "Upload failed. Try again.");
+      setError(err?.message || err?.response?.data?.message || "Upload failed. Try again.");
     } finally {
       setUploading(null);
     }
@@ -82,47 +108,79 @@ function AssetUploadStep({ onComplete }: { onComplete: (assets: UploadedAssets) 
       {/* Upload slots */}
       <div className="space-y-3">
         {ASSET_SLOTS.map((slot) => {
-          const key      = ASSET_KEY_MAP[slot.type];
-          const url      = assets[key];
+          const key      = ASSET_KEY_MAP[slot.type] as keyof UploadedAssets;
+          const isMedia  = slot.type === 'media';
+          const urls     = isMedia ? (assets.mediaUrls || []) : (assets[key] ? [assets[key] as string] : []);
           const isActive = uploading === slot.type;
 
           return (
-            <div key={slot.type}>
+            <div key={slot.type} className="space-y-2">
               <input
                 ref={(el) => { inputRefs.current[slot.type] = el; }}
                 type="file"
-                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                multiple={isMedia}
+                accept="image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,video/webm"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUpload(slot.type, file);
+                  if (e.target.files) {
+                    handleFilesArray(slot.type, e.target.files);
+                  }
                   e.target.value = "";
                 }}
               />
 
-              {url ? (
-                // ── Uploaded state ──
-                <div className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-xl group">
-                  {/* Thumbnail */}
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted/40 border border-border/40 shrink-0 flex items-center justify-center">
-                    <img src={url} alt={slot.label} className="w-full h-full object-contain p-1" />
+              {urls.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">{slot.label}</span>
+                    {isMedia && (
+                      <button 
+                        type="button" 
+                        onClick={() => inputRefs.current[slot.type]?.click()}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        + Add more
+                      </button>
+                    )}
                   </div>
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{slot.label}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <CheckCircle2 className="w-3 h-3 text-primary" />
-                      <span className="text-[11px] font-mono text-primary">Uploaded</span>
-                    </div>
+                  <div className="flex flex-col gap-2">
+                    {urls.map((url, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-primary/5 border border-primary/20 rounded-xl group">
+                        {/* Thumbnail */}
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted/40 border border-border/40 shrink-0 flex items-center justify-center">
+                          {url.match(/\.(mp4|webm|mov).*$/i) ? (
+                            <video src={url} className="w-full h-full object-contain p-1" />
+                          ) : (
+                            <img src={url} alt={slot.label} className="w-full h-full object-contain p-1" />
+                          )}
+                        </div>
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{isMedia ? `Media ${i + 1}` : slot.label}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <CheckCircle2 className="w-3 h-3 text-primary" />
+                            <span className="text-[11px] font-mono text-primary">Uploaded</span>
+                          </div>
+                        </div>
+                        {/* Remove */}
+                        <button
+                          type="button"
+                          onClick={() => setAssets((prev) => { 
+                            const n = { ...prev }; 
+                            if (isMedia && n.mediaUrls) {
+                              n.mediaUrls = n.mediaUrls.filter((_, index) => index !== i);
+                            } else {
+                              delete n[key]; 
+                            }
+                            return n; 
+                          })}
+                          className="w-7 h-7 rounded-lg bg-muted/50 hover:bg-destructive/10 hover:text-destructive flex items-center justify-center text-muted-foreground transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                  {/* Remove */}
-                  <button
-                    type="button"
-                    onClick={() => setAssets((prev) => { const n = { ...prev }; delete n[key]; return n; })}
-                    className="w-7 h-7 rounded-lg bg-muted/50 hover:bg-destructive/10 hover:text-destructive flex items-center justify-center text-muted-foreground transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               ) : (
                 // ── Upload zone ──
@@ -334,7 +392,12 @@ function PromptStep({
   
 }) {
   const textareaRef  = useRef<HTMLTextAreaElement | null>(null);
-  const uploadCount  = Object.values(assets).filter(Boolean).length;
+  
+  const uploadCount = Object.keys(assets).reduce((acc, key) => {
+    const val = assets[key as keyof UploadedAssets];
+    if (Array.isArray(val)) return acc + val.length;
+    return val ? acc + 1 : acc;
+  }, 0);
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -376,6 +439,12 @@ function PromptStep({
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
               <Stamp className="w-3 h-3 text-primary" />
               <span className="text-[11px] font-mono text-primary">Watermark</span>
+            </div>
+          )}
+          {assets.mediaUrls && (assets.mediaUrls.length > 0) && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
+              <Film className="w-3 h-3 text-primary" />
+              <span className="text-[11px] font-mono text-primary">{assets.mediaUrls.length} Media</span>
             </div>
           )}
         </div>
@@ -466,10 +535,12 @@ export default function PromptPage() {
     progressStep, progress, sidebarOpen, setSidebarOpen,
     isLoggedIn, authLoading, steps, outputUrl, errorMessage,
     isSubmitting, canRender, handleSubmit, handleReset, handleDownload, setPageStep,
+    handleStartRender, generatedScenes, setGeneratedScenes,
   } = usePromptLogic();
 
   const isIdle       = progressStep === "idle";
   const isProcessing = progressStep === "processing";
+  const isSceneAssignment = progressStep === "scene-assignment";
   const isComplete   = progressStep === "complete";
   const isError      = progressStep === "error";
   const changeCount  = countChanges(settings);
@@ -507,7 +578,7 @@ export default function PromptPage() {
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-hidden px-5 lg:px-8 py-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div className="flex-1 overflow-y-auto px-5 lg:px-8 py-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
 
           {/* ── STEP 1: Asset Upload ── */}
           {isIdle && pageStep === "assets" && (
@@ -606,6 +677,12 @@ export default function PromptPage() {
           <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl shadow-black/40 ring-1 ring-border/40">
             <VideoPlayer src={outputUrl} autoPlay showDownload={false} className="w-full" />
           </div>
+        ) : isSceneAssignment ? (
+          <SceneAssignmentCanvas 
+            scenes={generatedScenes} 
+            uploadedAssets={assets} 
+            onConfirm={handleStartRender} 
+          />
         ) : isProcessing ? (
           <ProcessingCanvas progress={progress} />
         ) : isError ? (

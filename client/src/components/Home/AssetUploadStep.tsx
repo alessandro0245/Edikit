@@ -11,13 +11,14 @@ export interface UploadedAssets {
   logoUrl?:      string;
   bgImageUrl?:   string;
   watermarkUrl?: string;
+  mediaUrls?:    string[];
 }
 
 interface AssetUploadStepProps {
   onComplete: (assets: UploadedAssets) => void;
 }
 
-type AssetType = "logo" | "background" | "watermark";
+type AssetType = "logo" | "background" | "watermark" | "media";
 
 interface AssetSlot {
   type:        AssetType;
@@ -49,51 +50,86 @@ const ASSET_SLOTS: AssetSlot[] = [
     hint:        "PNG with transparent bg recommended",
     icon:        <Stamp className="w-5 h-5" />,
   },
+  {
+    type:        "media",
+    label:       "Custom Media",
+    description: "Any image or video overlay",
+    hint:        "PNG, MP4, custom size",
+    icon:        <ImagePlus className="w-5 h-5" />,
+  },
 ];
 
 // ─── Single upload zone ───────────────────────────────────────────────────────
 const UploadZone: React.FC<{
   slot:       AssetSlot;
-  url?:       string;
-  onUpload:   (type: AssetType, file: File) => Promise<void>;
-  onRemove:   (type: AssetType) => void;
+  urls:       string[];
+  onUpload:   (type: AssetType, files: File[]) => Promise<void>;
+  onRemove:   (type: AssetType, index?: number) => void;
   uploading:  boolean;
-}> = ({ slot, url, onUpload, onRemove, uploading }) => {
+}> = ({ slot, urls, onUpload, onRemove, uploading }) => {
   const inputRef   = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
+  const isMedia = slot.type === 'media';
 
   const handleFile = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    if (file.size > 5 * 1024 * 1024) return;
-    onUpload(slot.type, file);
+    if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) return false;
+    if (file.size > 5 * 1024 * 1024) return false;
+    return true;
+  };
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    const validFiles = Array.from(files).filter(handleFile);
+    if (validFiles.length > 0) {
+      onUpload(slot.type, validFiles);
+    }
   };
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <span className="text-muted-foreground">{slot.icon}</span>
-        <div>
-          <p className="text-sm font-semibold text-foreground">{slot.label}</p>
-          <p className="text-xs text-muted-foreground">{slot.description}</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">{slot.icon}</span>
+          <div>
+            <p className="text-sm font-semibold text-foreground">{slot.label}</p>
+            <p className="text-xs text-muted-foreground">{slot.description}</p>
+          </div>
         </div>
+        {isMedia && urls.length > 0 && (
+          <button 
+            type="button" 
+            onClick={() => inputRef.current?.click()}
+            className="text-xs text-primary hover:underline"
+          >
+            + Add more
+          </button>
+        )}
       </div>
 
-      {url ? (
-        // Preview state
-        <div className="relative w-full h-28 rounded-xl overflow-hidden border border-border/60 bg-muted/20 group">
-          <img src={url} alt={slot.label} className="w-full h-full object-contain p-3" />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <button
-              type="button"
-              onClick={() => onRemove(slot.type)}
-              className="w-8 h-8 rounded-full bg-destructive flex items-center justify-center cursor-pointer"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-          </div>
-          <div className="absolute bottom-2 right-2 bg-primary/90 text-primary-foreground text-[10px] font-mono px-1.5 py-0.5 rounded">
-            ✓ Uploaded
-          </div>
+      {urls.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          {urls.map((url, i) => (
+            // Preview state
+            <div key={i} className="relative w-full h-28 rounded-xl overflow-hidden border border-border/60 bg-muted/20 group">
+              {url.match(/\.(mp4|webm|mov).*$/i) ? (
+                <video src={url} className="w-full h-full object-contain p-3" />
+              ) : (
+                <img src={url} alt={`${slot.label} ${i + 1}`} className="w-full h-full object-contain p-3" />
+              )}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => onRemove(slot.type, isMedia ? i : undefined)}
+                  className="w-8 h-8 rounded-full bg-destructive flex items-center justify-center cursor-pointer"
+                >
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
+              <div className="absolute bottom-2 right-2 bg-primary/90 text-primary-foreground text-[10px] font-mono px-1.5 py-0.5 rounded">
+                ✓ Uploaded {isMedia ? `(Scene ${i + 1})` : ''}
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         // Upload zone
@@ -104,8 +140,12 @@ const UploadZone: React.FC<{
           onDrop={(e) => {
             e.preventDefault();
             setDrag(false);
-            const file = e.dataTransfer.files[0];
-            if (file) handleFile(file);
+            if (isMedia) {
+              handleFiles(e.dataTransfer.files);
+            } else {
+              const file = e.dataTransfer.files[0];
+              if (file) handleFile(file);
+            }
           }}
           className={`
             relative w-full h-28 rounded-xl border-2 border-dashed
@@ -136,11 +176,11 @@ const UploadZone: React.FC<{
       <input
         ref={inputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+        multiple={isMedia}
+        accept="image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,video/webm"
         className="hidden"
         onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleFile(file);
+          handleFiles(e.target.files);
           e.target.value = "";
         }}
       />
@@ -154,13 +194,14 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
   const [uploading, setUploading]     = useState<AssetType | null>(null);
   const [error, setError]             = useState<string | null>(null);
 
-  const uploadCount = Object.values(assets).filter(Boolean).length;
+  const uploadCount = Object.keys(assets).reduce((acc, key) => {
+    const val = assets[key as keyof UploadedAssets];
+    if (Array.isArray(val)) return acc + val.length;
+    return val ? acc + 1 : acc;
+  }, 0);
 
   const handleUpload = async (type: AssetType, file: File) => {
     try {
-      setUploading(type);
-      setError(null);
-
       const formData = new FormData();
       formData.append("file",      file);
       formData.append("assetType", type);
@@ -170,7 +211,24 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
         withCredentials: true,
       });
 
-      setAssets((prev) => ({ ...prev, [`${type}Url`]: data.url }));
+      if (type === "media") {
+        setAssets((prev) => ({
+          ...prev,
+          mediaUrls: [...(prev.mediaUrls || []), data.url],
+        }));
+      } else {
+        setAssets((prev) => ({ ...prev, [`${type}Url`]: data.url }));
+      }
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const handleFilesArray = async (type: AssetType, files: File[]) => {
+    try {
+      setUploading(type);
+      setError(null);
+      await Promise.all(files.map((file) => handleUpload(type, file)));
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Upload failed. Try again.");
     } finally {
@@ -178,10 +236,14 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
     }
   };
 
-  const handleRemove = (type: AssetType) => {
+  const handleRemove = (type: AssetType, index?: number) => {
     setAssets((prev) => {
       const next = { ...prev };
-      delete next[`${type}Url` as keyof UploadedAssets];
+      if (type === 'media' && index !== undefined && next.mediaUrls) {
+        next.mediaUrls = next.mediaUrls.filter((_, i) => i !== index);
+      } else {
+        delete next[`${type}Url` as keyof UploadedAssets];
+      }
       return next;
     });
   };
@@ -200,16 +262,25 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
 
       {/* Upload zones */}
       <div className="space-y-5">
-        {ASSET_SLOTS.map((slot) => (
-          <UploadZone
-            key={slot.type}
-            slot={slot}
-            url={assets[`${slot.type}Url` as keyof UploadedAssets]}
-            onUpload={handleUpload}
-            onRemove={handleRemove}
-            uploading={uploading === slot.type}
-          />
-        ))}
+        {ASSET_SLOTS.map((slot) => {
+          const isMedia = slot.type === 'media';
+          const urls = isMedia 
+            ? (assets.mediaUrls || []) 
+            : (assets[`${slot.type}Url` as keyof UploadedAssets] 
+                ? [assets[`${slot.type}Url` as keyof UploadedAssets] as string] 
+                : []);
+
+          return (
+            <UploadZone
+              key={slot.type}
+              slot={slot}
+              urls={urls}
+              onUpload={handleFilesArray}
+              onRemove={handleRemove}
+              uploading={uploading === slot.type}
+            />
+          );
+        })}
       </div>
 
       {/* Error */}

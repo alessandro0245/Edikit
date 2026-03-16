@@ -32,7 +32,7 @@ export const WatermarkLayer: React.FC<WatermarkLayerProps> = ({
   };
 
   return (
-    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+    <AbsoluteFill style={{ pointerEvents: 'none', zIndex: 9999 }}>
       <div
         style={{
           position: 'absolute',
@@ -47,7 +47,7 @@ export const WatermarkLayer: React.FC<WatermarkLayerProps> = ({
             height:    size,
             objectFit: 'contain',
             // Desaturate slightly — watermarks should be unobtrusive
-            filter:    'grayscale(20%) drop-shadow(0px 1px 4px rgba(0,0,0,0.3))',
+            filter:    'drop-shadow(0px 1px 4px rgba(0,0,0,0.5))',
           }}
         />
       </div>
