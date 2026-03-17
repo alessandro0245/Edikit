@@ -37,10 +37,10 @@ export class AssetsController {
       throw new BadRequestException('No file provided.');
     }
 
-    const validTypes: AssetType[] = ['logo', 'background', 'watermark'];
+    const validTypes: AssetType[] = ['logo', 'background', 'watermark', 'media'];
     if (!validTypes.includes(assetType as AssetType)) {
       throw new BadRequestException(
-        `Invalid assetType "${assetType}". Must be: logo, background, or watermark.`,
+        `Invalid assetType "${assetType}". Must be: logo, background, watermark, or media.`,
       );
     }
 

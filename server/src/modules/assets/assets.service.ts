@@ -6,7 +6,7 @@ import {
 import { S3Service } from '../s3/s3.service';
 import { v4 as uuidv4 } from 'uuid';
 
-export type AssetType = 'logo' | 'background' | 'watermark';
+export type AssetType = 'logo' | 'background' | 'watermark' | 'media';
 
 export interface UploadedAsset {
   assetType: AssetType;
@@ -22,6 +22,8 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/jpg',
   'image/webp',
   'image/svg+xml',
+  'video/mp4',
+  'video/webm',
 ]);
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -81,6 +83,8 @@ export class AssetsService {
       'image/jpg':     'jpg',
       'image/webp':    'webp',
       'image/svg+xml': 'svg',
+      'video/mp4':     'mp4',
+      'video/webm':    'webm',
     };
     return map[mime] ?? 'png';
   }

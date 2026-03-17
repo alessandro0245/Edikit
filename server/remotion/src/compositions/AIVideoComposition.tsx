@@ -128,18 +128,18 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
                       scene={scene}
                       sceneIndex={index}
                       audio={audio}
+                      mediaUrl={scene.mediaUrl ?? (assets?.mediaUrls ? assets.mediaUrls[index % assets.mediaUrls.length] : undefined)}
+                      bgImageUrl={assets?.bgImageUrl}
+                      logoUrl={assets?.logoUrl}
                     />
                   ) : (
                     <KineticScene
                       scene={scene}
                       sceneIndex={index}
                       audio={audio}
+                      bgImageUrl={assets?.bgImageUrl}
+                      logoUrl={assets?.logoUrl}
                     />
-                  )}
-
-                  {/* Watermark on every scene */}
-                  {assets?.watermarkUrl && (
-                    <WatermarkLayer watermarkUrl={assets.watermarkUrl} />
                   )}
 
                   {index > 0 && audio && (
@@ -157,6 +157,11 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
           );
         })}
       </TransitionSeries>
+
+      {/* Global Watermark spanning the entire composition */}
+      {assets?.watermarkUrl && (
+        <WatermarkLayer watermarkUrl={assets.watermarkUrl} opacity={0.65} />
+      )}
     </AbsoluteFill>
   );
 };

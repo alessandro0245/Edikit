@@ -133,11 +133,12 @@ export class FreesoundService {
    * Replace these with your own S3 fallback tracks.
    */
   private getFallbackUrl(mood: MoodType): string {
+    const bucket = this.configService.get<string>('S3_OUTPUT_BUCKET') || 'edikit-ai-videos-prod';
     const fallbacks: Record<MoodType, string> = {
-      energetic: '/music/fallback/energetic.mp3',
-      cinematic: '/music/fallback/cinematic.mp3',
-      corporate: '/music/fallback/corporate.mp3',
-      chill:     '/music/fallback/chill.mp3',
+      energetic: `https://${bucket}.s3.amazonaws.com/music/fallback/energetic.mp3`,
+      cinematic: `https://${bucket}.s3.amazonaws.com/music/fallback/cinematic.mp3`,
+      corporate: `https://${bucket}.s3.amazonaws.com/music/fallback/corporate.mp3`,
+      chill:     `https://${bucket}.s3.amazonaws.com/music/fallback/chill.mp3`,
     };
     return fallbacks[mood];
   }

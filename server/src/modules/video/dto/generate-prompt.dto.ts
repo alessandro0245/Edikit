@@ -5,6 +5,8 @@ import {
   MaxLength,
   IsOptional,
   IsIn,
+  IsArray,
+  IsBoolean,
 } from 'class-validator';
 
 export class GeneratePromptDto {
@@ -45,4 +47,13 @@ export class GeneratePromptDto {
   @IsOptional()
   @IsString()
   watermarkUrl?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  mediaUrls?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  reviewScenes?: boolean;
 }

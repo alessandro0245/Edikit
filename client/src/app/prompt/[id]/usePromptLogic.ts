@@ -6,7 +6,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { VideoSettings, DEFAULT_SETTINGS } from "@/components/VideoSettingsModal/VideoSettingsModal";
 import type { UploadedAssets } from "@/components/Home/AssetUploadStep";
 
-export type ProgressStep = "idle" | "processing" | "complete" | "error";
+export type ProgressStep = "idle" | "processing" | "scene-assignment" | "complete" | "error";
 export type PageStep     = "assets" | "prompt"; // ← step 1 = asset upload, step 2 = prompt
 
 export interface JobStatus {
@@ -15,7 +15,8 @@ export interface JobStatus {
   progress:    number;
   outputUrl:   string | null;
   error:       string | null;
-  videoConfig: Record<string, unknown> | null;
+  needsSceneAssignment?: boolean;
+  videoConfig: { scenes?: any[]; [key: string]: any } | null;
 }
 
 const POLL_INTERVAL = 3000;
@@ -39,6 +40,7 @@ export function usePromptLogic() {
   const [outputUrl, setOutputUrl]       = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatedScenes, setGeneratedScenes] = useState<any[]>([]);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { canRender, refreshCredits } = useCredits();
@@ -144,16 +146,42 @@ export function usePromptLogic() {
           logoUrl:       assets.logoUrl       ?? undefined,
           bgImageUrl:    assets.bgImageUrl    ?? undefined,
           watermarkUrl:  assets.watermarkUrl  ?? undefined,
+          mediaUrls:     assets.mediaUrls     ?? undefined,
+          reviewScenes:  true, // Always pause so user can map media if they want
         },
         { withCredentials: true },
       );
 
       setJobId(data.jobId);
       setProgress(10);
-      startPolling(data.jobId);
+      
+      if (data.needsSceneAssignment) {
+        setGeneratedScenes(data.videoConfig?.scenes || []);
+        setProgressStep("scene-assignment");
+      } else {
+        startPolling(data.jobId);
+      }
     } catch (err: any) {
       setProgressStep("error");
       const message = err?.response?.data?.message || "Something went wrong. Please try again.";
+      setErrorMessage(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStartRender = async (finalScenes: any[]) => {
+    if (!jobId) return;
+    try {
+      setIsSubmitting(true);
+      await api.post(`/video/job/${jobId}/start-render`, { scenes: finalScenes }, { withCredentials: true });
+      setProgressStep("processing");
+      setProgress(15);
+      startPolling(jobId);
+    } catch (err: any) {
+      setProgressStep("error");
+      const message = err?.response?.data?.message || "Failed to start render. Please try again.";
       setErrorMessage(message);
       toast.error(message);
     } finally {
@@ -207,5 +235,8 @@ export function usePromptLogic() {
     handleReset,
     handleDownload,
     setPageStep,
+    handleStartRender,
+    generatedScenes,
+    setGeneratedScenes,
   };
 }

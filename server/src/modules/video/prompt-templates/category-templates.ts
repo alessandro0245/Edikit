@@ -11,6 +11,7 @@ export interface VisualSeed {
   sceneStructure: string;
   animationIntensity: AnimationIntensity;
   aspectRatio: AspectRatio;
+  mediaCount?: number;
 }
 
 export interface CategoryTemplate {
@@ -81,6 +82,7 @@ export function generateVisualSeed(
   resolvedPalette?: ColorPalette,
   animationIntensity: AnimationIntensity = 'dynamic',
   aspectRatio: AspectRatio = '16:9',
+  mediaCount?: number,
 ): VisualSeed {
   return {
     palette:            resolvedPalette ?? selectPalette(mood, numericSeed),
@@ -90,6 +92,7 @@ export function generateVisualSeed(
     sceneStructure:     pick(SCENE_STRUCTURES, numericSeed + 3),
     animationIntensity,
     aspectRatio,
+    mediaCount,
   };
 }
 
@@ -159,7 +162,7 @@ CTA SCENE RULES (type: "cta"):
 
 HARD RULES:
 - Exactly ONE intro (first scene), ONE cta (last scene), rest are content
-- Total scenes: 4-7
+- Total scenes: ${seed.mediaCount ? seed.mediaCount + 2 : '4-7'}
 - NO two consecutive content scenes use the same backgroundColor
 - Content textColor MUST be the correct pair for its backgroundColor
 - Output width MUST be ${dim.width}, height MUST be ${dim.height}
