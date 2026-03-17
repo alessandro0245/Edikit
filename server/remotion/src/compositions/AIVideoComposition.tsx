@@ -9,15 +9,15 @@ import { KineticScene } from '../components/KineticScene';
 import { ContentScene } from '../components/ContentScene';
 import { WatermarkLayer } from '../components/WatermarkLayer';
 import { TransitionAudio } from '../components/Sceneaudio';
-import type { VideoConfig, Scene, AudioConfig, MoodType, VideoAssets } from '../types';
-import { DEFAULT_FPS, TRANSITION_FRAMES } from '../types';
+import type { VideoConfig, AudioConfig, MoodType } from '../types';
+import { DEFAULT_FPS } from '../types';
 
 // ─── Transition logic ─────────────────────────────────────────────────────────
 // intro(kinetic) → content(classic): fast slide from right
 // content → content: mood-based
 // content → cta(kinetic): hard cut — sudden energy shift feels intentional
 
-type TransitionPresentation = ReturnType<typeof fade>;
+type TransitionPresentation = any;
 type TimingFn = Parameters<typeof TransitionSeries.Transition>[0]['timing'];
 
 function getTransition(

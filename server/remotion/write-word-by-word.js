@@ -1,4 +1,6 @@
-import React from 'react';
+const fs = require('fs');
+
+const content = `import React from 'react';
 import { useCurrentFrame, useVideoConfig, spring, interpolate, interpolateColors } from 'remotion';
 import type { AnimationType } from '../types';
 
@@ -70,13 +72,13 @@ export const WordByWord: React.FC<WordByWordProps> = ({
         const fromY = staggerPattern === 'wave' && i % 2 === 0 ? -40 : 40;
         const translateY = spring({ fps, frame: adjustedFrame, config: { damping: 14, stiffness: 120, mass: 0.8 }, from: fromY, to: 0 });
         const opacity = interpolate(adjustedFrame, [0, 8], [0, 1], { extrapolateRight: 'clamp' });
-        wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: 'inline-block' };
+        wordStyle = { transform: \`translateY(\${translateY}px)\`, opacity, display: 'inline-block' };
         break;
       }
       case 'slide-down': {
         const translateY = spring({ fps, frame: adjustedFrame, config: { damping: 14, stiffness: 120, mass: 0.8 }, from: -40, to: 0 });
         const opacity = interpolate(adjustedFrame, [0, 8], [0, 1], { extrapolateRight: 'clamp' });
-        wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: 'inline-block' };
+        wordStyle = { transform: \`translateY(\${translateY}px)\`, opacity, display: 'inline-block' };
         break;
       }
       case 'scale': {
@@ -85,7 +87,7 @@ export const WordByWord: React.FC<WordByWordProps> = ({
         const scaleFromZero = interpolate(adjustedFrame, [0, 4], [0, overshoot], { extrapolateRight: 'clamp' });
         const finalScale = adjustedFrame < 4 ? scaleFromZero : scale;
         const opacity = interpolate(adjustedFrame, [0, 5], [0, 1], { extrapolateRight: 'clamp' });
-        wordStyle = { transform: `scale(${finalScale})`, opacity, display: 'inline-block' };
+        wordStyle = { transform: \`scale(\${finalScale})\`, opacity, display: 'inline-block' };
         break;
       }
       case 'typewriter': {
@@ -119,14 +121,14 @@ export const WordByWord: React.FC<WordByWordProps> = ({
         ...wordStyle,
         color: currentTextColor,
         backgroundColor: revealMode === 'word' ? currentBgColor : 'transparent',
-        padding: `0 ${fontSize * 0.1 * highlightPop}px`,
-        borderRadius: `${fontSize * 0.15}px`,
-        boxShadow: revealMode === 'word' ? `0 ${fontSize * 0.05 * highlightPop}px ${fontSize * 0.15 * highlightPop}px rgba(0,0,0,${0.25 * highlightPop})` : 'none',
-        transform: `${wordStyle.transform || ''} scale(${1 + (0.08 * highlightPop)}) rotate(${(i % 2 === 0 ? -2 : 2) * highlightPop}deg)`,
+        padding: \`0 \${fontSize * 0.1 * highlightPop}px\`,
+        borderRadius: \`\${fontSize * 0.15}px\`,
+        boxShadow: revealMode === 'word' ? \`0 \${fontSize * 0.05 * highlightPop}px \${fontSize * 0.15 * highlightPop}px rgba(0,0,0,\${0.25 * highlightPop})\` : 'none',
+        transform: \`\${wordStyle.transform || ''} scale(\${1 + (0.08 * highlightPop)}) rotate(\${(i % 2 === 0 ? -2 : 2) * highlightPop}deg)\`,
         display: 'inline-block',
         lineHeight: 1,
-        margin: revealMode === 'word' ? `0 ${fontSize * 0.05 * highlightPop}px` : '0',
-        textShadow: revealMode === 'letter' && isActiveHighlight && !isStaticHighlighted ? `0 0 12px ${highlightColor}` : 'none'
+        margin: revealMode === 'word' ? \`0 \${fontSize * 0.05 * highlightPop}px\` : '0',
+        textShadow: revealMode === 'letter' && isActiveHighlight && !isStaticHighlighted ? \`0 0 12px \${highlightColor}\` : 'none'
       };
     }
 
@@ -142,14 +144,14 @@ export const WordByWord: React.FC<WordByWordProps> = ({
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         textAlign: 'center', lineHeight: 1.25, display: 'flex', flexWrap: 'wrap',
         justifyContent: 'center', alignItems: 'center',
-        gap: revealMode === 'word' ? `0 ${fontSize * 0.28}px` : `0 ${fontSize * 0.2}px`,
+        gap: revealMode === 'word' ? \`0 \${fontSize * 0.28}px\` : \`0 \${fontSize * 0.2}px\`,
       }}
     >
       {words.map((word, wIdx) => {
         if (revealMode === 'letter') {
           const chars = word.split('');
           return (
-            <span key={wIdx} style={{ display: 'inline-block', whiteSpace: 'nowrap', ...(highlightWords.includes(wIdx) ? { backgroundColor: highlightBgColor, padding: `0 ${fontSize * 0.1}px`, borderRadius: `${fontSize * 0.15}px` } : {}) }}>
+            <span key={wIdx} style={{ display: 'inline-block', whiteSpace: 'nowrap', ...(highlightWords.includes(wIdx) ? { backgroundColor: highlightBgColor, padding: \`0 \${fontSize * 0.1}px\`, borderRadius: \`\${fontSize * 0.15}px\` } : {}) }}>
               {chars.map((char, cIdx) => {
                 const i = globalItemIndex++;
                 const itemDelay = getDelay(i, totalItems);
@@ -157,7 +159,7 @@ export const WordByWord: React.FC<WordByWordProps> = ({
                 const wordStyle = getStyle(i, adjustedFrame, wIdx);
                 return <span key={cIdx} style={{ display: 'inline-block', ...wordStyle }}>{char}</span>;
               })}
-              {wIdx < words.length - 1 && <span style={{ display: 'inline-block', width: `${fontSize * 0.28}px` }} />}
+              {wIdx < words.length - 1 && <span style={{ display: 'inline-block', width: \`\${fontSize * 0.28}px\` }} />}
             </span>
           );
         } else {
@@ -175,3 +177,7 @@ export const WordByWord: React.FC<WordByWordProps> = ({
     </div>
   );
 };
+`;
+
+fs.writeFileSync('src/components/WordByWord.tsx', content);
+console.log('done');

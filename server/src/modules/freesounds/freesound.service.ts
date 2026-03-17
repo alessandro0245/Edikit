@@ -130,17 +130,17 @@ export class FreesoundService {
 
   /**
    * Fallback URLs — silent/minimal tracks if Freesound is unreachable.
-   * Replace these with your own S3 fallback tracks.
    */
   private getFallbackUrl(mood: MoodType): string {
-    const bucket = this.configService.get<string>('S3_OUTPUT_BUCKET') || 'edikit-ai-videos-prod';
+    // Instead of missing S3 bucket files, we fallback to our localized public SFX
+    // ensuring the Remotion player doesn't crash on [MediaError]
     const fallbacks: Record<MoodType, string> = {
-      energetic: `https://${bucket}.s3.amazonaws.com/music/fallback/energetic.mp3`,
-      cinematic: `https://${bucket}.s3.amazonaws.com/music/fallback/cinematic.mp3`,
-      corporate: `https://${bucket}.s3.amazonaws.com/music/fallback/corporate.mp3`,
-      chill:     `https://${bucket}.s3.amazonaws.com/music/fallback/chill.mp3`,
+      energetic: 'sfx/rise.mp3',
+      cinematic: 'sfx/rise-2.mp3',
+      corporate: 'sfx/impact-2.mp3',
+      chill:     'sfx/swoosh-4.mp3',
     };
-    return fallbacks[mood];
+    return fallbacks[mood] || 'sfx/rise.mp3';
   }
 
   /**

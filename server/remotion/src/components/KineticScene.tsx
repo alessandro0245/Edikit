@@ -72,7 +72,7 @@ const GlitchOverlay: React.FC<{ accentColor: string; seed: number }> = ({ accent
   const frame = useCurrentFrame();
   if (frame > 6) return null;
 
-  const [r, g, b] = hexRgb(accentColor);
+  const [r, , b] = hexRgb(accentColor);
   const intensity = interpolate(frame, [0, 6], [1, 0], { extrapolateRight: 'clamp' });
   const offsetX = (random(`glitch-x-${seed}-${frame}`) - 0.5) * 20 * intensity;
   const offsetY = (random(`glitch-y-${seed}-${frame}`) - 0.5) * 8  * intensity;

@@ -17,7 +17,7 @@ export const LogoLayer: React.FC<LogoLayerProps> = ({
   scene = 'intro',
 }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps, width } = useVideoConfig();
 
   // Spring entrance
   const scale = spring({

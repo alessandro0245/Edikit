@@ -1,5 +1,5 @@
 import React from 'react';
-import { Audio, useVideoConfig, staticFile } from 'remotion';
+import { Audio, staticFile } from 'remotion';
 import { getAnimationSfx, getSfxUrl } from '../../../src/modules/freesounds/audio-config';
 import type { AnimationType } from '../types';
 
@@ -7,14 +7,15 @@ interface SceneAudioProps {
   animation: AnimationType;
   sfxVolume: number;
   delay?: number; // frames before sfx fires
+  sceneIndex?: number;
 }
 
 export const SceneAudio: React.FC<SceneAudioProps> = ({
   animation,
   sfxVolume,
   delay = 5,
+  sceneIndex,
 }) => {
-  const { fps } = useVideoConfig();
   const sfxType = getAnimationSfx(animation);
 
   if (!sfxType) return null;
@@ -52,9 +53,10 @@ export const SceneAudio: React.FC<SceneAudioProps> = ({
 // Transition SFX — played at scene boundary
 interface TransitionAudioProps {
   sfxVolume: number;
+  transitionIndex?: number;
 }
 
-export const TransitionAudio: React.FC<TransitionAudioProps> = ({ sfxVolume }) => {
+export const TransitionAudio: React.FC<TransitionAudioProps> = ({ sfxVolume, transitionIndex }) => {
   return (
     <Audio
       src={staticFile(getSfxUrl('swoosh'))}

@@ -24,10 +24,6 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
-  const progress = interpolate(frame, [0, durationInFrames], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
-
   const colorB = accentColor ?? adjustBrightness(backgroundColor, -35);
   const colorC = adjustBrightness(backgroundColor, 20);
 
