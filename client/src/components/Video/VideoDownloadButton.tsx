@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { downloadVideo } from "@/lib/videoDownload";
 import { showInfoToast, showErrorToast } from "@/components/Toast/showToast";
 
 interface VideoDownloadButtonProps {
-  videoUrl: string;
+  videoUrl?: string; // Optional if getDownloadUrl is provided
+  getDownloadUrl?: () => Promise<string | null | undefined>; // For cases where we hit an API first
   filename?: string;
   variant?: "primary" | "secondary" | "outline";
   size?: "sm" | "md" | "lg";
@@ -17,8 +18,17 @@ interface VideoDownloadButtonProps {
   disabled?: boolean;
 }
 
+type DownloadState =
+  | "idle"
+  | "preparing"
+  | "downloading"
+  | "finalizing"
+  | "success"
+  | "error";
+
 export default function VideoDownloadButton({
-  videoUrl,
+  videoUrl: initialVideoUrl,
+  getDownloadUrl,
   filename,
   variant = "primary",
   size = "md",
@@ -28,86 +38,196 @@ export default function VideoDownloadButton({
   tooltip,
   disabled = false,
 }: VideoDownloadButtonProps) {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [state, setState] = useState<DownloadState>("idle");
+  const [progress, setProgress] = useState(0);
 
   const handleDownload = async () => {
-    setIsDownloading(true);
-    setDownloadProgress(0);
+    if (state !== "idle" && state !== "error") return;
+
+    setState("preparing");
+    setProgress(0);
 
     try {
-      await downloadVideo(videoUrl, {
+      // 1. Get URL if needed (This is the 4-5 second part)
+      let url = initialVideoUrl;
+      if (getDownloadUrl) {
+        url = (await getDownloadUrl()) || "";
+      }
+
+      if (!url) {
+        throw new Error("Could not retrieve download link");
+      }
+
+      // 2. Start Download
+      setState("downloading");
+      await downloadVideo(url, {
         filename,
-        onProgress: (progress) => setDownloadProgress(progress),
-        onSuccess: () => {
-          showInfoToast("Video downloaded successfully!");
+        onProgress: (p) => {
+          // Keep it at 99 max until finalizing
+          setProgress(Math.min(p, 99));
         },
-        onError: (error) => {
-          showErrorToast(error);
-          onError?.(error);
+        onSuccess: () => {
+          setState("finalizing");
+          setProgress(100);
+          setTimeout(() => {
+            setState("success");
+            showInfoToast("Video downloaded successfully!");
+            setTimeout(() => setState("idle"), 3000);
+          }, 800);
+        },
+        onError: (err) => {
+          setState("error");
+          showErrorToast(err);
+          onError?.(err);
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Download failed:", error);
-      showErrorToast("Failed to download video");
-    } finally {
-      setTimeout(() => {
-        setIsDownloading(false);
-        setDownloadProgress(0);
-      }, 1000);
+      setState("error");
+      const message =
+        error instanceof Error ? error.message : "Failed to download video";
+      showErrorToast(message);
+      setTimeout(() => setState("idle"), 3000);
     }
   };
 
-  // Button size styles
   const sizeStyles = {
-    sm: "px-3 py-1.5 text-sm gap-1.5",
-    md: "px-4 py-2.5 text-sm gap-2",
-    lg: "px-6 py-3 text-base gap-2",
+    sm: "h-9 px-3 text-sm gap-2",
+    md: "h-11 px-5 text-sm gap-2.5",
+    lg: "h-14 px-8 text-base gap-3",
   };
 
-  // Button variant styles
-  const variantStyles = {
-    primary:
-      "bg-linear-to-r from-primary to-primary/90 text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl",
-    secondary:
-      "bg-secondary text-secondary-foreground hover:bg-secondary/90",
-    outline:
-      "border border-border text-foreground hover:bg-accent",
+  const variantConfigs = {
+    primary: {
+      base: "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/95",
+      progress: "bg-white/20",
+      icon: "text-primary-foreground",
+    },
+    secondary: {
+      base: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      progress: "bg-primary/20",
+      icon: "text-secondary-foreground",
+    },
+    outline: {
+      base: "border border-border bg-background text-foreground hover:bg-accent",
+      progress: "bg-primary/10",
+      icon: "text-foreground",
+    },
   };
 
-  const iconSize = size === "sm" ? 4 : size === "lg" ? 5 : 4;
+  const currentVariant = variantConfigs[variant];
+  const isPending =
+    state !== "idle" && state !== "success" && state !== "error";
 
   return (
-    <div className="space-y-3">
+    <div className={`relative group ${className}`}>
       <button
         onClick={handleDownload}
-        disabled={isDownloading || disabled}
+        disabled={isPending || disabled}
         title={tooltip}
-        className={`inline-flex items-center justify-center rounded-lg font-medium transition-all disabled:opacity-60 disabled:cursor-not-allowed ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+        className={`
+          relative w-full overflow-hidden inline-flex items-center justify-center rounded-xl font-semibold 
+          transition-all duration-300 active:scale-[0.98] disabled:cursor-wait
+          ${sizeStyles[size]} 
+          ${state === "error" ? "bg-destructive text-destructive-foreground" : currentVariant.base}
+          ${disabled && state === "idle" ? "opacity-50 cursor-not-allowed grayscale" : ""}
+        `}
       >
-        {isDownloading ? (
-          <>
-            <Loader2 className={`w-${iconSize} h-${iconSize} animate-spin`} />
-            {showLabel && `Downloading... ${downloadProgress}%`}
-          </>
-        ) : (
-          <>
-            <Download className={`w-${iconSize} h-${iconSize}`} />
-            {showLabel && "Download Video"}
-          </>
+        {/* Idle Shine Effect */}
+        {state === "idle" && !disabled && (
+          <div className="absolute inset-0 z-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
         )}
+
+        {/* Progress Fill Background */}
+        {isPending && (
+          <div
+            className={`absolute inset-y-0 left-0 transition-all duration-700 ease-in-out z-0 ${currentVariant.progress}`}
+            style={{ width: `${state === "preparing" ? 25 : progress}%` }}
+          />
+        )}
+
+        {/* Shimmer effect during download */}
+        {state === "downloading" && (
+          <div className="absolute inset-0 z-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center justify-center gap-2.5">
+          {state === "idle" && (
+            <>
+              <Download className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+              {showLabel && <span>Download Video</span>}
+            </>
+          )}
+
+          {state === "preparing" && (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-white/80" />
+              {showLabel && (
+                <span className="animate-pulse flex items-center gap-1">
+                  Preparing<span>...</span>
+                </span>
+              )}
+            </>
+          )}
+
+          {state === "downloading" && (
+            <div className="flex flex-col items-center gap-0.5">
+              {showLabel && (
+                <span className="text-sm font-bold tracking-tight">
+                  Downloading {progress}%
+                </span>
+              )}
+              <div className="flex gap-1">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 h-1 rounded-full bg-current animate-bounce"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {state === "finalizing" && (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {showLabel && (
+                <span className="animate-pulse">Wrapping up...</span>
+              )}
+            </>
+          )}
+
+          {state === "success" && (
+            <>
+              <CheckCircle2 className="w-5 h-5 text-white animate-[in_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]" />
+              {showLabel && (
+                <span className="animate-[in_0.4s_ease-out] font-bold">
+                  Success!
+                </span>
+              )}
+            </>
+          )}
+
+          {state === "error" && (
+            <>
+              <AlertCircle className="w-4 h-4 animate-bounce" />
+              {showLabel && <span>Retry Download</span>}
+            </>
+          )}
+        </div>
       </button>
 
-      {isDownloading && downloadProgress > 0 && (
-        <div className="space-y-1">
-          <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-primary h-full transition-all duration-300"
-              style={{ width: `${downloadProgress}%` }}
-            />
-          </div>
-          <p className="text-xs text-center text-muted-foreground">
-            {downloadProgress}% downloaded
+      {/* Helper text for long downloads */}
+      {isPending && (
+        <div className="absolute -bottom-6 left-0 right-0 text-center animate-in fade-in slide-in-from-top-1">
+          <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">
+            {state === "preparing"
+              ? "Establishing secure connection..."
+              : state === "downloading"
+                ? "Fetching data packets..."
+                : "Saving to your device..."}
           </p>
         </div>
       )}

@@ -643,9 +643,9 @@ export default function PromptPage() {
                 </button>
               )}
 
-              {isComplete && outputUrl && (
+              {isComplete && (
                 <VideoDownloadButton
-                  videoUrl={outputUrl}
+                  getDownloadUrl={handleDownload}
                   filename={downloadFilename}
                   variant="primary"
                   size="lg"
