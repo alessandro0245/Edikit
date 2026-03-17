@@ -177,7 +177,7 @@ export default function Hero() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/templates"
-                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold bg-primary-gradient text-primary-foreground rounded-xl shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold bg-primary-gradient text-primary-foreground rounded-xl shadow-lg shadow-primary/25 transition-all  hover:-translate-y-0.5"
                   >
                     <Play className="w-5 h-5" />
                     Start Creating
