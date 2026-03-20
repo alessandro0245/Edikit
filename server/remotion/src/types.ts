@@ -31,9 +31,7 @@ export interface AudioConfig {
 }
 
 export interface VideoAssets {
-  logoUrl?:      string; // shown in intro + CTA with spring animation
   bgImageUrl?:   string; // replaces solid bg on intro scene
-  watermarkUrl?: string; // small fixed overlay on every scene
   mediaUrls?:    string[]; // array of images/videos to be used dynamically per scene
 }
 

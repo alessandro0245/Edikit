@@ -8,7 +8,6 @@ import {
 } from 'remotion';
 import { BackgroundLayer } from './BackgroundLayer';
 import { BgImageLayer } from './BgImageLayer';
-import { LogoLayer } from './LogoLayer';
 import { WordByWord } from './WordByWord';
 import { ParticleLayer } from './ParticleLayer';
 import { GrainOverlay } from './GrainOverlay';
@@ -65,9 +64,8 @@ export const IntroScene: React.FC<{
   scene:      Scene;
   sceneIndex?: number;
   audio?:     AudioConfig;
-  logoUrl?:   string;    // ← NEW
   bgImageUrl?: string;   // ← NEW
-}> = ({ scene, sceneIndex = 0, audio, logoUrl, bgImageUrl }) => {
+}> = ({ scene, sceneIndex = 0, audio, bgImageUrl }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
@@ -148,17 +146,6 @@ export const IntroScene: React.FC<{
           />
         )}
       </AbsoluteFill>
-
-      {/* Logo — top-left corner, animates in after text */}
-      {logoUrl && (
-        <LogoLayer
-          logoUrl={logoUrl}
-          position="top-left"
-          size={narrow ? 80 : 120}
-          delay={8}
-          scene="intro"
-        />
-      )}
 
       <GrainOverlay opacity={0.04} />
       {audio && (

@@ -51,7 +51,7 @@ export const MediaLayer: React.FC<{ mediaUrl?: string, sceneIndex?: number }> = 
       {/* Background bleed preventer - heavily blurred copy of itself behind everything */}
       <AbsoluteFill style={{ transform: 'scale(1.5)', filter: 'blur(40px)', opacity: 0.5 }}>
         {isVideo ? (
-          <Video src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video muted volume={0} src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <Img src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
@@ -68,7 +68,7 @@ export const MediaLayer: React.FC<{ mediaUrl?: string, sceneIndex?: number }> = 
         }}
       >
         {isVideo ? (
-          <Video src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video muted volume={0} src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <Img src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
@@ -85,7 +85,7 @@ export const MediaLayer: React.FC<{ mediaUrl?: string, sceneIndex?: number }> = 
         }}
       >
         {isVideo ? (
-          <Video src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video muted volume={0} src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <Img src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
@@ -101,7 +101,7 @@ export const MediaLayer: React.FC<{ mediaUrl?: string, sceneIndex?: number }> = 
         }}
       >
         {isVideo ? (
-          <Video src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video muted volume={0} src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <Img src={mediaUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
