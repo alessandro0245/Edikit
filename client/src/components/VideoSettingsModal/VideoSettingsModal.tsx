@@ -2,26 +2,23 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import {
-  X, Palette, Music, Sliders, Check, Wand2,
-  Volume2, VolumeX, Zap, Film, Briefcase, Leaf, Shuffle,
+  X, Palette, Sliders, Check
 } from "lucide-react";
-import { PalettePicker } from "@/app/prompt/[id]/PalettePicker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface VideoSettings {
-  paletteId: string | null;
-  soundtrackMood: SoundtrackMood;
+  backgroundColor: string | null;
+  textColor: string | null;
   animationIntensity: AnimationIntensity;
   aspectRatio: AspectRatio;
 }
 
-export type SoundtrackMood     = "auto" | "energetic" | "cinematic" | "corporate" | "chill" | "none";
 export type AnimationIntensity = "subtle" | "dynamic" | "intense";
 export type AspectRatio        = "16:9" | "9:16" | "1:1";
 
 export const DEFAULT_SETTINGS: VideoSettings = {
-  paletteId:          null,
-  soundtrackMood:     "auto",
+  backgroundColor:    null,
+  textColor:          null,
   animationIntensity: "dynamic",
   aspectRatio:        "16:9",
 };
@@ -36,14 +33,14 @@ interface VideoSettingsModalProps {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 export function countChanges(settings: VideoSettings): number {
   let n = 0;
-  if (settings.paletteId          !== DEFAULT_SETTINGS.paletteId)          n++;
-  if (settings.soundtrackMood     !== DEFAULT_SETTINGS.soundtrackMood)     n++;
+  if (settings.backgroundColor    !== DEFAULT_SETTINGS.backgroundColor)    n++;
+  if (settings.textColor          !== DEFAULT_SETTINGS.textColor)          n++;
   if (settings.animationIntensity !== DEFAULT_SETTINGS.animationIntensity) n++;
   if (settings.aspectRatio        !== DEFAULT_SETTINGS.aspectRatio)        n++;
   return n;
 }
 
-type Tab = "palette" | "soundtrack" | "style";
+type Tab = "colors" | "style";
 
 // ─── Option button (reusable) ─────────────────────────────────────────────────
 function OptionButton<T extends string>({
@@ -81,40 +78,58 @@ function OptionButton<T extends string>({
   );
 }
 
-// ─── Tab: Soundtrack ──────────────────────────────────────────────────────────
-const SOUNDTRACK_OPTIONS: {
-  value: SoundtrackMood;
-  label: string;
-  desc: string;
-  icon: React.ReactNode;
-  color: string;
-}[] = [
-  { value: "auto",       label: "Auto",      desc: "AI matches your prompt",    icon: <Wand2   className="w-5 h-5" />, color: "text-white/60"   },
-  { value: "energetic",  label: "Energetic",  desc: "High energy & punchy",     icon: <Zap     className="w-5 h-5" />, color: "text-orange-400" },
-  { value: "cinematic",  label: "Cinematic",  desc: "Dramatic & atmospheric",   icon: <Film    className="w-5 h-5" />, color: "text-cyan-400"   },
-  { value: "corporate",  label: "Corporate",  desc: "Clean & professional",     icon: <Briefcase className="w-5 h-5" />, color: "text-blue-400" },
-  { value: "chill",      label: "Chill",      desc: "Relaxed & ambient",        icon: <Leaf    className="w-5 h-5" />, color: "text-emerald-400"},
-  { value: "none",       label: "No Music",   desc: "Silent background",        icon: <VolumeX className="w-5 h-5" />, color: "text-white/30"   },
-];
-
-function SoundtrackTab({
-  value, onChange,
-}: { value: SoundtrackMood; onChange: (v: SoundtrackMood) => void }) {
+// ─── Tab: Colors (Solid/Gradient BG + Text) ──────────────────────────────────
+function ColorPickerTab({
+  backgroundColor, textColor,
+  onBackground, onText,
+}: {
+  backgroundColor: string | null;
+  textColor: string | null;
+  onBackground: (v: string) => void;
+  onText: (v: string) => void;
+}) {
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Background music mood for your video. Auto detects the best match from your prompt.
-        </p>
+    <div className="space-y-6">
+      {/* Background Color */}
+      <div className="space-y-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Background Color</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Solid or gradient for the video background.</p>
+        </div>
+        <div className="flex flex-col gap-3">
+            <input
+              type="color"
+              value={backgroundColor || "#000000"}
+              onChange={(e) => onBackground(e.target.value)}
+              className="w-full h-12 p-1 rounded-lg border border-border bg-background cursor-pointer"
+            />
+            <div className="flex gap-2 text-xs">
+              <button onClick={() => onBackground("#000000")} className="px-2 py-1 rounded bg-black text-white border border-white/20">Black</button>
+              <button onClick={() => onBackground("#ffffff")} className="px-2 py-1 rounded bg-white text-black border border-black/10">White</button>
+              <button onClick={() => onBackground("#1a1a2e")} className="px-2 py-1 rounded bg-[#1a1a2e] text-white">Dark Blue</button>
+            </div>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-2.5">
-        {SOUNDTRACK_OPTIONS.map((opt) => (
-          <OptionButton key={opt.value} value={opt.value} current={value} onClick={onChange}>
-            <span className={opt.color}>{opt.icon}</span>
-            <span className="text-[13px] font-semibold leading-none">{opt.label}</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-          </OptionButton>
-        ))}
+
+      {/* Text Color */}
+      <div className="space-y-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Text Color</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Primary color for text and headings.</p>
+        </div>
+        <div className="flex flex-col gap-3">
+            <input
+              type="color"
+              value={textColor || "#ffffff"}
+              onChange={(e) => onText(e.target.value)}
+              className="w-full h-12 p-1 rounded-lg border border-border bg-background cursor-pointer"
+            />
+             <div className="flex gap-2 text-xs">
+              <button onClick={() => onText("#ffffff")} className="px-2 py-1 rounded bg-white text-black border border-black/10">White</button>
+              <button onClick={() => onText("#000000")} className="px-2 py-1 rounded bg-black text-white border border-white/20">Black</button>
+              <button onClick={() => onText("#fbbf24")} className="px-2 py-1 rounded bg-amber-400 text-black">Amber</button>
+            </div>
+        </div>
       </div>
     </div>
   );
@@ -153,9 +168,9 @@ function StyleTab({
         </div>
         <div className="grid grid-cols-3 gap-2">
           {ANIMATION_OPTIONS.map((opt) => (
-            <OptionButton key={opt.value} value={opt.value} current={intensity} onClick={onIntensity}>
+            <OptionButton key={opt.value} value={opt.value} current={intensity} onClick={onIntensity} className="h-full">
               {/* Motion bar preview */}
-              <div className="flex items-end gap-0.5 h-5">
+              <div className="flex items-end gap-0.5 h-6 mb-2">
                 {opt.preview.map((op, i) => (
                   <div
                     key={i}
@@ -164,8 +179,8 @@ function StyleTab({
                   />
                 ))}
               </div>
-              <span className="text-[12px] font-semibold leading-none">{opt.label}</span>
-              <span className="text-[10px] text-muted-foreground leading-tight text-center">{opt.desc}</span>
+              <span className="text-[13px] font-semibold leading-none">{opt.label}</span>
+              <span className="text-[10px] text-muted-foreground leading-tight text-center mt-1">{opt.desc}</span>
             </OptionButton>
           ))}
         </div>
@@ -179,18 +194,18 @@ function StyleTab({
         </div>
         <div className="grid grid-cols-3 gap-2">
           {ASPECT_OPTIONS.map((opt) => (
-            <OptionButton key={opt.value} value={opt.value} current={aspectRatio} onClick={onAspectRatio}>
+            <OptionButton key={opt.value} value={opt.value} current={aspectRatio} onClick={onAspectRatio} className="h-full">
               {/* Visual ratio preview */}
-              <div className="flex items-center justify-center h-10">
+              <div className="flex items-center justify-center h-10 mb-2">
                 <div
                   style={{ width: opt.w, height: opt.h }}
-                  className={`rounded border-2 transition-colors ${
+                  className={`rounded-sm border-2 transition-colors ${
                     aspectRatio === opt.value ? "border-primary bg-primary/15" : "border-border/60 bg-muted/30"
                   }`}
                 />
               </div>
-              <span className="text-[12px] font-semibold leading-none">{opt.label}</span>
-              <span className="text-[10px] text-muted-foreground">{opt.desc}</span>
+              <span className="text-[13px] font-semibold leading-none">{opt.label}</span>
+              <span className="text-[10px] text-muted-foreground mt-1">{opt.desc}</span>
             </OptionButton>
           ))}
         </div>
@@ -204,7 +219,7 @@ function StyleTab({
 export function VideoSettingsModal({
   open, onClose, settings, onChange,
 }: VideoSettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("palette");
+  const [activeTab, setActiveTab] = useState<Tab>("colors");
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
@@ -226,8 +241,7 @@ export function VideoSettingsModal({
   const changes = countChanges(settings);
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "palette",    label: "Palette",    icon: <Palette className="w-3.5 h-3.5" /> },
-    { id: "soundtrack", label: "Soundtrack", icon: <Music   className="w-3.5 h-3.5" /> },
+    { id: "colors",    label: "Colors",    icon: <Palette className="w-3.5 h-3.5" /> },
     { id: "style",      label: "Style",      icon: <Sliders className="w-3.5 h-3.5" /> },
   ];
 
@@ -288,10 +302,12 @@ export function VideoSettingsModal({
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             // Show dot if tab has non-default setting
-            const hasDot =
-              (tab.id === "palette"    && settings.paletteId !== null) ||
-              (tab.id === "soundtrack" && settings.soundtrackMood !== "auto") ||
-              (tab.id === "style"      && (settings.animationIntensity !== "dynamic" || settings.aspectRatio !== "16:9"));
+            // Simple approach: colors dot if bg/text changed from default (null here means default)
+            // But default is null. So if not null, it's changed?
+            const isColorsActive = (settings.backgroundColor !== null || settings.textColor !== null);
+            const isStyleActive = (settings.animationIntensity !== "dynamic" || settings.aspectRatio !== "16:9");
+
+            const hasDot = (tab.id === "colors" && isColorsActive) || (tab.id === "style" && isStyleActive);
 
             return (
               <button
@@ -299,10 +315,10 @@ export function VideoSettingsModal({
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium
+                  relative flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium
                   transition-all duration-200 cursor-pointer
                   ${isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "text-primary-foreground shadow-sm bg-primary/10 ring-1 ring-primary/20"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                   }
                 `}
@@ -327,17 +343,12 @@ export function VideoSettingsModal({
           [&::-webkit-scrollbar-thumb]:bg-border/30
           [&::-webkit-scrollbar-thumb]:rounded-full">
 
-          {activeTab === "palette" && (
-            <PalettePicker
-              selectedId={settings.paletteId}
-              onSelect={(id) => onChange({ ...settings, paletteId: id })}
-            />
-          )}
-
-          {activeTab === "soundtrack" && (
-            <SoundtrackTab
-              value={settings.soundtrackMood}
-              onChange={(v) => onChange({ ...settings, soundtrackMood: v })}
+          {activeTab === "colors" && (
+            <ColorPickerTab
+              backgroundColor={settings.backgroundColor}
+              textColor={settings.textColor}
+              onBackground={(v) => onChange({ ...settings, backgroundColor: v })}
+              onText={(v) => onChange({ ...settings, textColor: v })}
             />
           )}
 

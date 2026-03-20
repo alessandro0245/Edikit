@@ -6,10 +6,9 @@ import { RemotionLambdaService } from './remotion-lambda.service';
 import { CreditsModule } from '../credits/credits.module';
 import { S3Module } from '../s3/s3.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
-import { FreesoundModule } from '../freesounds/freesound.module';
 
 @Module({
-  imports: [CreditsModule, S3Module, PrismaModule, FreesoundModule],
+  imports: [CreditsModule, S3Module, PrismaModule],
   controllers: [VideoController],
   providers: [VideoService, PromptService, RemotionLambdaService],
 })

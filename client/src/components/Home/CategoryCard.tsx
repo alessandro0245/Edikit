@@ -1,23 +1,20 @@
 "use client";
 
 import {
-  Instagram,
-  Briefcase,
-  Heart,
-  GraduationCap,
-  Sparkles,
+  Play,
+  FileText,
+  MousePointerClick,
   Wand2,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+// Map IDs to Lucide icons
 const iconMap = {
-  instagram: Instagram,
-  briefcase: Briefcase,
-  heart: Heart,
-  graduationCap: GraduationCap,
-  sparkles: Sparkles,
+  intro: Play,
+  content: FileText,
+  cta: MousePointerClick,
   custom: Wand2,
 };
 
@@ -42,7 +39,7 @@ export default function CategoryCard({
   imageUrl,
   isCustom = false,
 }: CategoryCardProps) {
-  const Icon = iconMap[iconName];
+  const Icon = iconMap[iconName] || Wand2;
 
   return (
     <Link href={`/prompt/${id}`} className="group h-full">
@@ -54,45 +51,45 @@ export default function CategoryCard({
               src={imageUrl}
               alt={title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-40 group-hover:opacity-50"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-card via-card/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-card via-card/80 to-transparent" />
           </div>
         )}
 
         {/* Content */}
-        <div className="relative h-full p-6 flex flex-col justify-between">
+        <div className="relative h-full p-6 flex flex-col justify-between z-10">
           {/* Icon & Title Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-background/80 backdrop-blur-sm group-hover:bg-primary/20 transition-colors duration-300">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-background/80 backdrop-blur-md group-hover:bg-primary/20 transition-colors duration-300 shadow-sm border border-border/50">
                 <Icon
-                  className={`w-5 h-5 transition-colors duration-300 ${
+                  className={`w-6 h-6 transition-colors duration-300 ${
                     isCustom ? "text-primary" : "text-foreground"
                   } group-hover:text-primary`}
                   strokeWidth={2}
                 />
               </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-foreground group-hover:text-foreground transition-colors">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                 {title}
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2 font-medium">
                 {description}
               </p>
             </div>
           </div>
 
           {/* Examples Tags */}
-          {examples.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {examples.map((example, index) => (
+          {examples && examples.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-6">
+              {examples.slice(0, 3).map((example, index) => (
                 <span
                   key={index}
-                  className="inline-block text-xs px-2.5 py-1 bg-background/60 backdrop-blur-sm text-foreground/70 rounded-full group-hover:bg-primary/20 group-hover:text-primary transition-colors duration-300"
+                  className="inline-block text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 bg-background/80 backdrop-blur-sm text-muted-foreground rounded-md border border-border/50 group-hover:border-primary/30 transition-colors duration-300"
                 >
                   {example}
                 </span>

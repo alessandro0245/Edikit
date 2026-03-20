@@ -22,11 +22,11 @@ export class GeneratePromptDto {
 
   @IsOptional()
   @IsString()
-  paletteId?: string;
+  backgroundColor?: string;
 
   @IsOptional()
-  @IsIn(['energetic', 'cinematic', 'corporate', 'chill', 'none'])
-  soundtrackMood?: string;
+  @IsString()
+  textColor?: string;
 
   @IsOptional()
   @IsIn(['subtle', 'dynamic', 'intense'])
@@ -38,15 +38,7 @@ export class GeneratePromptDto {
 
   @IsOptional()
   @IsString()
-  logoUrl?: string;
-
-  @IsOptional()
-  @IsString()
   bgImageUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  watermarkUrl?: string;
 
   @IsOptional()
   @IsArray()

@@ -98,9 +98,29 @@ export function generateVisualSeed(
 
 // ─── Prompt Builder ───────────────────────────────────────────────────────────
 
-function buildPrompt(categoryInstructions: string, seed: VisualSeed): string {
+function buildPrompt(categoryInstructions: string, seed: VisualSeed, singleSceneType?: 'intro' | 'content' | 'cta'): string {
   const p   = seed.palette;
   const dim = DIMENSIONS[seed.aspectRatio];
+  const isSingleScene = !!singleSceneType;
+
+  // If asking for a specific scene type, enforce "1 scene" rule. Otherwise, standard multi-scene rules.
+  const hardRules = isSingleScene
+    ? `
+HARD RULES:
+- EXACTLY ONE scene in the "scenes" array.
+- The scene type MUST match "${singleSceneType}".
+- Focus strictly on the rules for "${singleSceneType}" scenes below.
+- Duration: ${singleSceneType === 'intro' ? '2.5-3.5' : singleSceneType === 'content' ? '3-6' : '3-4'} seconds.
+- Output width MUST be ${dim.width}, height MUST be ${dim.height}
+`
+    : `
+HARD RULES:
+- Exactly ONE intro (first scene), ONE cta (last scene), rest are content
+- Total scenes: ${seed.mediaCount ? seed.mediaCount + 2 : '4-7'}
+- NO two consecutive content scenes use the same backgroundColor
+- Content textColor MUST be the correct pair for its backgroundColor
+- Output width MUST be ${dim.width}, height MUST be ${dim.height}
+`;
 
   return `
 You are an expert motion-graphics director creating kinetic typography videos.
@@ -132,8 +152,8 @@ INTRO SCENE RULES (type: "intro"):
 - text: Use pipe | to split into 2 lines. MAX 3 words per line. ALL CAPS.
   Example: "MEET YOUR|NEW EDITOR" or "INTRODUCING|EDIKIT AI"
 - subtext: ONE punchy line, max 5 words, all caps
-- backgroundColor: "#050505"
-- textColor: "${p.accent}" ← this becomes the first block color
+- backgroundColor: "${p.bg1}"
+- textColor: "${p.textOnBg1}"
 - duration: 2-2.5 seconds
 - fontSize: 80-96
 - animation: "slide" or "scale"
@@ -153,19 +173,14 @@ CTA SCENE RULES (type: "cta"):
 - text: Use pipe | to split into 2 lines. SHORT action phrase. ALL CAPS.
   Example: "START NOW|IT'S FREE" or "JOIN TODAY|GET STARTED"
 - subtext: Brand tagline or URL, short
-- backgroundColor: "#050505"
-- textColor: "${p.bgCta}" ← vivid CTA color as block color
+- backgroundColor: "${p.bgCta}"
+- textColor: "${p.textOnCta}"
 - duration: 2-3 seconds
 - fontSize: 80-96
 - animation: "scale" or "slide"
 ══════════════════════════════════════════════════
 
-HARD RULES:
-- Exactly ONE intro (first scene), ONE cta (last scene), rest are content
-- Total scenes: ${seed.mediaCount ? seed.mediaCount + 2 : '4-7'}
-- NO two consecutive content scenes use the same backgroundColor
-- Content textColor MUST be the correct pair for its backgroundColor
-- Output width MUST be ${dim.width}, height MUST be ${dim.height}
+${hardRules}
 
 ${categoryInstructions}
 
@@ -190,6 +205,49 @@ Ratio:     ${seed.aspectRatio} (${dim.width}×${dim.height})
 // ─── Category Templates ───────────────────────────────────────────────────────
 
 export const CATEGORY_TEMPLATES: Record<string, CategoryTemplate> = {
+  // New Single-Scene Templates
+  intro: {
+    getSystemPrompt: (seed) => buildPrompt(`
+CATEGORY: INTRO SCENE
+- Create a HIGH IMPACT opener.
+- Focus on grabbing attention immediately.
+- Use bold, large typography.
+`, seed, 'intro'),
+    defaultSceneCount: 1,
+    defaultDuration: 3,
+  },
+
+  content: {
+    getSystemPrompt: (seed) => buildPrompt(`
+CATEGORY: CONTENT SCENE
+- Clear, informative, and easy to read.
+- Focus on delivering the message effectively.
+`, seed, 'content'),
+    defaultSceneCount: 1,
+    defaultDuration: 4,
+  },
+
+  cta: {
+    getSystemPrompt: (seed) => buildPrompt(`
+CATEGORY: CALL TO ACTION
+- Strong, persuasive closing scene.
+- Clear directive to the viewer.
+`, seed, 'cta'),
+    defaultSceneCount: 1,
+    defaultDuration: 3,
+  },
+
+  // Retain default for fallback
+  default: {
+    getSystemPrompt: (seed) => buildPrompt(`
+CATEGORY: GENERAL
+- Balanced mix of animations.
+`, seed),
+    defaultSceneCount: 4,
+    defaultDuration: 3,
+  },
+
+  // Retain existing categories for backward compatibility (optional, but safer)
   marketing: {
     getSystemPrompt: (seed) => buildPrompt(`
 CATEGORY: MARKETING / ADVERTISING
@@ -254,17 +312,6 @@ CATEGORY: CREATIVE / ARTISTIC
 - fontSize swings: 48 to 96 across scenes.
 `, seed),
     defaultSceneCount: 5,
-    defaultDuration: 3,
-  },
-
-  default: {
-    getSystemPrompt: (seed) => buildPrompt(`
-CATEGORY: GENERAL
-- Balanced mix of animations — no single type more than twice.
-- 4-5 scenes, varied durations (2-4 seconds).
-- Tone: clear, engaging, adaptable.
-`, seed),
-    defaultSceneCount: 4,
     defaultDuration: 3,
   },
 };

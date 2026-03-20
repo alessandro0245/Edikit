@@ -32,7 +32,7 @@ import type { UploadedAssets } from "@/components/Home/AssetUploadStep";
 import { SceneAssignmentCanvas } from "./SceneAssignmentCanvas";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type AssetType = "logo" | "background" | "watermark" | "media";
+type AssetType = "background" | "media";
 
 interface AssetSlotConfig {
   type: AssetType;
@@ -43,53 +43,34 @@ interface AssetSlotConfig {
 
 const ASSET_SLOTS: AssetSlotConfig[] = [
   {
-    type: "logo",
-    label: "Logo",
-    hint: "PNG with transparent bg",
-    icon: <ImagePlus className="w-4 h-4" />,
-  },
-  {
     type: "background",
     label: "Background Image",
     hint: "Replaces intro scene bg",
     icon: <Layers className="w-4 h-4" />,
   },
   {
-    type: "watermark",
-    label: "Watermark",
-    hint: "Subtle corner overlay",
-    icon: <Stamp className="w-4 h-4" />,
-  },
-  {
     type: "media",
-    label: "Custom Media",
+    label: "Video Media",
     hint: "Any image or video overlay",
     icon: <ImagePlus className="w-4 h-4" />,
   },
 ];
 
 const ASSET_KEY_MAP: Record<AssetType, keyof UploadedAssets> = {
-  logo: "logoUrl",
   background: "bgImageUrl",
-  watermark: "watermarkUrl",
-  media: "mediaUrls" as any,
+  media: "mediaUrls" as any, // Not used directly in generic set due to array behavior
 };
-// ─── Asset Upload Step ────────────────────────────────────────────────────────
-function AssetUploadStep({
-  onComplete,
+// ─── Asset Uploader ───────────────────────────────────────────────────────────
+function AssetUploader({
+  assets,
+  setAssets,
 }: {
-  onComplete: (assets: UploadedAssets) => void;
+  assets: UploadedAssets;
+  setAssets: React.Dispatch<React.SetStateAction<UploadedAssets>>;
 }) {
-  const [assets, setAssets] = useState<UploadedAssets>({});
   const [uploading, setUploading] = useState<AssetType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-
-  const uploadCount = Object.keys(assets).reduce((acc, key) => {
-    const val = assets[key as keyof UploadedAssets];
-    if (Array.isArray(val)) return acc + val.length;
-    return val ? acc + 1 : acc;
-  }, 0);
 
   const handleUpload = async (type: AssetType, file: File) => {
     if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
@@ -125,10 +106,8 @@ function AssetUploadStep({
     setError(null);
     try {
       if (type === "media") {
-        // Run concurrent uploads logic internally within the same lifecycle bound
         await Promise.all(Array.from(files).map((f) => handleUpload(type, f)));
       } else {
-        // Single file
         await handleUpload(type, Array.from(files)[0]);
       }
     } catch (err: any) {
@@ -143,24 +122,16 @@ function AssetUploadStep({
   };
 
   return (
-    <div className="space-y-7">
-      {/* Header */}
+    <div className="space-y-4">
       <div className="space-y-1">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-1 h-5 bg-primary rounded-full" />
-          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
-            Step 1 of 2
-          </span>
-        </div>
-        <h2 className="text-xl font-bold text-foreground tracking-tight">
-          Brand Assets
-        </h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Upload your assets to personalize the video. All fields are optional.
+        <h3 className="text-sm font-semibold text-foreground tracking-tight">
+          Assets (Optional)
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          Upload images or videos to include in your video.
         </p>
       </div>
 
-      {/* Upload slots */}
       <div className="space-y-3">
         {ASSET_SLOTS.map((slot) => {
           const key = ASSET_KEY_MAP[slot.type] as keyof UploadedAssets;
@@ -245,8 +216,8 @@ function AssetUploadStep({
                           onClick={() =>
                             setAssets((prev) => {
                               const n = { ...prev };
-                              if (isMedia && n.mediaUrls) {
-                                n.mediaUrls = n.mediaUrls.filter(
+                              if (isMedia) {
+                                n.mediaUrls = (n.mediaUrls || []).filter(
                                   (_, index) => index !== i,
                                 );
                               } else {
@@ -304,40 +275,6 @@ function AssetUploadStep({
           <p className="text-xs text-destructive">{error}</p>
         </div>
       )}
-
-      {/* File note */}
-      <p className="text-[10px] font-mono text-muted-foreground/35 text-center tracking-wider uppercase">
-        PNG · JPEG · WEBP · SVG · Max 5MB
-      </p>
-
-      {/* Actions */}
-      <div className="flex gap-2.5 pt-1">
-        <button
-          type="button"
-          onClick={() => onComplete({})}
-          className="px-5 py-3 rounded-xl border border-border/50 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border transition-all cursor-pointer"
-        >
-          Skip
-        </button>
-        <button
-          type="button"
-          onClick={() => onComplete(assets)}
-          className="group flex-1 relative overflow-hidden flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 cursor-pointer"
-        >
-          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-          {uploadCount > 0 ? (
-            <>
-              <Sparkles className="w-4 h-4" />
-              Continue with {uploadCount} asset{uploadCount > 1 ? "s" : ""}
-            </>
-          ) : (
-            <>
-              Continue
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </>
-          )}
-        </button>
-      </div>
     </div>
   );
 }
@@ -532,6 +469,7 @@ function PromptStep({
   prompt,
   setPrompt,
   assets,
+  setAssets,
   settings,
   setSettings,
   settingsOpen,
@@ -542,11 +480,11 @@ function PromptStep({
   canRender,
   changeCount,
   onSubmit,
-  onBack,
 }: {
   prompt: string;
   setPrompt: (v: string) => void;
   assets: UploadedAssets;
+  setAssets: React.Dispatch<React.SetStateAction<UploadedAssets>>;
   settings: any;
   setSettings: (s: any) => void;
   settingsOpen: boolean;
@@ -557,79 +495,26 @@ function PromptStep({
   canRender: boolean | null | undefined;
   changeCount: number;
   onSubmit: (e: React.FormEvent) => void;
-  onBack: () => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const uploadCount = Object.keys(assets).reduce((acc, key) => {
-    const val = assets[key as keyof UploadedAssets];
-    if (Array.isArray(val)) return acc + val.length;
-    return val ? acc + 1 : acc;
-  }, 0);
-
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      {/* Header with step indicator */}
+    <form onSubmit={onSubmit} className="space-y-8">
+      {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors cursor-pointer uppercase tracking-[0.2em]"
-          >
-            ← Step 1
-          </button>
-          <span className="text-muted-foreground/30 text-xs">·</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1 h-5 bg-primary rounded-full" />
-            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
-              Step 2 of 2
-            </span>
-          </div>
-        </div>
         <h2 className="text-xl font-bold text-foreground tracking-tight">
-          Your Prompt
+          Create Video
         </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Describe your video and optionally add assets.
+        </p>
       </div>
 
-      {/* Asset summary — show uploaded assets as small chips */}
-      {uploadCount > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {assets.logoUrl && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
-              <ImagePlus className="w-3 h-3 text-primary" />
-              <span className="text-[11px] font-mono text-primary">Logo</span>
-            </div>
-          )}
-          {assets.bgImageUrl && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
-              <Layers className="w-3 h-3 text-primary" />
-              <span className="text-[11px] font-mono text-primary">
-                Background
-              </span>
-            </div>
-          )}
-          {assets.watermarkUrl && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
-              <Stamp className="w-3 h-3 text-primary" />
-              <span className="text-[11px] font-mono text-primary">
-                Watermark
-              </span>
-            </div>
-          )}
-          {assets.mediaUrls && assets.mediaUrls.length > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/8 border border-primary/20 rounded-lg">
-              <Film className="w-3 h-3 text-primary" />
-              <span className="text-[11px] font-mono text-primary">
-                {assets.mediaUrls.length} Media
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      {/* ── Asset Upload Section ── */}
+      <AssetUploader assets={assets} setAssets={setAssets} />
 
-      {/* Textarea */}
-      <div className="space-y-2">
+      {/* ── Prompt Section ── */}
+      <div className="space-y-3">
         <label
           htmlFor="prompt"
           className="text-xs font-semibold text-foreground uppercase tracking-widest"
@@ -748,9 +633,8 @@ function PromptStep({
 export default function PromptPage() {
   const {
     categoryId,
-    pageStep,
     assets,
-    handleAssetsComplete,
+    setAssets,
     prompt,
     setPrompt,
     settings,
@@ -771,7 +655,6 @@ export default function PromptPage() {
     handleSubmit,
     handleReset,
     handleDownload,
-    setPageStep,
     handleStartRender,
     generatedScenes,
     setGeneratedScenes,
@@ -842,17 +725,13 @@ export default function PromptPage() {
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 lg:px-8 py-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
-          {/* ── STEP 1: Asset Upload ── */}
-          {isIdle && pageStep === "assets" && (
-            <AssetUploadStep onComplete={handleAssetsComplete} />
-          )}
-
-          {/* ── STEP 2: Prompt ── */}
-          {isIdle && pageStep === "prompt" && (
+          {/* ── UNIFIED FORM ── */}
+          {isIdle && (
             <PromptStep
               prompt={prompt}
               setPrompt={setPrompt}
               assets={assets}
+              setAssets={setAssets}
               settings={settings}
               setSettings={setSettings}
               settingsOpen={settingsOpen}
@@ -863,7 +742,6 @@ export default function PromptPage() {
               canRender={canRender}
               changeCount={changeCount}
               onSubmit={handleSubmit}
-              onBack={() => setPageStep("assets")}
             />
           )}
 
@@ -949,15 +827,13 @@ export default function PromptPage() {
         {/* Footer */}
         <div className="px-8 py-4 border-t border-border bg-muted/20">
           <p className="text-[11px] text-muted-foreground text-center font-mono">
-            {isIdle && pageStep === "assets"
-              ? "All assets optional — skip to continue"
-              : isIdle
-                ? "5 credits per generation"
-                : isError
-                  ? "Credits refunded on failure"
-                  : isComplete
-                    ? "✓ Video ready to download"
-                    : "Processing — please wait..."}
+            {isIdle
+              ? "5 credits per generation"
+              : isError
+                ? "Credits refunded on failure"
+                : isComplete
+                  ? "✓ Video ready to download"
+                  : "Processing — please wait..."}
           </p>
         </div>
       </aside>

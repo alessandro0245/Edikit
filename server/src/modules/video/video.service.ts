@@ -35,13 +35,11 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
   const {
     prompt,
     categoryId,
-    paletteId,
-    soundtrackMood,
+    backgroundColor,
+    textColor,
     animationIntensity,
     aspectRatio,
-    logoUrl,
     bgImageUrl,
-    watermarkUrl,
     mediaUrls,
     reviewScenes,
   } = dto;
@@ -57,26 +55,24 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
   }
 
   this.logger.log(
-    `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | palette: ${paletteId ?? 'AI'} | soundtrack: ${soundtrackMood ?? 'auto'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'} | assets: logo=${!!logoUrl} bg=${!!bgImageUrl} watermark=${!!watermarkUrl} mediaUrlsCount=${mediaUrls?.length ?? 0}`,
+    `User ${userId} | prompt: "${prompt.substring(0, 50)}..." | bgColor: ${backgroundColor ?? 'default'} | textColor: ${textColor ?? 'default'} | intensity: ${animationIntensity ?? 'dynamic'} | ratio: ${aspectRatio ?? '16:9'} | assets: bg=${!!bgImageUrl} mediaUrlsCount=${mediaUrls?.length ?? 0}`,
   );
 
   const videoConfig = await this.promptService.processPrompt(
     prompt,
     categoryId,
-    paletteId,
-    soundtrackMood,
+    backgroundColor,
+    textColor,
     animationIntensity,
     aspectRatio,
     mediaUrls?.length,
   );
 
   // ── Attach assets to videoConfig if provided ──────────────────────────────
-  if (logoUrl || bgImageUrl || watermarkUrl || (mediaUrls && mediaUrls.length > 0)) {
+  if (bgImageUrl || (mediaUrls && mediaUrls.length > 0)) {
     videoConfig.assets = {
-      ...(logoUrl      && { logoUrl      }),
       ...(bgImageUrl   && { bgImageUrl   }),
-      ...(watermarkUrl && { watermarkUrl }),
-      ...((mediaUrls && mediaUrls.length > 0) && { mediaUrls }),
+      ...(mediaUrls && mediaUrls.length > 0 && { mediaUrls }),
     };
   }
 

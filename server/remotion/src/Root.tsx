@@ -71,13 +71,14 @@ const defaultProps: VideoConfig = {
       fontSize: 96,
     },
   ],
-  audio: {
-    mood: 'cinematic',
-    trackUrl: 'https://cdn.freesound.org/previews/612/612094_5674468-lq.mp3',
-    volume: 0.35,
-    sfxVolume: 0.55,
-    trackIndex: 0,
-  },
+  // Audio disabled by default or use a valid local path if available
+  // audio: {
+  //   mood: 'cinematic',
+  //   trackUrl: '', 
+  //   volume: 0.35,
+  //   sfxVolume: 0.55,
+  //   trackIndex: 0,
+  // },
 };
 
 export const RemotionRoot: React.FC = () => {

@@ -15,7 +15,6 @@ export type ProgressStep =
   | "scene-assignment"
   | "complete"
   | "error";
-export type PageStep = "assets" | "prompt"; // ← step 1 = asset upload, step 2 = prompt
 
 export interface JobStatus {
   jobId: string;
@@ -34,7 +33,6 @@ export function usePromptLogic() {
   const router = useRouter();
   const categoryId = params.id as string;
 
-  const [pageStep, setPageStep] = useState<PageStep>("assets"); // ← starts on assets
   const [assets, setAssets] = useState<UploadedAssets>({});
   const [prompt, setPrompt] = useState("");
   const [settings, setSettings] = useState<VideoSettings>(DEFAULT_SETTINGS);
@@ -134,12 +132,6 @@ export function usePromptLogic() {
     [refreshCredits],
   );
 
-  const handleAssetsComplete = (uploadedAssets: UploadedAssets) => {
-    setAssets(uploadedAssets);
-    setPageStep("prompt"); // advance to prompt step
-  };
-
-  console.log("Assets at submit time:", assets);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoggedIn) {
@@ -165,11 +157,9 @@ export function usePromptLogic() {
         {
           categoryId,
           prompt,
-          paletteId: settings.paletteId ?? undefined,
-          soundtrackMood:
-            settings.soundtrackMood !== "auto"
-              ? settings.soundtrackMood
-              : undefined,
+          // Pass custom colors if set
+          backgroundColor: settings.backgroundColor ?? undefined,
+          textColor: settings.textColor ?? undefined,
           animationIntensity:
             settings.animationIntensity !== "dynamic"
               ? settings.animationIntensity
@@ -177,23 +167,43 @@ export function usePromptLogic() {
           aspectRatio:
             settings.aspectRatio !== "16:9" ? settings.aspectRatio : undefined,
           // Asset URLs — only send if user uploaded them
-          logoUrl: assets.logoUrl ?? undefined,
           bgImageUrl: assets.bgImageUrl ?? undefined,
-          watermarkUrl: assets.watermarkUrl ?? undefined,
           mediaUrls: assets.mediaUrls ?? undefined,
-          reviewScenes: true, // Always pause so user can map media if they want
+          // Only pause for scene assignment when user uploaded multiple media files.
+          reviewScenes: (assets.mediaUrls?.length ?? 0) > 1,
         },
         { withCredentials: true },
       );
 
-      setJobId(data.jobId);
+      const jobResponse = data;
+      setJobId(jobResponse.jobId);
       setProgress(10);
 
-      if (data.needsSceneAssignment) {
-        setGeneratedScenes(data.videoConfig?.scenes || []);
-        setProgressStep("scene-assignment");
+      // If needsSceneAssignment is true:
+      // 1. One file -> Auto-assign to ALL content scenes and start render immediately.
+      // 2. Multiple files -> Show UI for user to pick.
+      if (jobResponse.needsSceneAssignment) {
+        const availableMedia = assets.mediaUrls || [];
+        if (availableMedia.length === 1) {
+          const singleMedia = availableMedia[0];
+          const autoAssignedScenes = (
+            jobResponse.videoConfig?.scenes || []
+          ).map((scene: any) => {
+            if (scene.type === "content") {
+              return { ...scene, mediaUrl: singleMedia };
+            }
+            return scene;
+          });
+
+          // Proceed directly to rendering with the auto-assigned scenes
+          await handleStartRender(autoAssignedScenes, jobResponse.jobId);
+        } else {
+          // Multiple files or no files (but needs assignment for some reason? shouldn't happen if empty) -> Show UI
+          setGeneratedScenes(jobResponse.videoConfig?.scenes || []);
+          setProgressStep("scene-assignment");
+        }
       } else {
-        startPolling(data.jobId);
+        startPolling(jobResponse.jobId);
       }
     } catch (err: any) {
       setProgressStep("error");
@@ -207,18 +217,22 @@ export function usePromptLogic() {
     }
   };
 
-  const handleStartRender = async (finalScenes: any[]) => {
-    if (!jobId) return;
+  const handleStartRender = async (
+    finalScenes: any[],
+    specificJobId?: string,
+  ) => {
+    const id = specificJobId || jobId;
+    if (!id) return;
     try {
       setIsSubmitting(true);
       await api.post(
-        `/video/job/${jobId}/start-render`,
+        `/video/job/${id}/start-render`,
         { scenes: finalScenes },
         { withCredentials: true },
       );
       setProgressStep("processing");
       setProgress(15);
-      startPolling(jobId);
+      startPolling(id);
     } catch (err: any) {
       setProgressStep("error");
       const message =
@@ -239,10 +253,10 @@ export function usePromptLogic() {
     setPrompt("");
     setAssets({});
     setSettings(DEFAULT_SETTINGS);
-    setPageStep("assets"); // go back to asset upload on reset
     setProgressStep("idle");
     setProgress(0);
     setJobId(null);
+
     setOutputUrl(null);
     setErrorMessage(null);
   };
@@ -265,9 +279,8 @@ export function usePromptLogic() {
 
   return {
     categoryId,
-    pageStep,
     assets,
-    handleAssetsComplete,
+    setAssets,
     prompt,
     setPrompt,
     settings,
@@ -289,7 +302,6 @@ export function usePromptLogic() {
     handleSubmit,
     handleReset,
     handleDownload,
-    setPageStep,
     handleStartRender,
     generatedScenes,
     setGeneratedScenes,

@@ -7,7 +7,6 @@ import { slide } from '@remotion/transitions/slide';
 import { wipe } from '@remotion/transitions/wipe';
 import { KineticScene } from '../components/KineticScene';
 import { ContentScene } from '../components/ContentScene';
-import { WatermarkLayer } from '../components/WatermarkLayer';
 import { TransitionAudio } from '../components/Sceneaudio';
 import type { VideoConfig, AudioConfig, MoodType } from '../types';
 import { DEFAULT_FPS } from '../types';
@@ -130,7 +129,6 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
                       audio={audio}
                       mediaUrl={scene.mediaUrl ?? (assets?.mediaUrls ? assets.mediaUrls[index % assets.mediaUrls.length] : undefined)}
                       bgImageUrl={assets?.bgImageUrl}
-                      logoUrl={assets?.logoUrl}
                     />
                   ) : (
                     <KineticScene
@@ -138,7 +136,7 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
                       sceneIndex={index}
                       audio={audio}
                       bgImageUrl={assets?.bgImageUrl}
-                      logoUrl={assets?.logoUrl}
+                      mediaUrl={scene.mediaUrl ?? (assets?.mediaUrls ? assets.mediaUrls[index % assets.mediaUrls.length] : undefined)}
                     />
                   )}
 
@@ -157,11 +155,6 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
           );
         })}
       </TransitionSeries>
-
-      {/* Global Watermark spanning the entire composition */}
-      {assets?.watermarkUrl && (
-        <WatermarkLayer watermarkUrl={assets.watermarkUrl} opacity={0.65} />
-      )}
     </AbsoluteFill>
   );
 };

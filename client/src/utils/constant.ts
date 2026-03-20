@@ -402,57 +402,27 @@ export const templates: Template[] = [
 
 export const categoriesTemplate = [
   {
-    id: "social-media-videos",
-    title: "Social Media Videos",
-    description:
-      "Create videos optimized for Instagram Reels, TikTok, and YouTube Shorts.",
-    iconName: "instagram" as const,
-    examples: ["Instagram Reels", "TikTok", "YouTube Shorts"],
-    imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80",
+    id: "intro",
+    title: "Intro Scene",
+    description: "Hook your audience instantly with a high-impact opening sequence.",
+    iconName: "intro" as const,
+    examples: ["Channel Welcome", "Series Title", "Breaking News"],
+    imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
   },
   {
-    id: "business-marketing",
-    title: "Business & Marketing",
-    description:
-      "Professional videos for product promotions, demos, and testimonials.",
-    iconName: "briefcase" as const,
-    examples: ["Product Promo", "App Demo", "Testimonial"],
-    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    id: "content",
+    title: "Content Scene",
+    description: "Pass your message clearly with readable, engaging kinetic typography.",
+    iconName: "content" as const,
+    examples: ["Top 5 Tips", "Explainer Text", "Quote or Stat"],
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
   },
   {
-    id: "personal-videos",
-    title: "Personal Videos",
-    description:
-      "Celebrate special moments with personalized videos for any occasion.",
-    iconName: "heart" as const,
-    examples: ["Birthday", "Wedding", "Travel"],
-    imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
-  },
-  {
-    id: "educational-content",
-    title: "Educational Content",
-    description:
-      "Engaging videos for courses, tutorials, and presentations.",
-    iconName: "graduationCap" as const,
-    examples: ["Course Intro", "Tutorial", "Slides"],
-    imageUrl: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
-  },
-  {
-    id: "branding-logo",
-    title: "Branding & Logo",
-    description:
-      "Professional animations for logo reveals and brand videos.",
-    iconName: "sparkles" as const,
-    examples: ["Logo Reveal", "Brand Intro", "Outro"],
-    imageUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80",
-  },
-  {
-    id: "custom-creation",
-    title: "Custom Creation",
-    description: "Bring your unique vision to life with custom video templates.",
-    iconName: "custom" as const,
-    examples: ["Your Idea", "Any Style", "Any Length"],
-    imageUrl: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80",
-    isCustom: true,
+    id: "cta",
+    title: "Call to Action",
+    description: "Drive results with a persuasive closing scene that demands action.",
+    iconName: "cta" as const,
+    examples: ["Subscribe Now", "Visit Website", "Follow Us"],
+    imageUrl: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=800&q=80",
   },
 ];
