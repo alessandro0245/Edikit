@@ -7,7 +7,6 @@ import { WordByWord } from './WordByWord';
 import { ParticleLayer } from './ParticleLayer';
 import { GrainOverlay } from './GrainOverlay';
 import { SceneAudio } from './Sceneaudio';
-import { LogoLayer } from './LogoLayer';
 import type { Scene, AudioConfig } from '../types';
 
 export const ContentScene: React.FC<{
@@ -16,8 +15,7 @@ export const ContentScene: React.FC<{
   audio?: AudioConfig;
   mediaUrl?: string;
   bgImageUrl?: string;
-  logoUrl?: string;
-}> = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl, logoUrl }) => {
+}> = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const isNarrow = width < height;
@@ -61,16 +59,6 @@ export const ContentScene: React.FC<{
       )}
       <MediaLayer mediaUrl={mediaUrl} sceneIndex={sceneIndex} />
       <ParticleLayer color={scene.textColor} seed={sceneIndex * 17 + 3} density={density} />
-
-      {logoUrl && (
-        <LogoLayer
-          logoUrl={logoUrl}
-          position="top-left"
-          size={isNarrow ? 80 : 120}
-          delay={8}
-          scene="content"
-        />
-      )}
 
       <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 100px', gap: 36 }}>
         <div style={{

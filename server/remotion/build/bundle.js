@@ -2,34 +2,34 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 8600
+/***/ 4904
 (__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 
-// EXTERNAL MODULE: ./node_modules/remotion/dist/esm/index.mjs
-var esm = __webpack_require__(3947);
-// EXTERNAL MODULE: ./node_modules/react/jsx-runtime.js
-var jsx_runtime = __webpack_require__(4848);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(5072);
+// EXTERNAL MODULE: ./node_modules/.pnpm/remotion@4.0.432_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/remotion/dist/esm/index.mjs
+var esm = __webpack_require__(3516);
+// EXTERNAL MODULE: ./node_modules/.pnpm/react@19.2.3/node_modules/react/jsx-runtime.js
+var jsx_runtime = __webpack_require__(5656);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(5968);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(7825);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(6529);
 var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(7659);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(4507);
 var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(5056);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(672);
 var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(540);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(2204);
 var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(1113);
+// EXTERNAL MODULE: ./node_modules/.pnpm/style-loader@4.0.0_webpack@5.105.0/node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(5385);
 var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/@tailwindcss/webpack/dist/index.js!./src/index.css
-var index_js_src = __webpack_require__(290);
+// EXTERNAL MODULE: ./node_modules/.pnpm/css-loader@5.2.7_webpack@5.105.0/node_modules/css-loader/dist/cjs.js!./node_modules/.pnpm/@tailwindcss+webpack@4.2.0_webpack@5.105.0/node_modules/@tailwindcss/webpack/dist/index.js!./src/index.css
+var index_js_src = __webpack_require__(5610);
 ;// ./src/index.css
 
       
@@ -57,11 +57,11 @@ var update = injectStylesIntoStyleTag_default()(index_js_src/* default */.A, opt
 
        /* harmony default export */ const src = (index_js_src/* default */.A && index_js_src/* default */.A.locals ? index_js_src/* default */.A.locals : undefined);
 
-// EXTERNAL MODULE: ./node_modules/react/index.js
-var react = __webpack_require__(6540);
-// EXTERNAL MODULE: ./node_modules/remotion/dist/esm/no-react.mjs
-var no_react = __webpack_require__(9382);
-;// ./node_modules/@remotion/transitions/dist/esm/index.mjs
+// EXTERNAL MODULE: ./node_modules/.pnpm/react@19.2.3/node_modules/react/index.js
+var react = __webpack_require__(7140);
+// EXTERNAL MODULE: ./node_modules/.pnpm/remotion@4.0.432_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/remotion/dist/esm/no-react.mjs
+var no_react = __webpack_require__(9455);
+;// ./node_modules/.pnpm/@remotion+transitions@4.0.4_2713f7a22a025d9b6c13350f78e44f2d/node_modules/@remotion/transitions/dist/esm/index.mjs
 /* unused harmony import specifier */ var React4;
 // src/presentations/slide.tsx
 
@@ -537,7 +537,7 @@ var useTransitionProgress = () => {
 };
 
 
-;// ./node_modules/@remotion/transitions/dist/esm/none.mjs
+;// ./node_modules/.pnpm/@remotion+transitions@4.0.4_2713f7a22a025d9b6c13350f78e44f2d/node_modules/@remotion/transitions/dist/esm/none.mjs
 // src/presentations/none.tsx
 
 
@@ -561,7 +561,7 @@ var none = (props) => {
 };
 
 
-;// ./node_modules/@remotion/transitions/dist/esm/fade.mjs
+;// ./node_modules/.pnpm/@remotion+transitions@4.0.4_2713f7a22a025d9b6c13350f78e44f2d/node_modules/@remotion/transitions/dist/esm/fade.mjs
 // src/presentations/fade.tsx
 
 
@@ -594,7 +594,7 @@ var fade = (props) => {
 };
 
 
-;// ./node_modules/@remotion/transitions/dist/esm/slide.mjs
+;// ./node_modules/.pnpm/@remotion+transitions@4.0.4_2713f7a22a025d9b6c13350f78e44f2d/node_modules/@remotion/transitions/dist/esm/slide.mjs
 // src/presentations/slide.tsx
 
 
@@ -674,7 +674,7 @@ var slide_slide = (props) => {
 };
 
 
-;// ./node_modules/@remotion/transitions/dist/esm/wipe.mjs
+;// ./node_modules/.pnpm/@remotion+transitions@4.0.4_2713f7a22a025d9b6c13350f78e44f2d/node_modules/@remotion/transitions/dist/esm/wipe.mjs
 // src/presentations/wipe.tsx
 
 
@@ -864,148 +864,78 @@ var wipe = (props) => {
 };
 
 
-;// ../src/modules/freesounds/audio-config.ts
+;// ./src/sfx-utils.ts
 
-function getSfxUrl(sfx) {
-  return `/sfx/${sfx}.mp3`;
+const SFX_POOL = {
+  // whoosh.mp3  whoosh-2.mp3  whoosh-3.mp3  whoosh-4.mp3  whoosh-5.mp3
+  whoosh: [
+    "/sfx/whoosh.mp3",
+    "/sfx/whoosh-2.mp3",
+    "/sfx/whoosh-3.mp3",
+    "/sfx/whoosh-4.mp3",
+    "/sfx/whoosh-5.mp3"
+  ],
+  // tick.mp3 only — no variants yet
+  // TODO: download tick-2.mp3 and tick-3.mp3 from Freesound
+  tick: [
+    "/sfx/tick.mp3",
+    "/sfx/tick.mp3",
+    // repeats until you add variants
+    "/sfx/tick.mp3"
+  ],
+  // pop.mp3  pop-2.mp3  pop-3.mp3  pop-4.mp3
+  pop: [
+    "/sfx/pop.mp3",
+    "/sfx/pop-2.mp3",
+    "/sfx/pop-3.mp3",
+    "/sfx/pop-4.mp3"
+  ],
+  // swoosh.mp3  swoosh-2.mp3  swoosh-3.mp3  swoosh-4.mp3  swoosh-5.mp3
+  swoosh: [
+    "/sfx/swoosh.mp3",
+    "/sfx/swoosh-2.mp3",
+    "/sfx/swoosh-3.mp3",
+    "/sfx/swoosh-4.mp3",
+    "/sfx/swoosh-5.mp3"
+  ],
+  // impact-1.mp3  impact-2.mp3  impact-3.mp3  impact-4.mp3
+  impact: [
+    "/sfx/impact-1.mp3",
+    "/sfx/impact-2.mp3",
+    "/sfx/impact-3.mp3",
+    "/sfx/impact-4.mp3"
+  ],
+  // rise.mp3  rise-1.mp3  rise-2.mp3  rise-3.mp3  rise-4.mp3
+  rise: [
+    "/sfx/rise.mp3",
+    "/sfx/rise-1.mp3",
+    "/sfx/rise-2.mp3",
+    "/sfx/rise-3.mp3",
+    "/sfx/rise-4.mp3"
+  ]
+};
+function getSfxVariant(sfx, sceneIndex) {
+  const pool = SFX_POOL[sfx];
+  return pool[sceneIndex % pool.length];
 }
 function getAnimationSfx(animation) {
   switch (animation) {
     case "slide":
-    case "slide-up":
     case "slide-down":
       return "whoosh";
+    case "slide-up":
+      return "rise";
     case "typewriter":
       return "tick";
     case "scale":
       return "pop";
+    case "fade":
     default:
       return null;
   }
 }
-const ENERGETIC_KEYWORDS = (/* unused pure expression or super */ null && ([
-  "fitness",
-  "sport",
-  "energy",
-  "power",
-  "fast",
-  "launch",
-  "explosive",
-  "action",
-  "hype",
-  "pump",
-  "workout",
-  "boost",
-  "dynamic",
-  "bold",
-  "fire",
-  "hustle",
-  "grind",
-  "race",
-  "speed",
-  "intense"
-]));
-const CINEMATIC_KEYWORDS = (/* unused pure expression or super */ null && ([
-  "story",
-  "film",
-  "dark",
-  "dystopian",
-  "memory",
-  "dream",
-  "epic",
-  "cinematic",
-  "mystery",
-  "thriller",
-  "emotion",
-  "journey",
-  "war",
-  "future",
-  "shadow",
-  "haunting",
-  "legendary",
-  "destiny",
-  "sacrifice"
-]));
-const CORPORATE_KEYWORDS = (/* unused pure expression or super */ null && ([
-  "business",
-  "company",
-  "finance",
-  "professional",
-  "enterprise",
-  "corporate",
-  "solution",
-  "strategy",
-  "growth",
-  "invest",
-  "revenue",
-  "b2b",
-  "saas",
-  "data",
-  "productivity",
-  "workflow",
-  "efficiency",
-  "roi",
-  "quarter",
-  "team"
-]));
-const CHILL_KEYWORDS = (/* unused pure expression or super */ null && ([
-  "relax",
-  "wellness",
-  "calm",
-  "nature",
-  "minimal",
-  "lifestyle",
-  "art",
-  "creative",
-  "ambient",
-  "soft",
-  "gentle",
-  "mindful",
-  "peace",
-  "yoga",
-  "meditate",
-  "breathe",
-  "slow",
-  "cozy",
-  "retreat",
-  "quiet"
-]));
-const CATEGORY_MOOD_MAP = {
-  marketing: "energetic",
-  "social-media": "energetic",
-  corporate: "corporate",
-  educational: "corporate",
-  creative: "cinematic",
-  default: "chill"
-};
-function detectMood(prompt, scenes, categoryId) {
-  const fullText = [
-    prompt,
-    ...scenes.map((s) => `${s.text} ${s.subtext ?? ""}`)
-  ].join(" ").toLowerCase();
-  const scores = {
-    energetic: 0,
-    cinematic: 0,
-    corporate: 0,
-    chill: 0
-  };
-  ENERGETIC_KEYWORDS.forEach((kw) => {
-    if (fullText.includes(kw)) scores.energetic += 2;
-  });
-  CINEMATIC_KEYWORDS.forEach((kw) => {
-    if (fullText.includes(kw)) scores.cinematic += 2;
-  });
-  CORPORATE_KEYWORDS.forEach((kw) => {
-    if (fullText.includes(kw)) scores.corporate += 2;
-  });
-  CHILL_KEYWORDS.forEach((kw) => {
-    if (fullText.includes(kw)) scores.chill += 2;
-  });
-  const categoryMood = CATEGORY_MOOD_MAP[categoryId] ?? "chill";
-  scores[categoryMood] += 3;
-  return Object.entries(scores).sort(
-    (a, b) => b[1] - a[1]
-  )[0][0];
+function getTransitionSfx(transitionIndex) {
+  return getSfxVariant("swoosh", transitionIndex);
 }
 
 ;// ./src/components/Sceneaudio.tsx
@@ -1016,16 +946,16 @@ function detectMood(prompt, scenes, categoryId) {
 const SceneAudio = ({
   animation,
   sfxVolume,
-  delay = 5
+  delay = 5,
+  sceneIndex = 0
 }) => {
-  const { fps } = (0,esm.useVideoConfig)();
   const sfxType = getAnimationSfx(animation);
   if (!sfxType) return null;
   if (sfxType === "tick") {
     return /* @__PURE__ */ (0,jsx_runtime.jsx)(jsx_runtime.Fragment, { children: Array.from({ length: 6 }, (_, i) => /* @__PURE__ */ (0,jsx_runtime.jsx)(
       esm.Audio,
       {
-        src: (0,esm.staticFile)(getSfxUrl("tick")),
+        src: (0,esm.staticFile)(getSfxVariant("tick", i)),
         startFrom: 0,
         volume: sfxVolume * 0.5,
         playbackRate: 1.2
@@ -1036,18 +966,18 @@ const SceneAudio = ({
   return /* @__PURE__ */ (0,jsx_runtime.jsx)(
     esm.Audio,
     {
-      src: (0,esm.staticFile)(getSfxUrl(sfxType)),
+      src: (0,esm.staticFile)(getSfxVariant(sfxType, sceneIndex)),
       startFrom: 0,
       volume: sfxVolume,
       playbackRate: sfxType === "whoosh" ? 1 : 1
     }
   );
 };
-const TransitionAudio = ({ sfxVolume }) => {
+const TransitionAudio = ({ sfxVolume, transitionIndex = 0 }) => {
   return /* @__PURE__ */ (0,jsx_runtime.jsx)(
     esm.Audio,
     {
-      src: (0,esm.staticFile)(getSfxUrl("swoosh")),
+      src: (0,esm.staticFile)(getSfxVariant("swoosh", transitionIndex)),
       startFrom: 0,
       volume: sfxVolume
     }
@@ -1060,38 +990,64 @@ const TransitionAudio = ({ sfxVolume }) => {
 
 const BgImageLayer = ({
   imageUrl,
-  overlayOpacity = 0.55
-  // default — keeps text readable over any image
+  overlayOpacity = 0.65,
+  sceneIndex = 0
 }) => {
   const frame = (0,esm.useCurrentFrame)();
-  const { durationInFrames } = (0,esm.useVideoConfig)();
-  const scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1, 1.06], {
-    extrapolateRight: "clamp",
-    extrapolateLeft: "clamp"
-  });
-  const opacity = (0,esm.interpolate)(frame, [0, 12], [0, 1], {
-    extrapolateRight: "clamp",
-    extrapolateLeft: "clamp"
-  });
-  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { opacity }, children: [
+  const isVideo = imageUrl == null ? void 0 : imageUrl.match(/\.(mp4|webm|mov)(\?.*)?$/i);
+  const { durationInFrames, fps } = (0,esm.useVideoConfig)();
+  const cameraMove = sceneIndex % 3;
+  let scale, panX, panY;
+  if (cameraMove === 0) {
+    scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1.15, 1.3], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
+    panX = (0,esm.interpolate)(frame, [0, durationInFrames], [10, -10], { extrapolateRight: "clamp" });
+    panY = 0;
+  } else if (cameraMove === 1) {
+    scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1.25, 1.15], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
+    panX = 0;
+    panY = (0,esm.interpolate)(frame, [0, durationInFrames], [15, -15], { extrapolateRight: "clamp" });
+  } else {
+    scale = 1.25;
+    panX = (0,esm.interpolate)(frame, [0, durationInFrames], [-20, 20], { extrapolateRight: "clamp" });
+    panY = (0,esm.interpolate)(frame, [0, durationInFrames], [-20, 15], { extrapolateRight: "clamp" });
+  }
+  const opacity = (0,esm.interpolate)(frame, [0, 15], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
+  const initialBlur = cameraMove === 2 ? 15 : 8;
+  const blur = (0,esm.interpolate)(frame, [0, fps * 1.5], [initialBlur, 0], { extrapolateRight: "clamp" });
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { opacity, backgroundColor: "#050505" }, children: [
     /* @__PURE__ */ (0,jsx_runtime.jsx)(
       esm.AbsoluteFill,
       {
         style: {
-          transform: `scale(${scale})`,
+          transform: `scale(1.5)`,
+          filter: `blur(40px) saturate(1.5)`,
+          opacity: 0.6
+        },
+        children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Video, { muted: true, volume: 0, src: imageUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: imageUrl, style: { width: "100%", height: "100%", objectFit: "cover" } })
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.AbsoluteFill,
+      {
+        style: {
+          transform: `scale(${scale}) translate(${panX}px, ${panY}px)`,
           transformOrigin: "center center",
+          filter: `blur(${blur}px)`,
           overflow: "hidden"
         },
-        children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
+        children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(
+          esm.Video,
+          {
+            muted: true,
+            volume: 0,
+            src: imageUrl,
+            style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }
+          }
+        ) : /* @__PURE__ */ (0,jsx_runtime.jsx)(
           esm.Img,
           {
             src: imageUrl,
-            style: {
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center"
-            }
+            style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }
           }
         )
       }
@@ -1100,7 +1056,8 @@ const BgImageLayer = ({
       esm.AbsoluteFill,
       {
         style: {
-          background: `rgba(0,0,0,${overlayOpacity})`
+          backgroundColor: cameraMove === 1 ? "rgba(20,0,40,0.1)" : "rgba(40,20,0,0.1)",
+          mixBlendMode: "overlay"
         }
       }
     ),
@@ -1108,82 +1065,18 @@ const BgImageLayer = ({
       esm.AbsoluteFill,
       {
         style: {
-          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%)"
+          background: `repeating-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0) 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)`
         }
       }
-    )
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: {
+      background: "radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.7) 100%)",
+      backgroundColor: `rgba(0,0,0,${overlayOpacity * 0.4})`
+    } })
   ] });
 };
 
-;// ./src/components/LogoLayer.tsx
-
-
-
-const LogoLayer = ({
-  logoUrl,
-  position = "top-left",
-  size = 120,
-  delay = 8,
-  scene = "intro"
-}) => {
-  const frame = (0,esm.useCurrentFrame)();
-  const { fps, width, height } = (0,esm.useVideoConfig)();
-  const scale = (0,esm.spring)({
-    fps,
-    frame: Math.max(0, frame - delay),
-    config: {
-      damping: scene === "intro" ? 14 : 20,
-      stiffness: scene === "intro" ? 100 : 140,
-      mass: 0.8
-    },
-    from: 0,
-    to: 1
-  });
-  const opacity = (0,esm.interpolate)(
-    frame,
-    [delay, delay + 10],
-    [0, 1],
-    { extrapolateRight: "clamp", extrapolateLeft: "clamp" }
-  );
-  const padding = Math.round(width * 0.04);
-  const positionStyles = {
-    "top-left": { top: padding, left: padding },
-    "top-right": { top: padding, right: padding },
-    "bottom-left": { bottom: padding, left: padding },
-    "bottom-right": { bottom: padding, right: padding },
-    "center-top": { top: padding, left: "50%", transform: `translateX(-50%) scale(${scale})` }
-  };
-  const posStyle = positionStyles[position] ?? positionStyles["top-left"];
-  const transformStyle = position === "center-top" ? {} : { transform: `scale(${scale})` };
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { pointerEvents: "none" }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
-    "div",
-    {
-      style: {
-        position: "absolute",
-        opacity,
-        transformOrigin: position.includes("right") ? "top right" : position === "center-top" ? "top center" : "top left",
-        ...posStyle,
-        ...transformStyle
-      },
-      children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
-        esm.Img,
-        {
-          src: logoUrl,
-          style: {
-            width: size,
-            height: size,
-            objectFit: "contain",
-            // Drop shadow for visibility on any bg
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.4))"
-          }
-        }
-      )
-    }
-  ) });
-};
-
 ;// ./src/components/KineticScene.tsx
-
 
 
 
@@ -1258,7 +1151,7 @@ function palette(base) {
 const GlitchOverlay = ({ accentColor, seed }) => {
   const frame = (0,esm.useCurrentFrame)();
   if (frame > 6) return null;
-  const [r, g, b] = hexRgb(accentColor);
+  const [r, , b] = hexRgb(accentColor);
   const intensity = (0,esm.interpolate)(frame, [0, 6], [1, 0], { extrapolateRight: "clamp" });
   const offsetX = ((0,esm.random)(`glitch-x-${seed}-${frame}`) - 0.5) * 20 * intensity;
   const offsetY = ((0,esm.random)(`glitch-y-${seed}-${frame}`) - 0.5) * 8 * intensity;
@@ -1452,7 +1345,7 @@ const BackgroundGlow = ({ color, frame }) => {
     pointerEvents: "none"
   } });
 };
-const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => {
+const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl }) => {
   const { width, height, fps } = (0,esm.useVideoConfig)();
   const frame = (0,esm.useCurrentFrame)();
   const fontSize = scaleFontSize(scene.fontSize, width, height);
@@ -1472,30 +1365,21 @@ const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => 
     to: 1
   });
   return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: {
-    background: bgImageUrl ? "transparent" : "#030303",
+    background: bgImageUrl ? "transparent" : scene.backgroundColor,
     transform: `scale(${sceneScale})`,
     transformOrigin: "center center",
     overflow: "hidden"
   }, children: [
-    bgImageUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)(BgImageLayer, { imageUrl: bgImageUrl }),
-    !bgImageUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)(BackgroundGlow, { color: scene.textColor, frame }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(Scanlines, {}),
-    logoUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)(
-      LogoLayer,
-      {
-        logoUrl,
-        position: "top-left",
-        size: isNarrow ? 80 : 120,
-        delay: 8,
-        scene: "intro"
-      }
-    ),
+    bgImageUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "absolute", inset: 0, zIndex: 0 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(BgImageLayer, { imageUrl: bgImageUrl }) }),
+    !bgImageUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "absolute", inset: 0, zIndex: 0 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(BackgroundGlow, { color: scene.textColor, frame }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "absolute", inset: 0, zIndex: 5 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(Scanlines, {}) }),
     /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "flex-start",
-      gap: Math.round(fontSize * 0.15)
+      gap: Math.round(fontSize * 0.15),
+      zIndex: 10
     }, children: [
       allLines.map((line, i) => {
         const isSubtext = scene.subtext && i === allLines.length - 1;
@@ -1508,8 +1392,8 @@ const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => 
             {
               text: line,
               fontSize: fs,
-              textColor: "#ffffff",
-              barColor: color,
+              textColor: scene.textColor,
+              barColor: scene.backgroundColor,
               delay,
               width,
               isSubtext: !!isSubtext
@@ -1541,7 +1425,7 @@ const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => 
         }
       )
     ] }),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "absolute", inset: 0, zIndex: 15 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
       SceneStamp,
       {
         index: sceneIndex,
@@ -1549,8 +1433,8 @@ const KineticScene = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => 
         width,
         height
       }
-    ),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(GlitchOverlay, { accentColor: scene.textColor, seed: sceneIndex }),
+    ) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { position: "absolute", inset: 0, zIndex: 12 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(GlitchOverlay, { accentColor: scene.textColor, seed: sceneIndex }) }),
     audio && /* @__PURE__ */ (0,jsx_runtime.jsx)(
       SceneAudio,
       {
@@ -1582,9 +1466,6 @@ const BackgroundLayer = ({
 }) => {
   const frame = (0,esm.useCurrentFrame)();
   const { durationInFrames } = (0,esm.useVideoConfig)();
-  const progress = (0,esm.interpolate)(frame, [0, durationInFrames], [0, 1], {
-    extrapolateRight: "clamp"
-  });
   const colorB = accentColor ?? adjustBrightness(backgroundColor, -35);
   const colorC = adjustBrightness(backgroundColor, 20);
   const angle = (0,esm.interpolate)(frame, [0, durationInFrames], [120, 240], { extrapolateRight: "clamp" });
@@ -1636,35 +1517,87 @@ const BackgroundLayer = ({
 
 
 
-const MediaLayer = ({ mediaUrl }) => {
+const MediaLayer = ({ mediaUrl, sceneIndex = 0 }) => {
+  const frame = (0,esm.useCurrentFrame)();
+  const { fps, durationInFrames } = (0,esm.useVideoConfig)();
   if (!mediaUrl) return null;
-  const isVideo = mediaUrl.match(/\.(mp4|webm)$/i);
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(
-    esm.AbsoluteFill,
-    {
-      style: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        opacity: 0.5,
-        // keep it semi-transparent so text is readable
-        zIndex: 0
-      },
-      children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(
-        esm.Video,
-        {
-          src: mediaUrl,
-          style: { width: "100%", height: "100%", objectFit: "cover" }
-        }
-      ) : /* @__PURE__ */ (0,jsx_runtime.jsx)(
-        esm.Img,
-        {
-          src: mediaUrl,
-          style: { width: "100%", height: "100%", objectFit: "cover" }
-        }
-      )
-    }
-  );
+  const isVideo = mediaUrl.match(/\.(mp4|webm|mov)(\?.*)?$/i);
+  const opacity = (0,esm.interpolate)(frame, [0, fps], [0, 0.65], { extrapolateRight: "clamp" });
+  const moveType = sceneIndex % 4;
+  let scale, translateX, translateY;
+  if (moveType === 0) {
+    scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1.15, 1.25], { extrapolateRight: "clamp" });
+    translateX = (0,esm.interpolate)(frame, [0, durationInFrames], [10, -20]);
+    translateY = (0,esm.interpolate)(frame, [0, durationInFrames], [0, 0]);
+  } else if (moveType === 1) {
+    scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1.25, 1.15], { extrapolateRight: "clamp" });
+    translateX = (0,esm.interpolate)(frame, [0, durationInFrames], [-20, 15]);
+    translateY = (0,esm.interpolate)(frame, [0, durationInFrames], [15, -10]);
+  } else if (moveType === 2) {
+    scale = (0,esm.interpolate)(frame, [0, durationInFrames], [1.15, 1.35], { extrapolateRight: "clamp" });
+    translateX = 0;
+    translateY = 0;
+  } else {
+    scale = 1.2;
+    translateX = (0,esm.interpolate)(frame, [0, durationInFrames], [-10, 10]);
+    translateY = (0,esm.interpolate)(frame, [0, durationInFrames], [-25, 25]);
+  }
+  const splitEndFrame = moveType === 2 ? fps * 2 : fps * 1.5;
+  const rgbIntensity = (0,esm.interpolate)(frame, [0, splitEndFrame], [15, 0], { extrapolateRight: "clamp" });
+  return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { zIndex: 0, backgroundColor: "#000" }, children: [
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { transform: "scale(1.5)", filter: "blur(40px)", opacity: 0.5 }, children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Video, { muted: true, volume: 0, src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.AbsoluteFill,
+      {
+        style: {
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          opacity,
+          mixBlendMode: "screen",
+          transform: `scale(${scale}) translate(${translateX - rgbIntensity}px, ${translateY}px)`,
+          filter: "sepia(100%) hue-rotate(-50deg) saturate(200%)",
+          overflow: "hidden"
+        },
+        children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Video, { muted: true, volume: 0, src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } })
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.AbsoluteFill,
+      {
+        style: {
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          opacity,
+          mixBlendMode: "screen",
+          transform: `scale(${scale}) translate(${translateX + rgbIntensity}px, ${translateY}px)`,
+          filter: "sepia(100%) hue-rotate(150deg) saturate(200%)",
+          overflow: "hidden"
+        },
+        children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Video, { muted: true, volume: 0, src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } })
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(
+      esm.AbsoluteFill,
+      {
+        style: {
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          opacity,
+          mixBlendMode: "normal",
+          transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
+          overflow: "hidden"
+        },
+        children: isVideo ? /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Video, { muted: true, volume: 0, src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.Img, { src: mediaUrl, style: { width: "100%", height: "100%", objectFit: "cover" } })
+      }
+    ),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: {
+      background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%)",
+      opacity: 0.9
+    } })
+  ] });
 };
 
 ;// ./src/components/WordByWord.tsx
@@ -1679,12 +1612,20 @@ const WordByWord = ({
   delay = 0,
   fontWeight = 700,
   staggerFrames = 5,
-  staggerPattern = "cascade"
+  staggerPattern = "cascade",
+  highlightWords = [],
+  highlightColor = "#000000",
+  highlightBgColor = "#ffffff",
+  liveKaraoke = false,
+  revealMode = "word"
 }) => {
   const frame = (0,esm.useCurrentFrame)();
   const { fps } = (0,esm.useVideoConfig)();
   const words = text.split(" ");
-  const getWordDelay = (i, total) => {
+  const totalWords = words.length;
+  const totalChars = words.reduce((acc, word) => acc + word.length, 0);
+  const totalItems = revealMode === "letter" ? totalChars : totalWords;
+  const getDelay = (i, total) => {
     switch (staggerPattern) {
       case "wave":
         return delay + Math.abs(i - Math.floor(total / 2)) * staggerFrames;
@@ -1695,6 +1636,75 @@ const WordByWord = ({
         return delay + i * staggerFrames;
     }
   };
+  const getStyle = (i, adjustedFrame, wordIndex) => {
+    let wordStyle = {};
+    switch (animation) {
+      case "fade": {
+        const opacity = (0,esm.interpolate)(adjustedFrame, [0, fps * 0.4], [0, 1], { extrapolateRight: "clamp" });
+        wordStyle = { opacity };
+        break;
+      }
+      case "slide":
+      case "slide-up": {
+        const fromY = staggerPattern === "wave" && i % 2 === 0 ? -40 : 40;
+        const translateY = (0,esm.spring)({ fps, frame: adjustedFrame, config: { damping: 14, stiffness: 120, mass: 0.8 }, from: fromY, to: 0 });
+        const opacity = (0,esm.interpolate)(adjustedFrame, [0, 8], [0, 1], { extrapolateRight: "clamp" });
+        wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: "inline-block" };
+        break;
+      }
+      case "slide-down": {
+        const translateY = (0,esm.spring)({ fps, frame: adjustedFrame, config: { damping: 14, stiffness: 120, mass: 0.8 }, from: -40, to: 0 });
+        const opacity = (0,esm.interpolate)(adjustedFrame, [0, 8], [0, 1], { extrapolateRight: "clamp" });
+        wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: "inline-block" };
+        break;
+      }
+      case "scale": {
+        const overshoot = staggerPattern === "explosive" ? 1.3 : 1;
+        const scale = (0,esm.spring)({ fps, frame: adjustedFrame, config: { damping: staggerPattern === "explosive" ? 8 : 10, stiffness: staggerPattern === "explosive" ? 220 : 180, mass: 0.6 }, from: overshoot, to: 1 });
+        const scaleFromZero = (0,esm.interpolate)(adjustedFrame, [0, 4], [0, overshoot], { extrapolateRight: "clamp" });
+        const finalScale = adjustedFrame < 4 ? scaleFromZero : scale;
+        const opacity = (0,esm.interpolate)(adjustedFrame, [0, 5], [0, 1], { extrapolateRight: "clamp" });
+        wordStyle = { transform: `scale(${finalScale})`, opacity, display: "inline-block" };
+        break;
+      }
+      case "typewriter": {
+        wordStyle = { opacity: adjustedFrame > 0 ? 1 : 0 };
+        break;
+      }
+      default:
+        wordStyle = { opacity: 1 };
+    }
+    const isStaticHighlighted = highlightWords.includes(wordIndex);
+    let highlightPop = 0;
+    let isActiveHighlight = false;
+    const liveKaraokeHighlightProgress = liveKaraoke ? (0,esm.interpolate)(adjustedFrame, [0, staggerFrames * 1.5, staggerFrames * 3.5], [0, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 0;
+    if (isStaticHighlighted) {
+      isActiveHighlight = true;
+      highlightPop = (0,esm.spring)({ fps, frame: Math.max(0, frame - delay - wordIndex * staggerFrames), config: { damping: 12, stiffness: 180 }, from: 0, to: 1 });
+    } else if (liveKaraoke && adjustedFrame >= 0 && liveKaraokeHighlightProgress > 0) {
+      isActiveHighlight = true;
+      highlightPop = liveKaraokeHighlightProgress;
+    }
+    if (isActiveHighlight) {
+      const currentTextColor = isStaticHighlighted ? highlightColor : (0,esm.interpolateColors)(highlightPop, [0, 0.5, 1], [color, highlightColor, highlightColor]);
+      const currentBgColor = isStaticHighlighted && revealMode === "word" ? highlightBgColor : (0,esm.interpolateColors)(highlightPop, [0, 0.5, 1], ["rgba(0,0,0,0)", highlightBgColor, highlightBgColor]);
+      wordStyle = {
+        ...wordStyle,
+        color: currentTextColor,
+        backgroundColor: revealMode === "word" ? currentBgColor : "transparent",
+        padding: `0 ${fontSize * 0.1 * highlightPop}px`,
+        borderRadius: `${fontSize * 0.15}px`,
+        boxShadow: revealMode === "word" ? `0 ${fontSize * 0.05 * highlightPop}px ${fontSize * 0.15 * highlightPop}px rgba(0,0,0,${0.25 * highlightPop})` : "none",
+        transform: `${wordStyle.transform || ""} scale(${1 + 0.08 * highlightPop}) rotate(${(i % 2 === 0 ? -2 : 2) * highlightPop}deg)`,
+        display: "inline-block",
+        lineHeight: 1,
+        margin: revealMode === "word" ? `0 ${fontSize * 0.05 * highlightPop}px` : "0",
+        textShadow: revealMode === "letter" && isActiveHighlight && !isStaticHighlighted ? `0 0 12px ${highlightColor}` : "none"
+      };
+    }
+    return wordStyle;
+  };
+  let globalItemIndex = 0;
   return /* @__PURE__ */ (0,jsx_runtime.jsx)(
     "div",
     {
@@ -1709,81 +1719,28 @@ const WordByWord = ({
         flexWrap: "wrap",
         justifyContent: "center",
         alignItems: "center",
-        gap: `0 ${fontSize * 0.28}px`
+        gap: revealMode === "word" ? `0 ${fontSize * 0.28}px` : `0 ${fontSize * 0.2}px`
       },
-      children: words.map((word, i) => {
-        const wordDelay = getWordDelay(i, words.length);
-        const adjustedFrame = Math.max(0, frame - wordDelay);
-        let wordStyle = {};
-        switch (animation) {
-          case "fade": {
-            const opacity = (0,esm.interpolate)(adjustedFrame, [0, fps * 0.4], [0, 1], {
-              extrapolateRight: "clamp"
-            });
-            wordStyle = { opacity };
-            break;
-          }
-          case "slide":
-          case "slide-up": {
-            const fromY = staggerPattern === "wave" && i % 2 === 0 ? -40 : 40;
-            const translateY = (0,esm.spring)({
-              fps,
-              frame: adjustedFrame,
-              config: { damping: 14, stiffness: 120, mass: 0.8 },
-              from: fromY,
-              to: 0
-            });
-            const opacity = (0,esm.interpolate)(adjustedFrame, [0, 8], [0, 1], {
-              extrapolateRight: "clamp"
-            });
-            wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: "inline-block" };
-            break;
-          }
-          case "slide-down": {
-            const translateY = (0,esm.spring)({
-              fps,
-              frame: adjustedFrame,
-              config: { damping: 14, stiffness: 120, mass: 0.8 },
-              from: -40,
-              to: 0
-            });
-            const opacity = (0,esm.interpolate)(adjustedFrame, [0, 8], [0, 1], {
-              extrapolateRight: "clamp"
-            });
-            wordStyle = { transform: `translateY(${translateY}px)`, opacity, display: "inline-block" };
-            break;
-          }
-          case "scale": {
-            const overshoot = staggerPattern === "explosive" ? 1.3 : 1;
-            const scale = (0,esm.spring)({
-              fps,
-              frame: adjustedFrame,
-              config: {
-                damping: staggerPattern === "explosive" ? 8 : 10,
-                stiffness: staggerPattern === "explosive" ? 220 : 180,
-                mass: 0.6
-              },
-              from: overshoot,
-              to: 1
-            });
-            const scaleFromZero = (0,esm.interpolate)(adjustedFrame, [0, 4], [0, overshoot], {
-              extrapolateRight: "clamp"
-            });
-            const finalScale = adjustedFrame < 4 ? scaleFromZero : scale;
-            const opacity = (0,esm.interpolate)(adjustedFrame, [0, 5], [0, 1], {
-              extrapolateRight: "clamp"
-            });
-            wordStyle = { transform: `scale(${finalScale})`, opacity, display: "inline-block" };
-            break;
-          }
-          case "typewriter": {
-            wordStyle = { opacity: adjustedFrame > 0 ? 1 : 0 };
-            break;
-          }
-          default:
-            wordStyle = { opacity: 1 };
+      children: words.map((word, wIdx) => {
+        if (revealMode === "letter") {
+          const chars = word.split("");
+          return /* @__PURE__ */ (0,jsx_runtime.jsxs)("span", { style: { display: "inline-block", whiteSpace: "nowrap", ...highlightWords.includes(wIdx) ? { backgroundColor: highlightBgColor, padding: `0 ${fontSize * 0.1}px`, borderRadius: `${fontSize * 0.15}px` } : {} }, children: [
+            chars.map((char, cIdx) => {
+              const i = globalItemIndex++;
+              const itemDelay = getDelay(i, totalItems);
+              const adjustedFrame = Math.max(0, frame - itemDelay);
+              const wordStyle = getStyle(i, adjustedFrame, wIdx);
+              return /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { display: "inline-block", ...wordStyle }, children: char }, cIdx);
+            }),
+            wIdx < words.length - 1 && /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { display: "inline-block", width: `${fontSize * 0.28}px` } })
+          ] }, wIdx);
+        } else {
+          const i = globalItemIndex++;
+          const itemDelay = getDelay(i, totalItems);
+          const adjustedFrame = Math.max(0, frame - itemDelay);
+          const wordStyle = getStyle(i, adjustedFrame, wIdx);
+          return /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { display: "inline-block", ...wordStyle }, children: word }, i);
         }
-        return /* @__PURE__ */ (0,jsx_runtime.jsx)("span", { style: { display: "inline-block", ...wordStyle }, children: word }, i);
       })
     }
   );
@@ -1900,39 +1857,54 @@ const GrainOverlay = ({ opacity = 0.035 }) => {
 
 
 
-
-const ContentScene = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl, logoUrl }) => {
+const ContentScene = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl }) => {
   const frame = (0,esm.useCurrentFrame)();
   const { fps, width, height } = (0,esm.useVideoConfig)();
   const isNarrow = width < height;
   const barWidth = (0,esm.spring)({ fps, frame, config: { damping: 180, stiffness: 70 }, from: 0, to: 80, delay: 8 });
-  const barOpacity = (0,esm.interpolate)(frame, [8, 20], [0, 0.8], { extrapolateRight: "clamp" });
+  const barOpacity = (0,esm.interpolate)(frame, [8, 20], [0, 1], { extrapolateRight: "clamp" });
+  const boxSlideY = (0,esm.spring)({ fps, frame, config: { damping: 14, stiffness: 120, mass: 0.8 }, from: 50, to: 0, delay: 5 });
   const patterns = ["wave", "cascade", "explosive"];
   const staggerPattern = patterns[sceneIndex % patterns.length];
   const densities = ["low", "normal", "low"];
   const density = densities[sceneIndex % densities.length];
+  const words = scene.text.split(" ");
+  const highlightCandidateIndices = words.map((w, i) => w.replace(/[^a-zA-Z]/g, "").length > 4 ? i : -1).filter((i) => i !== -1).sort((a, b) => {
+    const distA = Math.abs(a - words.length / 2);
+    const distB = Math.abs(b - words.length / 2);
+    return distA - distB;
+  });
+  const highlightWordsToUse = highlightCandidateIndices.slice(0, 1 + sceneIndex % 2);
+  const isKaraokeScene = sceneIndex % 2 === 1;
   return /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { children: [
-    bgImageUrl ? /* @__PURE__ */ (0,jsx_runtime.jsx)(BgImageLayer, { imageUrl: bgImageUrl }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(
+    bgImageUrl ? /* @__PURE__ */ (0,jsx_runtime.jsx)(BgImageLayer, { imageUrl: bgImageUrl, sceneIndex }) : /* @__PURE__ */ (0,jsx_runtime.jsx)(
       BackgroundLayer,
       {
         backgroundColor: scene.backgroundColor,
         gradientVariant: (sceneIndex + 1) % 3
       }
     ),
-    /* @__PURE__ */ (0,jsx_runtime.jsx)(MediaLayer, { mediaUrl }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(MediaLayer, { mediaUrl, sceneIndex }),
     /* @__PURE__ */ (0,jsx_runtime.jsx)(ParticleLayer, { color: scene.textColor, seed: sceneIndex * 17 + 3, density }),
-    logoUrl && /* @__PURE__ */ (0,jsx_runtime.jsx)(
-      LogoLayer,
-      {
-        logoUrl,
-        position: "top-left",
-        size: isNarrow ? 80 : 120,
-        delay: 8,
-        scene: "content"
-      }
-    ),
-    /* @__PURE__ */ (0,jsx_runtime.jsxs)(esm.AbsoluteFill, { style: { display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0 140px", gap: 36 }, children: [
-      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: barWidth, height: 4, backgroundColor: scene.textColor, borderRadius: 2, opacity: barOpacity, alignSelf: "flex-start", marginLeft: "10%" } }),
+    /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0 100px", gap: 36 }, children: /* @__PURE__ */ (0,jsx_runtime.jsxs)("div", { style: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 36,
+      background: "rgba(0, 0, 0, 0.25)",
+      // Smooth glassy container
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      padding: "60px 80px",
+      borderRadius: 32,
+      border: "1px solid rgba(255, 255, 255, 0.1)",
+      boxShadow: "0 24px 64px rgba(0,0,0,0.3)",
+      opacity: barOpacity,
+      // Tie it to the same entry fade
+      transform: `translateY(${boxSlideY + Math.sin(frame / 25) * 6}px) rotate(${Math.sin(frame / 45) * 0.5}deg)`
+      // Glide in and ambient float
+    }, children: [
+      /* @__PURE__ */ (0,jsx_runtime.jsx)("div", { style: { width: barWidth, height: 4, backgroundColor: scene.textColor, borderRadius: 2, alignSelf: "flex-start" } }),
       /* @__PURE__ */ (0,jsx_runtime.jsx)(
         WordByWord,
         {
@@ -1941,8 +1913,13 @@ const ContentScene = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl, logo
           color: scene.textColor,
           fontSize: scene.fontSize,
           delay: 5,
-          staggerFrames: 5,
-          staggerPattern
+          staggerFrames: isKaraokeScene ? Math.max(1, Math.floor(120 / scene.text.length)) : 6,
+          staggerPattern: isKaraokeScene ? "cascade" : staggerPattern,
+          highlightWords: isKaraokeScene ? [] : highlightWordsToUse,
+          highlightColor: scene.backgroundColor,
+          highlightBgColor: scene.textColor,
+          liveKaraoke: isKaraokeScene,
+          revealMode: isKaraokeScene ? "letter" : "word"
         }
       ),
       scene.subtext && /* @__PURE__ */ (0,jsx_runtime.jsx)(
@@ -1958,57 +1935,10 @@ const ContentScene = ({ scene, sceneIndex = 1, audio, mediaUrl, bgImageUrl, logo
           staggerPattern: "cascade"
         }
       )
-    ] }),
+    ] }) }),
     /* @__PURE__ */ (0,jsx_runtime.jsx)(GrainOverlay, { opacity: 0.035 }),
     audio && /* @__PURE__ */ (0,jsx_runtime.jsx)(SceneAudio, { animation: scene.animation, sfxVolume: audio.sfxVolume, delay: 5 })
   ] });
-};
-
-;// ./src/components/WatermarkLayer.tsx
-
-
-
-const WatermarkLayer = ({
-  watermarkUrl,
-  corner = "bottom-right",
-  opacity = 0.35,
-  size = 80
-}) => {
-  const frame = (0,esm.useCurrentFrame)();
-  const alpha = (0,esm.interpolate)(frame, [0, 15], [0, opacity], {
-    extrapolateRight: "clamp",
-    extrapolateLeft: "clamp"
-  });
-  const padding = 32;
-  const cornerStyles = {
-    "bottom-right": { bottom: padding, right: padding },
-    "bottom-left": { bottom: padding, left: padding },
-    "top-right": { top: padding, right: padding },
-    "top-left": { top: padding, left: padding }
-  };
-  return /* @__PURE__ */ (0,jsx_runtime.jsx)(esm.AbsoluteFill, { style: { pointerEvents: "none", zIndex: 9999 }, children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
-    "div",
-    {
-      style: {
-        position: "absolute",
-        opacity: alpha,
-        ...cornerStyles[corner]
-      },
-      children: /* @__PURE__ */ (0,jsx_runtime.jsx)(
-        esm.Img,
-        {
-          src: watermarkUrl,
-          style: {
-            width: size,
-            height: size,
-            objectFit: "contain",
-            // Desaturate slightly — watermarks should be unobtrusive
-            filter: "drop-shadow(0px 1px 4px rgba(0,0,0,0.5))"
-          }
-        }
-      )
-    }
-  ) });
 };
 
 ;// ./src/types.ts
@@ -2036,7 +1966,6 @@ function getTotalDurationInFrames(scenes, fps) {
 }
 
 ;// ./src/compositions/AIVideoComposition.tsx
-
 
 
 
@@ -2125,9 +2054,8 @@ const AIVideoComposition = (props) => {
               scene,
               sceneIndex: index,
               audio,
-              mediaUrl: (assets == null ? void 0 : assets.mediaUrls) ? assets.mediaUrls[index % assets.mediaUrls.length] : void 0,
-              bgImageUrl: assets == null ? void 0 : assets.bgImageUrl,
-              logoUrl: assets == null ? void 0 : assets.logoUrl
+              mediaUrl: scene.mediaUrl ?? ((assets == null ? void 0 : assets.mediaUrls) ? assets.mediaUrls[index % assets.mediaUrls.length] : void 0),
+              bgImageUrl: assets == null ? void 0 : assets.bgImageUrl
             }
           ) : /* @__PURE__ */ (0,jsx_runtime.jsx)(
             KineticScene,
@@ -2135,8 +2063,7 @@ const AIVideoComposition = (props) => {
               scene,
               sceneIndex: index,
               audio,
-              bgImageUrl: assets == null ? void 0 : assets.bgImageUrl,
-              logoUrl: assets == null ? void 0 : assets.logoUrl
+              bgImageUrl: assets == null ? void 0 : assets.bgImageUrl
             }
           ),
           index > 0 && audio && /* @__PURE__ */ (0,jsx_runtime.jsx)(
@@ -2151,8 +2078,7 @@ const AIVideoComposition = (props) => {
           )
         ] }) })
       ] }, index);
-    }) }),
-    (assets == null ? void 0 : assets.watermarkUrl) && /* @__PURE__ */ (0,jsx_runtime.jsx)(WatermarkLayer, { watermarkUrl: assets.watermarkUrl, opacity: 0.65 })
+    }) })
   ] });
 };
 
@@ -2226,14 +2152,15 @@ const defaultProps = {
       duration: 2.5,
       fontSize: 96
     }
-  ],
-  audio: {
-    mood: "cinematic",
-    trackUrl: "https://cdn.freesound.org/previews/612/612094_5674468-lq.mp3",
-    volume: 0.35,
-    sfxVolume: 0.55,
-    trackIndex: 0
-  }
+  ]
+  // Audio disabled by default or use a valid local path if available
+  // audio: {
+  //   mood: 'cinematic',
+  //   trackUrl: '', 
+  //   volume: 0.35,
+  //   sfxVolume: 0.55,
+  //   trackIndex: 0,
+  // },
 };
 const RemotionRoot = () => {
   const calcMetadata = async ({ props }) => ({
@@ -2269,7 +2196,7 @@ const RemotionRoot = () => {
 
 /***/ },
 
-/***/ 6507
+/***/ 7865
 (__unused_webpack_module, exports) {
 
 var __webpack_unused_export__;
@@ -2418,11 +2345,11 @@ exports.d = injectCSS;
 
 /***/ },
 
-/***/ 3610
+/***/ 1616
 (__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 var react__WEBPACK_IMPORTED_MODULE_0___namespace_cache;
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6540);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7140);
 
 
 if (typeof globalThis === 'undefined') {
@@ -2434,29 +2361,29 @@ if (typeof globalThis === 'undefined') {
 
 /***/ },
 
-/***/ 290
+/***/ 5610
 (module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4991);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8045);
+/* harmony import */ var _node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7816);
+/* harmony import */ var _node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_pnpm_css_loader_5_2_7_webpack_5_105_0_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-transition-duration: 150ms;\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .visible {\n    visibility: visible;\n  }\n  .absolute {\n    position: absolute;\n  }\n  .fixed {\n    position: fixed;\n  }\n  .relative {\n    position: relative;\n  }\n  .static {\n    position: static;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .container {\n    width: 100%;\n    @media (width >= 40rem) {\n      max-width: 40rem;\n    }\n    @media (width >= 48rem) {\n      max-width: 48rem;\n    }\n    @media (width >= 64rem) {\n      max-width: 64rem;\n    }\n    @media (width >= 80rem) {\n      max-width: 80rem;\n    }\n    @media (width >= 96rem) {\n      max-width: 96rem;\n    }\n  }\n  .block {\n    display: block;\n  }\n  .flex {\n    display: flex;\n  }\n  .hidden {\n    display: none;\n  }\n  .inline-block {\n    display: inline-block;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n  .uppercase {\n    text-transform: uppercase;\n  }\n  .italic {\n    font-style: italic;\n  }\n  .shadow {\n    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .ring {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .outline {\n    outline-style: var(--tw-outline-style);\n    outline-width: 1px;\n  }\n  .filter {\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .transition {\n    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-inset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-ring-inset {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-offset-width {\n  syntax: \"<length>\";\n  inherits: false;\n  initial-value: 0px;\n}\n@property --tw-ring-offset-color {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: #fff;\n}\n@property --tw-ring-offset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-outline-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-blur {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-brightness {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-contrast {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-grayscale {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-hue-rotate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-invert {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-opacity {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-saturate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-sepia {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-drop-shadow-size {\n  syntax: \"*\";\n  inherits: false;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n      --tw-shadow: 0 0 #0000;\n      --tw-shadow-color: initial;\n      --tw-shadow-alpha: 100%;\n      --tw-inset-shadow: 0 0 #0000;\n      --tw-inset-shadow-color: initial;\n      --tw-inset-shadow-alpha: 100%;\n      --tw-ring-color: initial;\n      --tw-ring-shadow: 0 0 #0000;\n      --tw-inset-ring-color: initial;\n      --tw-inset-ring-shadow: 0 0 #0000;\n      --tw-ring-inset: initial;\n      --tw-ring-offset-width: 0px;\n      --tw-ring-offset-color: #fff;\n      --tw-ring-offset-shadow: 0 0 #0000;\n      --tw-outline-style: solid;\n      --tw-blur: initial;\n      --tw-brightness: initial;\n      --tw-contrast: initial;\n      --tw-grayscale: initial;\n      --tw-hue-rotate: initial;\n      --tw-invert: initial;\n      --tw-opacity: initial;\n      --tw-saturate: initial;\n      --tw-sepia: initial;\n      --tw-drop-shadow: initial;\n      --tw-drop-shadow-color: initial;\n      --tw-drop-shadow-alpha: 100%;\n      --tw-drop-shadow-size: initial;\n    }\n  }\n}\n", "",{"version":3,"sources":["webpack://./src/index.css"],"names":[],"mappings":"AAAA,gEAAgE;AAChE,iBAAiB;AACjB,yCAAyC;AACzC;EACE;IACE;6DACyD;IACzD;iDAC6C;IAC7C,kBAAkB;IAClB,oCAAoC;IACpC,kEAAkE;IAClE,uCAAuC;IACvC,wEAAwE;IACxE;;KAEC;IACD,4CAA4C;IAC5C;;KAEC;IACD;;KAEC;EACH;AACF;AACA;EACE;IACE,sBAAsB;IACtB,SAAS;IACT,UAAU;IACV,eAAe;EACjB;EACA;IACE,gBAAgB;IAChB,8BAA8B;IAC9B,WAAW;IACX,6JAA6J;IAC7J,mEAAmE;IACnE,yEAAyE;IACzE,wCAAwC;EAC1C;EACA;IACE,oBAAoB;EACtB;EACA;IACE,SAAS;IACT,cAAc;IACd,qBAAqB;EACvB;EACA;IACE,yCAAyC;IACzC,iCAAiC;EACnC;EACA;IACE,kBAAkB;IAClB,oBAAoB;EACtB;EACA;IACE,cAAc;IACd,gCAAgC;IAChC,wBAAwB;EAC1B;EACA;IACE,mBAAmB;EACrB;EACA;IACE,kJAAkJ;IAClJ,0EAA0E;IAC1E,8EAA8E;IAC9E,cAAc;EAChB;EACA;IACE,cAAc;EAChB;EACA;IACE,cAAc;IACd,cAAc;IACd,kBAAkB;IAClB,wBAAwB;EAC1B;EACA;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;EACA;IACE,cAAc;IACd,qBAAqB;IACrB,yBAAyB;EAC3B;EACA;IACE,aAAa;EACf;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,kBAAkB;EACpB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,cAAc;IACd,sBAAsB;EACxB;EACA;IACE,eAAe;IACf,YAAY;EACd;EACA;IACE,aAAa;IACb,8BAA8B;IAC9B,gCAAgC;IAChC,uBAAuB;IACvB,cAAc;IACd,gBAAgB;IAChB,6BAA6B;IAC7B,UAAU;EACZ;EACA;IACE,mBAAmB;EACrB;EACA;IACE,0BAA0B;EAC5B;EACA;IACE,sBAAsB;EACxB;EACA;IACE,UAAU;IACV,mBAAmB;IACnB;MACE,yDAAyD;IAC3D;EACF;EACA;IACE,gBAAgB;EAClB;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,eAAe;IACf,mBAAmB;EACrB;EACA;IACE,oBAAoB;EACtB;EACA;IACE,UAAU;EACZ;EACA;IACE,gBAAgB;EAClB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,YAAY;EACd;EACA;IACE,wBAAwB;EAC1B;AACF;AACA;EACE;IACE,mBAAmB;EACrB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,eAAe;EACjB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,kCAAkC;EACpC;EACA;IACE,gCAAgC;EAClC;EACA;IACE,WAAW;IACX;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;EACF;EACA;IACE,cAAc;EAChB;EACA;IACE,aAAa;EACf;EACA;IACE,aAAa;EACf;EACA;IACE,qBAAqB;EACvB;EACA;IACE,0GAA0G;EAC5G;EACA;IACE,oCAAoC;IACpC,iBAAiB;EACnB;EACA;IACE,yBAAyB;EAC3B;EACA;IACE,kBAAkB;EACpB;EACA;IACE,0HAA0H;IAC1H,sIAAsI;EACxI;EACA;IACE,wHAAwH;IACxH,sIAAsI;EACxI;EACA;IACE,sCAAsC;IACtC,kBAAkB;EACpB;EACA;IACE,0LAA0L;EAC5L;EACA;IACE,yUAAyU;IACzU,qFAAqF;IACrF,2EAA2E;EAC7E;AACF;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,oBAAoB;AACtB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,kBAAkB;EAClB,eAAe;EACf,kBAAkB;AACpB;AACA;EACE,WAAW;EACX,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;EACf,oBAAoB;AACtB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE;IACE;MACE,sBAAsB;MACtB,sBAAsB;MACtB,sBAAsB;MACtB,oBAAoB;MACpB,oBAAoB;MACpB,wBAAwB;MACxB,sBAAsB;MACtB,0BAA0B;MAC1B,uBAAuB;MACvB,4BAA4B;MAC5B,gCAAgC;MAChC,6BAA6B;MAC7B,wBAAwB;MACxB,2BAA2B;MAC3B,8BAA8B;MAC9B,iCAAiC;MACjC,wBAAwB;MACxB,2BAA2B;MAC3B,4BAA4B;MAC5B,kCAAkC;MAClC,yBAAyB;MACzB,kBAAkB;MAClB,wBAAwB;MACxB,sBAAsB;MACtB,uBAAuB;MACvB,wBAAwB;MACxB,oBAAoB;MACpB,qBAAqB;MACrB,sBAAsB;MACtB,mBAAmB;MACnB,yBAAyB;MACzB,+BAA+B;MAC/B,4BAA4B;MAC5B,8BAA8B;IAChC;EACF;AACF","sourcesContent":["/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-transition-duration: 150ms;\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .visible {\n    visibility: visible;\n  }\n  .absolute {\n    position: absolute;\n  }\n  .fixed {\n    position: fixed;\n  }\n  .relative {\n    position: relative;\n  }\n  .static {\n    position: static;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .container {\n    width: 100%;\n    @media (width >= 40rem) {\n      max-width: 40rem;\n    }\n    @media (width >= 48rem) {\n      max-width: 48rem;\n    }\n    @media (width >= 64rem) {\n      max-width: 64rem;\n    }\n    @media (width >= 80rem) {\n      max-width: 80rem;\n    }\n    @media (width >= 96rem) {\n      max-width: 96rem;\n    }\n  }\n  .block {\n    display: block;\n  }\n  .flex {\n    display: flex;\n  }\n  .hidden {\n    display: none;\n  }\n  .inline-block {\n    display: inline-block;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n  .uppercase {\n    text-transform: uppercase;\n  }\n  .italic {\n    font-style: italic;\n  }\n  .shadow {\n    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .ring {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .outline {\n    outline-style: var(--tw-outline-style);\n    outline-width: 1px;\n  }\n  .filter {\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .transition {\n    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-inset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-ring-inset {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-offset-width {\n  syntax: \"<length>\";\n  inherits: false;\n  initial-value: 0px;\n}\n@property --tw-ring-offset-color {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: #fff;\n}\n@property --tw-ring-offset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-outline-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-blur {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-brightness {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-contrast {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-grayscale {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-hue-rotate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-invert {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-opacity {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-saturate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-sepia {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-drop-shadow-size {\n  syntax: \"*\";\n  inherits: false;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n      --tw-shadow: 0 0 #0000;\n      --tw-shadow-color: initial;\n      --tw-shadow-alpha: 100%;\n      --tw-inset-shadow: 0 0 #0000;\n      --tw-inset-shadow-color: initial;\n      --tw-inset-shadow-alpha: 100%;\n      --tw-ring-color: initial;\n      --tw-ring-shadow: 0 0 #0000;\n      --tw-inset-ring-color: initial;\n      --tw-inset-ring-shadow: 0 0 #0000;\n      --tw-ring-inset: initial;\n      --tw-ring-offset-width: 0px;\n      --tw-ring-offset-color: #fff;\n      --tw-ring-offset-shadow: 0 0 #0000;\n      --tw-outline-style: solid;\n      --tw-blur: initial;\n      --tw-brightness: initial;\n      --tw-contrast: initial;\n      --tw-grayscale: initial;\n      --tw-hue-rotate: initial;\n      --tw-invert: initial;\n      --tw-opacity: initial;\n      --tw-saturate: initial;\n      --tw-sepia: initial;\n      --tw-drop-shadow: initial;\n      --tw-drop-shadow-color: initial;\n      --tw-drop-shadow-alpha: 100%;\n      --tw-drop-shadow-size: initial;\n    }\n  }\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-transition-duration: 150ms;\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .visible {\n    visibility: visible;\n  }\n  .absolute {\n    position: absolute;\n  }\n  .fixed {\n    position: fixed;\n  }\n  .relative {\n    position: relative;\n  }\n  .static {\n    position: static;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .container {\n    width: 100%;\n    @media (width >= 40rem) {\n      max-width: 40rem;\n    }\n    @media (width >= 48rem) {\n      max-width: 48rem;\n    }\n    @media (width >= 64rem) {\n      max-width: 64rem;\n    }\n    @media (width >= 80rem) {\n      max-width: 80rem;\n    }\n    @media (width >= 96rem) {\n      max-width: 96rem;\n    }\n  }\n  .block {\n    display: block;\n  }\n  .flex {\n    display: flex;\n  }\n  .hidden {\n    display: none;\n  }\n  .inline-block {\n    display: inline-block;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n  .uppercase {\n    text-transform: uppercase;\n  }\n  .italic {\n    font-style: italic;\n  }\n  .ring {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .outline {\n    outline-style: var(--tw-outline-style);\n    outline-width: 1px;\n  }\n  .blur {\n    --tw-blur: blur(8px);\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .filter {\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .transition {\n    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-inset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-ring-inset {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-offset-width {\n  syntax: \"<length>\";\n  inherits: false;\n  initial-value: 0px;\n}\n@property --tw-ring-offset-color {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: #fff;\n}\n@property --tw-ring-offset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-outline-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-blur {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-brightness {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-contrast {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-grayscale {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-hue-rotate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-invert {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-opacity {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-saturate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-sepia {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-drop-shadow-size {\n  syntax: \"*\";\n  inherits: false;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n      --tw-shadow: 0 0 #0000;\n      --tw-shadow-color: initial;\n      --tw-shadow-alpha: 100%;\n      --tw-inset-shadow: 0 0 #0000;\n      --tw-inset-shadow-color: initial;\n      --tw-inset-shadow-alpha: 100%;\n      --tw-ring-color: initial;\n      --tw-ring-shadow: 0 0 #0000;\n      --tw-inset-ring-color: initial;\n      --tw-inset-ring-shadow: 0 0 #0000;\n      --tw-ring-inset: initial;\n      --tw-ring-offset-width: 0px;\n      --tw-ring-offset-color: #fff;\n      --tw-ring-offset-shadow: 0 0 #0000;\n      --tw-outline-style: solid;\n      --tw-blur: initial;\n      --tw-brightness: initial;\n      --tw-contrast: initial;\n      --tw-grayscale: initial;\n      --tw-hue-rotate: initial;\n      --tw-invert: initial;\n      --tw-opacity: initial;\n      --tw-saturate: initial;\n      --tw-sepia: initial;\n      --tw-drop-shadow: initial;\n      --tw-drop-shadow-color: initial;\n      --tw-drop-shadow-alpha: 100%;\n      --tw-drop-shadow-size: initial;\n    }\n  }\n}\n", "",{"version":3,"sources":["webpack://./src/index.css"],"names":[],"mappings":"AAAA,gEAAgE;AAChE,iBAAiB;AACjB,yCAAyC;AACzC;EACE;IACE;6DACyD;IACzD;iDAC6C;IAC7C,kBAAkB;IAClB,oCAAoC;IACpC,kEAAkE;IAClE,uCAAuC;IACvC,wEAAwE;IACxE;;KAEC;IACD,4CAA4C;IAC5C;;KAEC;IACD;;KAEC;EACH;AACF;AACA;EACE;IACE,sBAAsB;IACtB,SAAS;IACT,UAAU;IACV,eAAe;EACjB;EACA;IACE,gBAAgB;IAChB,8BAA8B;IAC9B,WAAW;IACX,6JAA6J;IAC7J,mEAAmE;IACnE,yEAAyE;IACzE,wCAAwC;EAC1C;EACA;IACE,oBAAoB;EACtB;EACA;IACE,SAAS;IACT,cAAc;IACd,qBAAqB;EACvB;EACA;IACE,yCAAyC;IACzC,iCAAiC;EACnC;EACA;IACE,kBAAkB;IAClB,oBAAoB;EACtB;EACA;IACE,cAAc;IACd,gCAAgC;IAChC,wBAAwB;EAC1B;EACA;IACE,mBAAmB;EACrB;EACA;IACE,kJAAkJ;IAClJ,0EAA0E;IAC1E,8EAA8E;IAC9E,cAAc;EAChB;EACA;IACE,cAAc;EAChB;EACA;IACE,cAAc;IACd,cAAc;IACd,kBAAkB;IAClB,wBAAwB;EAC1B;EACA;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;EACA;IACE,cAAc;IACd,qBAAqB;IACrB,yBAAyB;EAC3B;EACA;IACE,aAAa;EACf;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,kBAAkB;EACpB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,cAAc;IACd,sBAAsB;EACxB;EACA;IACE,eAAe;IACf,YAAY;EACd;EACA;IACE,aAAa;IACb,8BAA8B;IAC9B,gCAAgC;IAChC,uBAAuB;IACvB,cAAc;IACd,gBAAgB;IAChB,6BAA6B;IAC7B,UAAU;EACZ;EACA;IACE,mBAAmB;EACrB;EACA;IACE,0BAA0B;EAC5B;EACA;IACE,sBAAsB;EACxB;EACA;IACE,UAAU;IACV,mBAAmB;IACnB;MACE,yDAAyD;IAC3D;EACF;EACA;IACE,gBAAgB;EAClB;EACA;IACE,wBAAwB;EAC1B;EACA;IACE,eAAe;IACf,mBAAmB;EACrB;EACA;IACE,oBAAoB;EACtB;EACA;IACE,UAAU;EACZ;EACA;IACE,gBAAgB;EAClB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,YAAY;EACd;EACA;IACE,wBAAwB;EAC1B;AACF;AACA;EACE;IACE,mBAAmB;EACrB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,eAAe;EACjB;EACA;IACE,kBAAkB;EACpB;EACA;IACE,gBAAgB;EAClB;EACA;IACE,kCAAkC;EACpC;EACA;IACE,gCAAgC;EAClC;EACA;IACE,WAAW;IACX;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;IACA;MACE,gBAAgB;IAClB;EACF;EACA;IACE,cAAc;EAChB;EACA;IACE,aAAa;EACf;EACA;IACE,aAAa;EACf;EACA;IACE,qBAAqB;EACvB;EACA;IACE,0GAA0G;EAC5G;EACA;IACE,oCAAoC;IACpC,iBAAiB;EACnB;EACA;IACE,yBAAyB;EAC3B;EACA;IACE,kBAAkB;EACpB;EACA;IACE,wHAAwH;IACxH,sIAAsI;EACxI;EACA;IACE,sCAAsC;IACtC,kBAAkB;EACpB;EACA;IACE,oBAAoB;IACpB,0LAA0L;EAC5L;EACA;IACE,0LAA0L;EAC5L;EACA;IACE,yUAAyU;IACzU,qFAAqF;IACrF,2EAA2E;EAC7E;AACF;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,oBAAoB;AACtB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,kBAAkB;EAClB,eAAe;EACf,kBAAkB;AACpB;AACA;EACE,WAAW;EACX,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;EACf,wBAAwB;AAC1B;AACA;EACE,WAAW;EACX,eAAe;EACf,oBAAoB;AACtB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,eAAe;EACf,mBAAmB;AACrB;AACA;EACE,WAAW;EACX,eAAe;AACjB;AACA;EACE;IACE;MACE,sBAAsB;MACtB,sBAAsB;MACtB,sBAAsB;MACtB,oBAAoB;MACpB,oBAAoB;MACpB,wBAAwB;MACxB,sBAAsB;MACtB,0BAA0B;MAC1B,uBAAuB;MACvB,4BAA4B;MAC5B,gCAAgC;MAChC,6BAA6B;MAC7B,wBAAwB;MACxB,2BAA2B;MAC3B,8BAA8B;MAC9B,iCAAiC;MACjC,wBAAwB;MACxB,2BAA2B;MAC3B,4BAA4B;MAC5B,kCAAkC;MAClC,yBAAyB;MACzB,kBAAkB;MAClB,wBAAwB;MACxB,sBAAsB;MACtB,uBAAuB;MACvB,wBAAwB;MACxB,oBAAoB;MACpB,qBAAqB;MACrB,sBAAsB;MACtB,mBAAmB;MACnB,yBAAyB;MACzB,+BAA+B;MAC/B,4BAA4B;MAC5B,8BAA8B;IAChC;EACF;AACF","sourcesContent":["/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */\n@layer properties;\n@layer theme, base, components, utilities;\n@layer theme {\n  :root, :host {\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\",\n      \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\";\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,\n      \"Liberation Mono\", \"Courier New\", monospace;\n    --spacing: 0.25rem;\n    --default-transition-duration: 150ms;\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\n    --default-font-family: var(--font-sans);\n    --default-font-feature-settings: var(--font-sans--font-feature-settings);\n    --default-font-variation-settings: var(\n      --font-sans--font-variation-settings\n    );\n    --default-mono-font-family: var(--font-mono);\n    --default-mono-font-feature-settings: var(\n      --font-mono--font-feature-settings\n    );\n    --default-mono-font-variation-settings: var(\n      --font-mono--font-variation-settings\n    );\n  }\n}\n@layer base {\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n  }\n  html, :host {\n    line-height: 1.5;\n    -webkit-text-size-adjust: 100%;\n    tab-size: 4;\n    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\" );\n    font-feature-settings: var(--default-font-feature-settings, normal);\n    font-variation-settings: var( --default-font-variation-settings, normal );\n    -webkit-tap-highlight-color: transparent;\n  }\n  body {\n    line-height: inherit;\n  }\n  hr {\n    height: 0;\n    color: inherit;\n    border-top-width: 1px;\n  }\n  abbr:where([title]) {\n    -webkit-text-decoration: underline dotted;\n    text-decoration: underline dotted;\n  }\n  h1, h2, h3, h4, h5, h6 {\n    font-size: inherit;\n    font-weight: inherit;\n  }\n  a {\n    color: inherit;\n    -webkit-text-decoration: inherit;\n    text-decoration: inherit;\n  }\n  b, strong {\n    font-weight: bolder;\n  }\n  code, kbd, samp, pre {\n    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace );\n    font-feature-settings: var( --default-mono-font-feature-settings, normal );\n    font-variation-settings: var( --default-mono-font-variation-settings, normal );\n    font-size: 1em;\n  }\n  small {\n    font-size: 80%;\n  }\n  sub, sup {\n    font-size: 75%;\n    line-height: 0;\n    position: relative;\n    vertical-align: baseline;\n  }\n  sub {\n    bottom: -0.25em;\n  }\n  sup {\n    top: -0.5em;\n  }\n  table {\n    text-indent: 0;\n    border-color: inherit;\n    border-collapse: collapse;\n  }\n  :-moz-focusring {\n    outline: auto;\n  }\n  progress {\n    vertical-align: baseline;\n  }\n  summary {\n    display: list-item;\n  }\n  ol, ul, menu {\n    list-style: none;\n  }\n  img, svg, video, canvas, audio, iframe, embed, object {\n    display: block;\n    vertical-align: middle;\n  }\n  img, video {\n    max-width: 100%;\n    height: auto;\n  }\n  button, input, select, optgroup, textarea, ::file-selector-button {\n    font: inherit;\n    font-feature-settings: inherit;\n    font-variation-settings: inherit;\n    letter-spacing: inherit;\n    color: inherit;\n    border-radius: 0;\n    background-color: transparent;\n    opacity: 1;\n  }\n  :where(select:is([multiple], [size])) optgroup {\n    font-weight: bolder;\n  }\n  :where(select:is([multiple], [size])) optgroup option {\n    padding-inline-start: 20px;\n  }\n  ::file-selector-button {\n    margin-inline-end: 4px;\n  }\n  ::placeholder {\n    opacity: 1;\n    color: currentColor;\n    @supports (color: color-mix(in lab, red, red)) {\n      color: color-mix(in oklab, currentColor 50%, transparent);\n    }\n  }\n  textarea {\n    resize: vertical;\n  }\n  ::-webkit-search-decoration {\n    -webkit-appearance: none;\n  }\n  ::-webkit-date-and-time-value {\n    min-height: 1lh;\n    text-align: inherit;\n  }\n  ::-webkit-datetime-edit {\n    display: inline-flex;\n  }\n  ::-webkit-datetime-edit-fields-wrapper {\n    padding: 0;\n  }\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\n    padding-block: 0;\n  }\n  :-moz-ui-invalid {\n    box-shadow: none;\n  }\n  button, input:where([type=\"button\"], [type=\"reset\"], [type=\"submit\"]), ::file-selector-button {\n    appearance: button;\n  }\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\n    height: auto;\n  }\n  [hidden]:where(:not([hidden=\"until-found\"])) {\n    display: none !important;\n  }\n}\n@layer utilities {\n  .visible {\n    visibility: visible;\n  }\n  .absolute {\n    position: absolute;\n  }\n  .fixed {\n    position: fixed;\n  }\n  .relative {\n    position: relative;\n  }\n  .static {\n    position: static;\n  }\n  .start {\n    inset-inline-start: var(--spacing);\n  }\n  .end {\n    inset-inline-end: var(--spacing);\n  }\n  .container {\n    width: 100%;\n    @media (width >= 40rem) {\n      max-width: 40rem;\n    }\n    @media (width >= 48rem) {\n      max-width: 48rem;\n    }\n    @media (width >= 64rem) {\n      max-width: 64rem;\n    }\n    @media (width >= 80rem) {\n      max-width: 80rem;\n    }\n    @media (width >= 96rem) {\n      max-width: 96rem;\n    }\n  }\n  .block {\n    display: block;\n  }\n  .flex {\n    display: flex;\n  }\n  .hidden {\n    display: none;\n  }\n  .inline-block {\n    display: inline-block;\n  }\n  .transform {\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\n  }\n  .border {\n    border-style: var(--tw-border-style);\n    border-width: 1px;\n  }\n  .uppercase {\n    text-transform: uppercase;\n  }\n  .italic {\n    font-style: italic;\n  }\n  .ring {\n    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\n  }\n  .outline {\n    outline-style: var(--tw-outline-style);\n    outline-width: 1px;\n  }\n  .blur {\n    --tw-blur: blur(8px);\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .filter {\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\n  }\n  .transition {\n    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\n  }\n}\n@property --tw-rotate-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-inset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-inset-ring-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-inset-ring-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-ring-inset {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-ring-offset-width {\n  syntax: \"<length>\";\n  inherits: false;\n  initial-value: 0px;\n}\n@property --tw-ring-offset-color {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: #fff;\n}\n@property --tw-ring-offset-shadow {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-outline-style {\n  syntax: \"*\";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-blur {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-brightness {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-contrast {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-grayscale {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-hue-rotate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-invert {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-opacity {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-saturate {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-sepia {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-color {\n  syntax: \"*\";\n  inherits: false;\n}\n@property --tw-drop-shadow-alpha {\n  syntax: \"<percentage>\";\n  inherits: false;\n  initial-value: 100%;\n}\n@property --tw-drop-shadow-size {\n  syntax: \"*\";\n  inherits: false;\n}\n@layer properties {\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\n    *, ::before, ::after, ::backdrop {\n      --tw-rotate-x: initial;\n      --tw-rotate-y: initial;\n      --tw-rotate-z: initial;\n      --tw-skew-x: initial;\n      --tw-skew-y: initial;\n      --tw-border-style: solid;\n      --tw-shadow: 0 0 #0000;\n      --tw-shadow-color: initial;\n      --tw-shadow-alpha: 100%;\n      --tw-inset-shadow: 0 0 #0000;\n      --tw-inset-shadow-color: initial;\n      --tw-inset-shadow-alpha: 100%;\n      --tw-ring-color: initial;\n      --tw-ring-shadow: 0 0 #0000;\n      --tw-inset-ring-color: initial;\n      --tw-inset-ring-shadow: 0 0 #0000;\n      --tw-ring-inset: initial;\n      --tw-ring-offset-width: 0px;\n      --tw-ring-offset-color: #fff;\n      --tw-ring-offset-shadow: 0 0 #0000;\n      --tw-outline-style: solid;\n      --tw-blur: initial;\n      --tw-brightness: initial;\n      --tw-contrast: initial;\n      --tw-grayscale: initial;\n      --tw-hue-rotate: initial;\n      --tw-invert: initial;\n      --tw-opacity: initial;\n      --tw-saturate: initial;\n      --tw-sepia: initial;\n      --tw-drop-shadow: initial;\n      --tw-drop-shadow-color: initial;\n      --tw-drop-shadow-alpha: 100%;\n      --tw-drop-shadow-size: initial;\n    }\n  }\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ },
 
-/***/ 6314
+/***/ 7816
 (module) {
 
 
@@ -2528,7 +2455,7 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ },
 
-/***/ 4991
+/***/ 8045
 (module) {
 
 
@@ -2570,7 +2497,7 @@ module.exports = function cssWithMappingToString(item) {
 
 /***/ },
 
-/***/ 1247
+/***/ 2033
 (__unused_webpack_module, exports, __webpack_require__) {
 
 /**
@@ -2587,9 +2514,9 @@ module.exports = function cssWithMappingToString(item) {
  Modernizr 3.0.0pre (Custom Build) | MIT
 */
 
-var Scheduler = __webpack_require__(9982),
-  React = __webpack_require__(6540),
-  ReactDOM = __webpack_require__(961);
+var Scheduler = __webpack_require__(5666),
+  React = __webpack_require__(7140),
+  ReactDOM = __webpack_require__(5219);
 function formatProdErrorMessage(code) {
   var url = "https://react.dev/errors/" + code;
   if (1 < arguments.length) {
@@ -18626,7 +18553,7 @@ exports.version = "19.2.3";
 
 /***/ },
 
-/***/ 6221
+/***/ 9707
 (__unused_webpack_module, exports, __webpack_require__) {
 
 /**
@@ -18640,7 +18567,7 @@ exports.version = "19.2.3";
  */
 
 
-var React = __webpack_require__(6540);
+var React = __webpack_require__(7140);
 function formatProdErrorMessage(code) {
   var url = "https://react.dev/errors/" + code;
   if (1 < arguments.length) {
@@ -18843,7 +18770,7 @@ exports.version = "19.2.3";
 
 /***/ },
 
-/***/ 5338
+/***/ 4668
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
@@ -18872,14 +18799,14 @@ if (true) {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(1247);
+  module.exports = __webpack_require__(2033);
 } else // removed by dead control flow
 {}
 
 
 /***/ },
 
-/***/ 961
+/***/ 5219
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
@@ -18908,14 +18835,14 @@ if (true) {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(6221);
+  module.exports = __webpack_require__(9707);
 } else // removed by dead control flow
 {}
 
 
 /***/ },
 
-/***/ 9698
+/***/ 2330
 (__unused_webpack_module, exports) {
 
 /**
@@ -18956,7 +18883,7 @@ exports.jsxs = jsxProd;
 
 /***/ },
 
-/***/ 9869
+/***/ 6069
 (__unused_webpack_module, exports) {
 
 /**
@@ -19505,33 +19432,33 @@ exports.version = "19.2.3";
 
 /***/ },
 
-/***/ 6540
+/***/ 7140
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
 
 if (true) {
-  module.exports = __webpack_require__(9869);
+  module.exports = __webpack_require__(6069);
 } else // removed by dead control flow
 {}
 
 
 /***/ },
 
-/***/ 4848
+/***/ 5656
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
 
 if (true) {
-  module.exports = __webpack_require__(9698);
+  module.exports = __webpack_require__(2330);
 } else // removed by dead control flow
 {}
 
 
 /***/ },
 
-/***/ 4477
+/***/ 4697
 (__unused_webpack_module, exports) {
 
 /**
@@ -19878,20 +19805,20 @@ exports.unstable_wrapCallback = function (callback) {
 
 /***/ },
 
-/***/ 9982
+/***/ 5666
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
 
 if (true) {
-  module.exports = __webpack_require__(4477);
+  module.exports = __webpack_require__(4697);
 } else // removed by dead control flow
 {}
 
 
 /***/ },
 
-/***/ 5072
+/***/ 5968
 (module) {
 
 
@@ -19981,7 +19908,7 @@ module.exports = function (list, options) {
 
 /***/ },
 
-/***/ 7659
+/***/ 4507
 (module) {
 
 
@@ -20021,7 +19948,7 @@ module.exports = insertBySelector;
 
 /***/ },
 
-/***/ 540
+/***/ 2204
 (module) {
 
 
@@ -20037,7 +19964,7 @@ module.exports = insertStyleElement;
 
 /***/ },
 
-/***/ 5056
+/***/ 672
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
@@ -20053,7 +19980,7 @@ module.exports = setAttributesWithoutAttributes;
 
 /***/ },
 
-/***/ 7825
+/***/ 6529
 (module) {
 
 
@@ -20120,7 +20047,7 @@ module.exports = domAPI;
 
 /***/ },
 
-/***/ 1113
+/***/ 5385
 (module) {
 
 
@@ -20140,15 +20067,15 @@ module.exports = styleTagTransform;
 
 /***/ },
 
-/***/ 3482
+/***/ 2239
 (__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 /* unused harmony export setBundleModeAndUpdate */
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6540);
-/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5338);
-/* harmony import */ var remotion__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3947);
-/* harmony import */ var remotion_no_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9382);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4848);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7140);
+/* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4668);
+/* harmony import */ var remotion__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3516);
+/* harmony import */ var remotion_no_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9455);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5656);
 
 
 // src/renderEntry.tsx
@@ -20304,6 +20231,7 @@ var renderContent = (Root) => {
         videoEnabled: window.remotion_videoEnabled,
         logLevel: window.remotion_logLevel,
         numberOfAudioTags: 0,
+        nonceContextSeed: 0,
         audioLatencyHint: window.remotion_audioLatencyHint ?? "interactive",
         visualModeEnabled: false,
         children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(remotion__WEBPACK_IMPORTED_MODULE_2__.Internals.RenderAssetManagerProvider, {
@@ -20332,6 +20260,7 @@ var renderContent = (Root) => {
         logLevel: window.remotion_logLevel,
         numberOfAudioTags: 0,
         audioLatencyHint: window.remotion_audioLatencyHint ?? "interactive",
+        nonceContextSeed: 0,
         visualModeEnabled: false,
         children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(remotion__WEBPACK_IMPORTED_MODULE_2__.Internals.RenderAssetManagerProvider, {
           collectAssets: null,
@@ -20348,7 +20277,7 @@ var renderContent = (Root) => {
     renderToDOM(/* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
       children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(DelayedSpinner, {})
     }));
-    Promise.all(/* import() */[__webpack_require__.e(429), __webpack_require__.e(845)]).then(__webpack_require__.bind(__webpack_require__, 2429)).then(({ StudioInternals }) => {
+    Promise.all(/* import() */[__webpack_require__.e(690), __webpack_require__.e(133)]).then(__webpack_require__.bind(__webpack_require__, 1690)).then(({ StudioInternals }) => {
       window.remotion_isStudio = true;
       window.remotion_isReadOnlyStudio = true;
       window.remotion_inputProps = "{}";
@@ -20492,8 +20421,8 @@ if (typeof window !== "undefined") {
 
 /***/ },
 
-/***/ 3947
-(__webpack_module__, __webpack_exports__, __webpack_require__) {
+/***/ 3516
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -20542,9 +20471,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   useVideoConfig: () => (/* binding */ useVideoConfig),
 /* harmony export */   watchStaticFile: () => (/* binding */ watchStaticFile)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6540);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4848);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(961);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7140);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5656);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5219);
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -20608,7 +20537,7 @@ function truthy(value) {
 }
 
 // src/version.ts
-var VERSION = "4.0.434";
+var VERSION = "4.0.432";
 
 // src/multiple-versions-warning.ts
 var checkMultipleRemotionVersions = () => {
@@ -20750,20 +20679,6 @@ var AbsoluteFill = (0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(AbsoluteFil
 
 var SequenceContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(null);
 
-// src/timeline-position-state.ts
-var exports_timeline_position_state = {};
-__export(exports_timeline_position_state, {
-  useTimelineSetFrame: () => useTimelineSetFrame,
-  useTimelinePosition: () => useTimelinePosition,
-  useTimelineContext: () => useTimelineContext,
-  usePlayingState: () => usePlayingState,
-  useAbsoluteTimelinePosition: () => useAbsoluteTimelinePosition,
-  persistCurrentFrame: () => persistCurrentFrame,
-  getInitialFrameState: () => getInitialFrameState,
-  getFrameForComposition: () => getFrameForComposition
-});
-
-
 // src/TimelineContext.tsx
 
 
@@ -20801,59 +20716,21 @@ var random = (seed, dummy) => {
   throw new Error("random() argument must be a number or a string");
 };
 
-// src/use-delay-render.tsx
+// src/timeline-position-state.ts
+var exports_timeline_position_state = {};
+__export(exports_timeline_position_state, {
+  useTimelineSetFrame: () => useTimelineSetFrame,
+  useTimelinePosition: () => useTimelinePosition,
+  usePlayingState: () => usePlayingState,
+  useAbsoluteTimelinePosition: () => useAbsoluteTimelinePosition,
+  persistCurrentFrame: () => persistCurrentFrame,
+  getInitialFrameState: () => getInitialFrameState,
+  getFrameForComposition: () => getFrameForComposition
+});
 
 
-// src/cancel-render.ts
-var getErrorStackWithMessage = (error) => {
-  const stack = error.stack ?? "";
-  return stack.startsWith("Error:") ? stack : `${error.message}
-${stack}`;
-};
-var isErrorLike = (err) => {
-  if (err instanceof Error) {
-    return true;
-  }
-  if (err === null) {
-    return false;
-  }
-  if (typeof err !== "object") {
-    return false;
-  }
-  if (!("stack" in err)) {
-    return false;
-  }
-  if (typeof err.stack !== "string") {
-    return false;
-  }
-  if (!("message" in err)) {
-    return false;
-  }
-  if (typeof err.message !== "string") {
-    return false;
-  }
-  return true;
-};
-function cancelRenderInternal(scope, err) {
-  let error;
-  if (isErrorLike(err)) {
-    error = err;
-    if (!error.stack) {
-      error.stack = new Error(error.message).stack;
-    }
-  } else if (typeof err === "string") {
-    error = Error(err);
-  } else {
-    error = Error("Rendering was cancelled");
-  }
-  if (scope) {
-    scope.remotion_cancelledError = getErrorStackWithMessage(error);
-  }
-  throw error;
-}
-function cancelRender(err) {
-  return cancelRenderInternal(typeof window !== "undefined" ? window : undefined, err);
-}
+// src/use-remotion-environment.ts
+
 
 // src/get-remotion-environment.ts
 function getNodeEnvString() {
@@ -20876,195 +20753,6 @@ var getRemotionEnvironment = () => {
   };
 };
 
-// src/log.ts
-var logLevels = ["trace", "verbose", "info", "warn", "error"];
-var getNumberForLogLevel = (level) => {
-  return logLevels.indexOf(level);
-};
-var isEqualOrBelowLogLevel = (currentLevel, level) => {
-  return getNumberForLogLevel(currentLevel) <= getNumberForLogLevel(level);
-};
-var transformArgs = ({
-  args,
-  logLevel,
-  tag
-}) => {
-  const arr = [...args];
-  if (getRemotionEnvironment().isRendering && !getRemotionEnvironment().isClientSideRendering) {
-    arr.unshift(Symbol.for(`__remotion_level_${logLevel}`));
-  }
-  if (tag && getRemotionEnvironment().isRendering && !getRemotionEnvironment().isClientSideRendering) {
-    arr.unshift(Symbol.for(`__remotion_tag_${tag}`));
-  }
-  return arr;
-};
-var verbose = (options, ...args) => {
-  if (isEqualOrBelowLogLevel(options.logLevel, "verbose")) {
-    return console.debug(...transformArgs({ args, logLevel: "verbose", tag: options.tag }));
-  }
-};
-var trace = (options, ...args) => {
-  if (isEqualOrBelowLogLevel(options.logLevel, "trace")) {
-    return console.debug(...transformArgs({ args, logLevel: "trace", tag: options.tag }));
-  }
-};
-var info = (options, ...args) => {
-  if (isEqualOrBelowLogLevel(options.logLevel, "info")) {
-    return console.log(...transformArgs({ args, logLevel: "info", tag: options.tag }));
-  }
-};
-var warn = (options, ...args) => {
-  if (isEqualOrBelowLogLevel(options.logLevel, "warn")) {
-    return console.warn(...transformArgs({ args, logLevel: "warn", tag: options.tag }));
-  }
-};
-var error = (options, ...args) => {
-  return console.error(...transformArgs({ args, logLevel: "error", tag: options.tag }));
-};
-var Log = {
-  trace,
-  verbose,
-  info,
-  warn,
-  error
-};
-
-// src/delay-render.ts
-if (typeof window !== "undefined") {
-  window.remotion_renderReady = false;
-  if (!window.remotion_delayRenderTimeouts) {
-    window.remotion_delayRenderTimeouts = {};
-  }
-  window.remotion_delayRenderHandles = [];
-}
-var DELAY_RENDER_CALLSTACK_TOKEN = "The delayRender was called:";
-var DELAY_RENDER_RETRIES_LEFT = "Retries left: ";
-var DELAY_RENDER_RETRY_TOKEN = "- Rendering the frame will be retried.";
-var DELAY_RENDER_CLEAR_TOKEN = "handle was cleared after";
-var defaultTimeout = 30000;
-var delayRenderInternal = ({
-  scope,
-  environment,
-  label,
-  options
-}) => {
-  if (typeof label !== "string" && label !== null) {
-    throw new Error("The label parameter of delayRender() must be a string or undefined, got: " + JSON.stringify(label));
-  }
-  const handle = Math.random();
-  scope.remotion_delayRenderHandles.push(handle);
-  const called = Error().stack?.replace(/^Error/g, "") ?? "";
-  if (environment.isRendering) {
-    const timeoutToUse = (options?.timeoutInMilliseconds ?? scope.remotion_puppeteerTimeout ?? defaultTimeout) - 2000;
-    const retriesLeft = (options?.retries ?? 0) - (scope.remotion_attempt - 1);
-    scope.remotion_delayRenderTimeouts[handle] = {
-      label: label ?? null,
-      startTime: Date.now(),
-      timeout: setTimeout(() => {
-        const message = [
-          `A delayRender()`,
-          label ? `"${label}"` : null,
-          `was called but not cleared after ${timeoutToUse}ms. See https://remotion.dev/docs/timeout for help.`,
-          retriesLeft > 0 ? DELAY_RENDER_RETRIES_LEFT + retriesLeft : null,
-          retriesLeft > 0 ? DELAY_RENDER_RETRY_TOKEN : null,
-          DELAY_RENDER_CALLSTACK_TOKEN,
-          called
-        ].filter(truthy).join(" ");
-        if (environment.isClientSideRendering) {
-          scope.remotion_cancelledError = getErrorStackWithMessage(Error(message));
-        } else {
-          cancelRenderInternal(scope, Error(message));
-        }
-      }, timeoutToUse)
-    };
-  }
-  scope.remotion_renderReady = false;
-  return handle;
-};
-var delayRender = (label, options) => {
-  if (typeof window === "undefined") {
-    return Math.random();
-  }
-  return delayRenderInternal({
-    scope: window,
-    environment: getRemotionEnvironment(),
-    label: label ?? null,
-    options: options ?? {}
-  });
-};
-var continueRenderInternal = ({
-  scope,
-  handle,
-  environment,
-  logLevel
-}) => {
-  if (typeof handle === "undefined") {
-    throw new TypeError("The continueRender() method must be called with a parameter that is the return value of delayRender(). No value was passed.");
-  }
-  if (typeof handle !== "number") {
-    throw new TypeError("The parameter passed into continueRender() must be the return value of delayRender() which is a number. Got: " + JSON.stringify(handle));
-  }
-  scope.remotion_delayRenderHandles = scope.remotion_delayRenderHandles.filter((h) => {
-    if (h === handle) {
-      if (environment.isRendering && scope !== undefined) {
-        if (!scope.remotion_delayRenderTimeouts[handle]) {
-          return false;
-        }
-        const { label, startTime, timeout } = scope.remotion_delayRenderTimeouts[handle];
-        clearTimeout(timeout);
-        const message = [
-          label ? `"${label}"` : "A handle",
-          DELAY_RENDER_CLEAR_TOKEN,
-          `${Date.now() - startTime}ms`
-        ].filter(truthy).join(" ");
-        Log.verbose({ logLevel, tag: "delayRender()" }, message);
-        delete scope.remotion_delayRenderTimeouts[handle];
-      }
-      return false;
-    }
-    return true;
-  });
-  if (scope.remotion_delayRenderHandles.length === 0) {
-    scope.remotion_renderReady = true;
-  }
-};
-var continueRender = (handle) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-  continueRenderInternal({
-    scope: window,
-    handle,
-    environment: getRemotionEnvironment(),
-    logLevel: window.remotion_logLevel ?? "info"
-  });
-};
-
-// src/log-level-context.tsx
-
-
-var LogLevelContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
-  logLevel: "info",
-  mountTime: 0
-});
-var useLogLevel = () => {
-  const { logLevel } = react__WEBPACK_IMPORTED_MODULE_0__.useContext(LogLevelContext);
-  if (logLevel === null) {
-    throw new Error("useLogLevel must be used within a LogLevelProvider");
-  }
-  return logLevel;
-};
-var useMountTime = () => {
-  const { mountTime } = react__WEBPACK_IMPORTED_MODULE_0__.useContext(LogLevelContext);
-  if (mountTime === null) {
-    throw new Error("useMountTime must be used within a LogLevelProvider");
-  }
-  return mountTime;
-};
-
-// src/use-remotion-environment.ts
-
-
 // src/remotion-environment-context.ts
 
 var RemotionEnvironmentContext = react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
@@ -21074,116 +20762,6 @@ var useRemotionEnvironment = () => {
   const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(RemotionEnvironmentContext);
   const [env] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => getRemotionEnvironment());
   return context ?? env;
-};
-
-// src/use-delay-render.tsx
-var DelayRenderContextType = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(null);
-var useDelayRender = () => {
-  const environment = useRemotionEnvironment();
-  const scope = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(DelayRenderContextType) ?? (typeof window !== "undefined" ? window : undefined);
-  const logLevel = useLogLevel();
-  const delayRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((label, options) => {
-    if (!scope) {
-      return Math.random();
-    }
-    return delayRenderInternal({
-      scope,
-      environment,
-      label: label ?? null,
-      options: options ?? {}
-    });
-  }, [environment, scope]);
-  const continueRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((handle) => {
-    if (!scope) {
-      return;
-    }
-    continueRenderInternal({
-      scope,
-      handle,
-      environment,
-      logLevel
-    });
-  }, [environment, logLevel, scope]);
-  const cancelRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((err) => {
-    return cancelRenderInternal(scope ?? (typeof window !== "undefined" ? window : undefined), err);
-  }, [scope]);
-  return { delayRender: delayRender2, continueRender: continueRender2, cancelRender: cancelRender2 };
-};
-
-// src/TimelineContext.tsx
-
-var SetTimelineContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
-  setFrame: () => {
-    throw new Error("default");
-  },
-  setPlaying: () => {
-    throw new Error("default");
-  }
-});
-var TimelineContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(null);
-var AbsoluteTimeContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(null);
-var TimelineContextProvider = ({ children, frameState }) => {
-  const [playing, setPlaying] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const imperativePlaying = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
-  const [playbackRate, setPlaybackRate] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1);
-  const audioAndVideoTags = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)([]);
-  const [remotionRootId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => String(random(null)));
-  const [_frame, setFrame] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => getInitialFrameState());
-  const frame = frameState ?? _frame;
-  const { delayRender: delayRender2, continueRender: continueRender2 } = useDelayRender();
-  if (typeof window !== "undefined") {
-    (0,react__WEBPACK_IMPORTED_MODULE_0__.useLayoutEffect)(() => {
-      window.remotion_setFrame = (f, composition, attempt) => {
-        window.remotion_attempt = attempt;
-        const id = delayRender2(`Setting the current frame to ${f}`);
-        let asyncUpdate = true;
-        setFrame((s) => {
-          const currentFrame = s[composition] ?? window.remotion_initialFrame;
-          if (currentFrame === f) {
-            asyncUpdate = false;
-            return s;
-          }
-          return {
-            ...s,
-            [composition]: f
-          };
-        });
-        if (asyncUpdate) {
-          requestAnimationFrame(() => continueRender2(id));
-        } else {
-          continueRender2(id);
-        }
-      };
-      window.remotion_isPlayer = false;
-    }, [continueRender2, delayRender2]);
-  }
-  const timelineContextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    return {
-      frame,
-      playing,
-      imperativePlaying,
-      rootId: remotionRootId,
-      playbackRate,
-      setPlaybackRate,
-      audioAndVideoTags
-    };
-  }, [frame, playbackRate, playing, remotionRootId]);
-  const setTimelineContextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    return {
-      setFrame,
-      setPlaying
-    };
-  }, []);
-  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(AbsoluteTimeContext.Provider, {
-    value: timelineContextValue,
-    children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(TimelineContext.Provider, {
-      value: timelineContextValue,
-      children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(SetTimelineContext.Provider, {
-        value: setTimelineContextValue,
-        children
-      })
-    })
-  });
 };
 
 // src/use-video.ts
@@ -21592,22 +21170,12 @@ var useTimelinePositionFromContext = (state) => {
   const unclamped = state.frame[videoConfig.id] ?? (env.isPlayer ? 0 : getFrameForComposition(videoConfig.id));
   return Math.min(videoConfig.durationInFrames - 1, unclamped);
 };
-var useTimelineContext = () => {
-  const state = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
-  if (state === null) {
-    throw new Error("TimelineContext is not available. This hook must be used inside a <Player> or the Remotion Studio.");
-  }
-  return state;
-};
 var useTimelinePosition = () => {
-  const state = useTimelineContext();
+  const state = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   return useTimelinePositionFromContext(state);
 };
 var useAbsoluteTimelinePosition = () => {
   const state = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(AbsoluteTimeContext);
-  if (state === null) {
-    throw new Error("AbsoluteTimeContext is not available. This hook must be used inside a <Player> or the Remotion Studio.");
-  }
   return useTimelinePositionFromContext(state);
 };
 var useTimelineSetFrame = () => {
@@ -21615,9 +21183,383 @@ var useTimelineSetFrame = () => {
   return setFrame;
 };
 var usePlayingState = () => {
-  const { playing, imperativePlaying } = useTimelineContext();
+  const { playing, imperativePlaying } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const { setPlaying } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(SetTimelineContext);
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => [playing, setPlaying, imperativePlaying], [imperativePlaying, playing, setPlaying]);
+};
+
+// src/use-delay-render.tsx
+
+
+// src/cancel-render.ts
+var getErrorStackWithMessage = (error) => {
+  const stack = error.stack ?? "";
+  return stack.startsWith("Error:") ? stack : `${error.message}
+${stack}`;
+};
+var isErrorLike = (err) => {
+  if (err instanceof Error) {
+    return true;
+  }
+  if (err === null) {
+    return false;
+  }
+  if (typeof err !== "object") {
+    return false;
+  }
+  if (!("stack" in err)) {
+    return false;
+  }
+  if (typeof err.stack !== "string") {
+    return false;
+  }
+  if (!("message" in err)) {
+    return false;
+  }
+  if (typeof err.message !== "string") {
+    return false;
+  }
+  return true;
+};
+function cancelRenderInternal(scope, err) {
+  let error;
+  if (isErrorLike(err)) {
+    error = err;
+    if (!error.stack) {
+      error.stack = new Error(error.message).stack;
+    }
+  } else if (typeof err === "string") {
+    error = Error(err);
+  } else {
+    error = Error("Rendering was cancelled");
+  }
+  if (scope) {
+    scope.remotion_cancelledError = getErrorStackWithMessage(error);
+  }
+  throw error;
+}
+function cancelRender(err) {
+  return cancelRenderInternal(typeof window !== "undefined" ? window : undefined, err);
+}
+
+// src/log.ts
+var logLevels = ["trace", "verbose", "info", "warn", "error"];
+var getNumberForLogLevel = (level) => {
+  return logLevels.indexOf(level);
+};
+var isEqualOrBelowLogLevel = (currentLevel, level) => {
+  return getNumberForLogLevel(currentLevel) <= getNumberForLogLevel(level);
+};
+var transformArgs = ({
+  args,
+  logLevel,
+  tag
+}) => {
+  const arr = [...args];
+  if (getRemotionEnvironment().isRendering && !getRemotionEnvironment().isClientSideRendering) {
+    arr.unshift(Symbol.for(`__remotion_level_${logLevel}`));
+  }
+  if (tag && getRemotionEnvironment().isRendering && !getRemotionEnvironment().isClientSideRendering) {
+    arr.unshift(Symbol.for(`__remotion_tag_${tag}`));
+  }
+  return arr;
+};
+var verbose = (options, ...args) => {
+  if (isEqualOrBelowLogLevel(options.logLevel, "verbose")) {
+    return console.debug(...transformArgs({ args, logLevel: "verbose", tag: options.tag }));
+  }
+};
+var trace = (options, ...args) => {
+  if (isEqualOrBelowLogLevel(options.logLevel, "trace")) {
+    return console.debug(...transformArgs({ args, logLevel: "trace", tag: options.tag }));
+  }
+};
+var info = (options, ...args) => {
+  if (isEqualOrBelowLogLevel(options.logLevel, "info")) {
+    return console.log(...transformArgs({ args, logLevel: "info", tag: options.tag }));
+  }
+};
+var warn = (options, ...args) => {
+  if (isEqualOrBelowLogLevel(options.logLevel, "warn")) {
+    return console.warn(...transformArgs({ args, logLevel: "warn", tag: options.tag }));
+  }
+};
+var error = (options, ...args) => {
+  return console.error(...transformArgs({ args, logLevel: "error", tag: options.tag }));
+};
+var Log = {
+  trace,
+  verbose,
+  info,
+  warn,
+  error
+};
+
+// src/delay-render.ts
+if (typeof window !== "undefined") {
+  window.remotion_renderReady = false;
+  if (!window.remotion_delayRenderTimeouts) {
+    window.remotion_delayRenderTimeouts = {};
+  }
+  window.remotion_delayRenderHandles = [];
+}
+var DELAY_RENDER_CALLSTACK_TOKEN = "The delayRender was called:";
+var DELAY_RENDER_RETRIES_LEFT = "Retries left: ";
+var DELAY_RENDER_RETRY_TOKEN = "- Rendering the frame will be retried.";
+var DELAY_RENDER_CLEAR_TOKEN = "handle was cleared after";
+var defaultTimeout = 30000;
+var delayRenderInternal = ({
+  scope,
+  environment,
+  label,
+  options
+}) => {
+  if (typeof label !== "string" && label !== null) {
+    throw new Error("The label parameter of delayRender() must be a string or undefined, got: " + JSON.stringify(label));
+  }
+  const handle = Math.random();
+  scope.remotion_delayRenderHandles.push(handle);
+  const called = Error().stack?.replace(/^Error/g, "") ?? "";
+  if (environment.isRendering) {
+    const timeoutToUse = (options?.timeoutInMilliseconds ?? scope.remotion_puppeteerTimeout ?? defaultTimeout) - 2000;
+    const retriesLeft = (options?.retries ?? 0) - (scope.remotion_attempt - 1);
+    scope.remotion_delayRenderTimeouts[handle] = {
+      label: label ?? null,
+      startTime: Date.now(),
+      timeout: setTimeout(() => {
+        const message = [
+          `A delayRender()`,
+          label ? `"${label}"` : null,
+          `was called but not cleared after ${timeoutToUse}ms. See https://remotion.dev/docs/timeout for help.`,
+          retriesLeft > 0 ? DELAY_RENDER_RETRIES_LEFT + retriesLeft : null,
+          retriesLeft > 0 ? DELAY_RENDER_RETRY_TOKEN : null,
+          DELAY_RENDER_CALLSTACK_TOKEN,
+          called
+        ].filter(truthy).join(" ");
+        if (environment.isClientSideRendering) {
+          scope.remotion_cancelledError = getErrorStackWithMessage(Error(message));
+        } else {
+          cancelRenderInternal(scope, Error(message));
+        }
+      }, timeoutToUse)
+    };
+  }
+  scope.remotion_renderReady = false;
+  return handle;
+};
+var delayRender = (label, options) => {
+  if (typeof window === "undefined") {
+    return Math.random();
+  }
+  return delayRenderInternal({
+    scope: window,
+    environment: getRemotionEnvironment(),
+    label: label ?? null,
+    options: options ?? {}
+  });
+};
+var continueRenderInternal = ({
+  scope,
+  handle,
+  environment,
+  logLevel
+}) => {
+  if (typeof handle === "undefined") {
+    throw new TypeError("The continueRender() method must be called with a parameter that is the return value of delayRender(). No value was passed.");
+  }
+  if (typeof handle !== "number") {
+    throw new TypeError("The parameter passed into continueRender() must be the return value of delayRender() which is a number. Got: " + JSON.stringify(handle));
+  }
+  scope.remotion_delayRenderHandles = scope.remotion_delayRenderHandles.filter((h) => {
+    if (h === handle) {
+      if (environment.isRendering && scope !== undefined) {
+        if (!scope.remotion_delayRenderTimeouts[handle]) {
+          return false;
+        }
+        const { label, startTime, timeout } = scope.remotion_delayRenderTimeouts[handle];
+        clearTimeout(timeout);
+        const message = [
+          label ? `"${label}"` : "A handle",
+          DELAY_RENDER_CLEAR_TOKEN,
+          `${Date.now() - startTime}ms`
+        ].filter(truthy).join(" ");
+        Log.verbose({ logLevel, tag: "delayRender()" }, message);
+        delete scope.remotion_delayRenderTimeouts[handle];
+      }
+      return false;
+    }
+    return true;
+  });
+  if (scope.remotion_delayRenderHandles.length === 0) {
+    scope.remotion_renderReady = true;
+  }
+};
+var continueRender = (handle) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  continueRenderInternal({
+    scope: window,
+    handle,
+    environment: getRemotionEnvironment(),
+    logLevel: window.remotion_logLevel ?? "info"
+  });
+};
+
+// src/log-level-context.tsx
+
+
+var LogLevelContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  logLevel: "info",
+  mountTime: 0
+});
+var useLogLevel = () => {
+  const { logLevel } = react__WEBPACK_IMPORTED_MODULE_0__.useContext(LogLevelContext);
+  if (logLevel === null) {
+    throw new Error("useLogLevel must be used within a LogLevelProvider");
+  }
+  return logLevel;
+};
+var useMountTime = () => {
+  const { mountTime } = react__WEBPACK_IMPORTED_MODULE_0__.useContext(LogLevelContext);
+  if (mountTime === null) {
+    throw new Error("useMountTime must be used within a LogLevelProvider");
+  }
+  return mountTime;
+};
+
+// src/use-delay-render.tsx
+var DelayRenderContextType = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(null);
+var useDelayRender = () => {
+  const environment = useRemotionEnvironment();
+  const scope = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(DelayRenderContextType) ?? (typeof window !== "undefined" ? window : undefined);
+  const logLevel = useLogLevel();
+  const delayRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((label, options) => {
+    if (!scope) {
+      return Math.random();
+    }
+    return delayRenderInternal({
+      scope,
+      environment,
+      label: label ?? null,
+      options: options ?? {}
+    });
+  }, [environment, scope]);
+  const continueRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((handle) => {
+    if (!scope) {
+      return;
+    }
+    continueRenderInternal({
+      scope,
+      handle,
+      environment,
+      logLevel
+    });
+  }, [environment, logLevel, scope]);
+  const cancelRender2 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((err) => {
+    return cancelRenderInternal(scope ?? (typeof window !== "undefined" ? window : undefined), err);
+  }, [scope]);
+  return { delayRender: delayRender2, continueRender: continueRender2, cancelRender: cancelRender2 };
+};
+
+// src/TimelineContext.tsx
+
+var SetTimelineContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  setFrame: () => {
+    throw new Error("default");
+  },
+  setPlaying: () => {
+    throw new Error("default");
+  }
+});
+var TimelineContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  frame: {},
+  playing: false,
+  playbackRate: 1,
+  rootId: "",
+  imperativePlaying: {
+    current: false
+  },
+  setPlaybackRate: () => {
+    throw new Error("default");
+  },
+  audioAndVideoTags: { current: [] }
+});
+var AbsoluteTimeContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
+  frame: {},
+  playing: false,
+  playbackRate: 1,
+  rootId: "",
+  imperativePlaying: {
+    current: false
+  },
+  setPlaybackRate: () => {
+    throw new Error("default");
+  },
+  audioAndVideoTags: { current: [] }
+});
+var TimelineContextProvider = ({ children, frameState }) => {
+  const [playing, setPlaying] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const imperativePlaying = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
+  const [playbackRate, setPlaybackRate] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1);
+  const audioAndVideoTags = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)([]);
+  const [remotionRootId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => String(random(null)));
+  const [_frame, setFrame] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => getInitialFrameState());
+  const frame = frameState ?? _frame;
+  const { delayRender: delayRender2, continueRender: continueRender2 } = useDelayRender();
+  if (typeof window !== "undefined") {
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useLayoutEffect)(() => {
+      window.remotion_setFrame = (f, composition, attempt) => {
+        window.remotion_attempt = attempt;
+        const id = delayRender2(`Setting the current frame to ${f}`);
+        let asyncUpdate = true;
+        setFrame((s) => {
+          const currentFrame = s[composition] ?? window.remotion_initialFrame;
+          if (currentFrame === f) {
+            asyncUpdate = false;
+            return s;
+          }
+          return {
+            ...s,
+            [composition]: f
+          };
+        });
+        if (asyncUpdate) {
+          requestAnimationFrame(() => continueRender2(id));
+        } else {
+          continueRender2(id);
+        }
+      };
+      window.remotion_isPlayer = false;
+    }, [continueRender2, delayRender2]);
+  }
+  const timelineContextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    return {
+      frame,
+      playing,
+      imperativePlaying,
+      rootId: remotionRootId,
+      playbackRate,
+      setPlaybackRate,
+      audioAndVideoTags
+    };
+  }, [frame, playbackRate, playing, remotionRootId]);
+  const setTimelineContextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    return {
+      setFrame,
+      setPlaying
+    };
+  }, []);
+  return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(AbsoluteTimeContext.Provider, {
+    value: timelineContextValue,
+    children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(TimelineContext.Provider, {
+      value: timelineContextValue,
+      children: /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(SetTimelineContext.Provider, {
+        value: setTimelineContextValue,
+        children
+      })
+    })
+  });
 };
 
 // src/use-current-frame.ts
@@ -21746,7 +21688,7 @@ var Freeze = ({
       return active(frame);
     }
   }, [active, frame]);
-  const timelineContext = useTimelineContext();
+  const timelineContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const sequenceContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(SequenceContext);
   const relativeFrom = sequenceContext?.relativeFrom ?? 0;
   const timelineValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
@@ -21790,36 +21732,18 @@ var Freeze = ({
 var NonceContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
   getNonce: () => 0
 });
-var fastRefreshNonce = 0;
-try {
-  if (true) {
-    if (__webpack_module__.hot) {
-      __webpack_module__.hot.addStatusHandler((status) => {
-        if (status === "idle") {
-          fastRefreshNonce++;
-        }
-      });
-    }
-  }
-} catch {}
 var useNonce = () => {
   const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(NonceContext);
-  const nonce = context.getNonce();
-  const nonceRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(nonce);
-  nonceRef.current = nonce;
-  const history = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)([[fastRefreshNonce, nonce]]);
-  const get = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
-    if (fastRefreshNonce !== history.current[history.current.length - 1][0]) {
-      history.current = [
-        ...history.current,
-        [fastRefreshNonce, nonceRef.current]
-      ];
+  const [nonce, setNonce] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => context.getNonce());
+  const lastContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(context);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (lastContext.current === context) {
+      return;
     }
-    return history.current;
-  }, [history]);
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    return { get };
-  }, [get]);
+    lastContext.current = context;
+    setNonce(context.getNonce);
+  }, [context]);
+  return nonce;
 };
 
 // src/PremountContext.tsx
@@ -21976,7 +21900,7 @@ var RegularSequenceRefForwardingFunction = ({
   const { layout = "absolute-fill" } = other;
   const [id] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(() => String(Math.random()));
   const parentSequence = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(SequenceContext);
-  const { rootId } = useTimelineContext();
+  const { rootId } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const cumulatedFrom = parentSequence ? parentSequence.cumulatedFrom + parentSequence.relativeFrom : 0;
   const nonce = useNonce();
   if (layout !== "absolute-fill" && layout !== "none") {
@@ -22054,7 +21978,7 @@ var RegularSequenceRefForwardingFunction = ({
       type: "sequence",
       rootId,
       showInTimeline,
-      nonce: nonce.get(),
+      nonce,
       loopDisplay,
       stack: stack ?? inheritedStack,
       premountDisplay: premountDisplay ?? null,
@@ -22150,7 +22074,7 @@ var PremountedPostmountedSequenceRefForwardingFunction = (props, ref) => {
     styleWhilePremounted,
     styleWhilePostmounted
   ]);
-  const { playing } = useTimelineContext();
+  const { playing } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const premountFramesRemaining = premountingActive ? from - frame : 0;
   const premountContextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
     return {
@@ -23949,7 +23873,7 @@ var useBasicMediaInTimeline = ({
   }, [initialVolume, mediaType, src, volume]);
   const doesVolumeChange = typeof volume === "function";
   const nonce = useNonce();
-  const { rootId } = useTimelineContext();
+  const { rootId } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const env = useRemotionEnvironment();
   return {
     volumes,
@@ -24017,7 +23941,7 @@ var useMediaInTimeline = ({
       rootId,
       volume: volumes,
       showInTimeline: true,
-      nonce: nonce.get(),
+      nonce,
       startMediaFrom: 0 - startsAt,
       doesVolumeChange,
       loopDisplay,
@@ -24700,7 +24624,7 @@ var useMediaPlayback = ({
   isPostmounting,
   onAutoPlayError
 }) => {
-  const { playbackRate: globalPlaybackRate } = useTimelineContext();
+  const { playbackRate: globalPlaybackRate } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const frame = useCurrentFrame();
   const absoluteFrame = useTimelinePosition();
   const [playing] = usePlayingState();
@@ -24939,7 +24863,7 @@ var useMediaTag = ({
   isPremounting,
   isPostmounting
 }) => {
-  const { audioAndVideoTags, imperativePlaying } = useTimelineContext();
+  const { audioAndVideoTags, imperativePlaying } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(TimelineContext);
   const logLevel = useLogLevel();
   const mountTime = useMountTime();
   const env = useRemotionEnvironment();
@@ -25484,7 +25408,6 @@ var FolderContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
 var Folder = ({ name, children }) => {
   const parent = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(FolderContext);
   const { registerFolder, unregisterFolder } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(CompositionSetters);
-  const nonce = useNonce();
   validateFolderName(name);
   const parentNameArr = [parent.parentName, parent.folderName].filter(truthy);
   const parentName = parentNameArr.length === 0 ? null : parentNameArr.join("/");
@@ -25495,18 +25418,11 @@ var Folder = ({ name, children }) => {
     };
   }, [name, parentName]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    registerFolder(name, parentName, nonce.get());
+    registerFolder(name, parentName);
     return () => {
       unregisterFolder(name, parentName);
     };
-  }, [
-    name,
-    parent.folderName,
-    parentName,
-    registerFolder,
-    unregisterFolder,
-    nonce
-  ]);
+  }, [name, parent.folderName, parentName, registerFolder, unregisterFolder]);
   return /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(FolderContext.Provider, {
     value,
     children
@@ -25717,7 +25633,7 @@ var InnerComposition = ({
       folderName,
       component: lazy,
       defaultProps: serializeThenDeserializeInStudio(defaultProps ?? {}),
-      nonce: nonce.get(),
+      nonce,
       parentFolderName: parentName,
       schema: schema ?? null,
       calculateMetadata: compProps.calculateMetadata ?? null
@@ -26220,7 +26136,8 @@ var CompositionManagerProvider = ({
       if (comps.find((c2) => c2.id === comp.id)) {
         throw new Error(`Multiple composition with id ${comp.id} are registered.`);
       }
-      return [...comps, comp];
+      const value = [...comps, comp].slice().sort((a2, b2) => a2.nonce - b2.nonce);
+      return value;
     });
   }, [updateCompositions]);
   const unregisterComposition = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((id) => {
@@ -26228,14 +26145,13 @@ var CompositionManagerProvider = ({
       return comps.filter((c2) => c2.id !== id);
     });
   }, []);
-  const registerFolder = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((name, parent, nonce) => {
+  const registerFolder = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)((name, parent) => {
     setFolders((prevFolders) => {
       return [
         ...prevFolders,
         {
           name,
-          parent,
-          nonce
+          parent
         }
       ];
     });
@@ -26364,8 +26280,7 @@ var getEffectiveVisualModeValue = ({
   codeValue,
   runtimeValue,
   dragOverrideValue,
-  defaultValue,
-  shouldResortToDefaultValueIfUndefined = false
+  defaultValue
 }) => {
   if (dragOverrideValue !== undefined) {
     return dragOverrideValue;
@@ -26376,7 +26291,7 @@ var getEffectiveVisualModeValue = ({
   if (!codeValue.canUpdate) {
     return runtimeValue;
   }
-  if (codeValue.codeValue === undefined && shouldResortToDefaultValueIfUndefined) {
+  if (codeValue.codeValue === undefined) {
     return defaultValue;
   }
   return codeValue.codeValue;
@@ -26472,6 +26387,7 @@ var RemotionRootContexts = ({
   videoEnabled,
   audioEnabled,
   frameState,
+  nonceContextSeed,
   visualModeEnabled
 }) => {
   const nonceContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
@@ -26479,7 +26395,7 @@ var RemotionRootContexts = ({
     return {
       getNonce: () => counter++
     };
-  }, []);
+  }, [nonceContextSeed]);
   const logging = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
     return { logLevel, mountTime: Date.now() };
   }, [logLevel]);
@@ -26827,8 +26743,7 @@ var useSchema = (schema, currentValue) => {
         codeValue: codeValueStatus,
         runtimeValue: currentValue[key],
         dragOverrideValue: overrideValues[key],
-        defaultValue: schema[key]?.default,
-        shouldResortToDefaultValueIfUndefined: false
+        defaultValue: schema[key]?.default
       });
     }
     return {
@@ -27524,65 +27439,6 @@ var watchStaticFile = (fileName, callback) => {
   return { cancel };
 };
 
-// src/wrap-in-schema.ts
-
-var getNestedValue = (obj, key) => {
-  const parts = key.split(".");
-  let current = obj;
-  for (const part of parts) {
-    if (current === null || current === undefined || typeof current !== "object")
-      return;
-    current = current[part];
-  }
-  return current;
-};
-var mergeValues = (props2, values, schemaKeys) => {
-  const merged = { ...props2 };
-  for (const key of schemaKeys) {
-    const value = values[key];
-    const parts = key.split(".");
-    if (parts.length === 1) {
-      merged[key] = value;
-      continue;
-    }
-    let current = merged;
-    for (let i = 0;i < parts.length - 1; i++) {
-      const part = parts[i];
-      if (typeof current[part] === "object" && current[part] !== null) {
-        current[part] = { ...current[part] };
-      } else {
-        current[part] = {};
-      }
-      current = current[part];
-    }
-    current[parts[parts.length - 1]] = value;
-  }
-  return merged;
-};
-var wrapInSchema = (Component, schema) => {
-  const schemaKeys = Object.keys(schema);
-  const Wrapped = (0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)((props2, ref) => {
-    const env = useRemotionEnvironment();
-    if (!env.isStudio || env.isReadOnlyStudio || env.isRendering || !false) {
-      return react__WEBPACK_IMPORTED_MODULE_0__.createElement(Component, {
-        ...props2,
-        controls: null,
-        ref
-      });
-    }
-    // removed by dead control flow
-
-    // removed by dead control flow
-
-    // removed by dead control flow
-
-    // removed by dead control flow
-
-  });
-  Wrapped.displayName = `wrapInSchema(${Component.displayName || Component.name || "Component"})`;
-  return Wrapped;
-};
-
 // src/wrap-remotion-context.tsx
 
 
@@ -27690,7 +27546,6 @@ var Internals = {
   SequenceStackTracesUpdateContext,
   SequenceVisibilityToggleContext,
   useSchema,
-  wrapInSchema,
   useSequenceControlOverride,
   RemotionRootContexts,
   CompositionManagerProvider,
@@ -27738,7 +27593,6 @@ var Internals = {
   REMOTION_STUDIO_CONTAINER_ELEMENT,
   RenderAssetManager,
   persistCurrentFrame,
-  useTimelineContext,
   useTimelineSetFrame,
   isIosSafari,
   WATCH_REMOTION_STATIC_FILES,
@@ -29084,7 +28938,7 @@ addSequenceStackTraces(Sequence);
 
 /***/ },
 
-/***/ 9382
+/***/ 9455
 (__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
@@ -30092,10 +29946,10 @@ var NoReactInternals = {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	__webpack_require__(6507);
-/******/ 	__webpack_require__(8600);
-/******/ 	__webpack_require__(3610);
-/******/ 	var __webpack_exports__ = __webpack_require__(3482);
+/******/ 	__webpack_require__(7865);
+/******/ 	__webpack_require__(4904);
+/******/ 	__webpack_require__(1616);
+/******/ 	var __webpack_exports__ = __webpack_require__(2239);
 /******/ 	
 /******/ })()
 ;

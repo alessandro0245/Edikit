@@ -8,9 +8,7 @@ import {
 import api from "@/lib/auth";
 
 export interface UploadedAssets {
-  logoUrl?:      string;
   bgImageUrl?:   string;
-  watermarkUrl?: string;
   mediaUrls?:    string[];
 }
 
@@ -18,7 +16,7 @@ interface AssetUploadStepProps {
   onComplete: (assets: UploadedAssets) => void;
 }
 
-type AssetType = "logo" | "background" | "watermark" | "media";
+type AssetType = "background" | "media";
 
 interface AssetSlot {
   type:        AssetType;
@@ -30,13 +28,6 @@ interface AssetSlot {
 
 const ASSET_SLOTS: AssetSlot[] = [
   {
-    type:        "logo",
-    label:       "Logo",
-    description: "Shown in intro & CTA scenes",
-    hint:        "PNG with transparent bg works best",
-    icon:        <ImagePlus className="w-5 h-5" />,
-  },
-  {
     type:        "background",
     label:       "Background Image",
     description: "Replaces solid color on intro scene",
@@ -44,15 +35,8 @@ const ASSET_SLOTS: AssetSlot[] = [
     icon:        <Layers className="w-5 h-5" />,
   },
   {
-    type:        "watermark",
-    label:       "Watermark",
-    description: "Subtle overlay on every scene",
-    hint:        "PNG with transparent bg recommended",
-    icon:        <Stamp className="w-5 h-5" />,
-  },
-  {
     type:        "media",
-    label:       "Custom Media",
+    label:       "Video Media",
     description: "Any image or video overlay",
     hint:        "PNG, MP4, custom size",
     icon:        <ImagePlus className="w-5 h-5" />,

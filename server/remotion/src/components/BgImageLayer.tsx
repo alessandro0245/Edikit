@@ -57,7 +57,7 @@ export const BgImageLayer: React.FC<BgImageLayerProps> = ({
         }}
       >
         {isVideo ? (
-          <Video src={imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video muted volume={0} src={imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <Img src={imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
@@ -74,6 +74,8 @@ export const BgImageLayer: React.FC<BgImageLayerProps> = ({
       >
         {isVideo ? (
           <Video
+            muted
+            volume={0}
             src={imageUrl}
             style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />

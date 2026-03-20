@@ -9,7 +9,6 @@ import {
 } from 'remotion';
 import { SceneAudio } from './Sceneaudio';
 import { BgImageLayer } from './BgImageLayer';
-import { LogoLayer } from './LogoLayer';
 import type { Scene, AudioConfig } from '../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -339,8 +338,7 @@ export const KineticScene: React.FC<{
   sceneIndex?: number;
   audio?:      AudioConfig;
   bgImageUrl?: string;
-  logoUrl?:    string;
-}> = ({ scene, sceneIndex = 0, audio, bgImageUrl, logoUrl }) => {
+}> = ({ scene, sceneIndex = 0, audio, bgImageUrl }) => {
   const { width, height, fps } = useVideoConfig();
   const frame = useCurrentFrame();
 
@@ -376,28 +374,25 @@ export const KineticScene: React.FC<{
 
   return (
     <AbsoluteFill style={{
-      background:      bgImageUrl ? 'transparent' : '#030303',
+      background:      bgImageUrl ? 'transparent' : scene.backgroundColor,
       transform:       `scale(${sceneScale})`,
       transformOrigin: 'center center',
       overflow:        'hidden',
     }}>
-      {bgImageUrl && <BgImageLayer imageUrl={bgImageUrl} />}
+      {/* Background image — sits behind everything */}
+      {bgImageUrl && <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <BgImageLayer imageUrl={bgImageUrl} />
+      </div>}
 
       {/* Background glow — color bleeds from left */}
-      {!bgImageUrl && <BackgroundGlow color={scene.textColor} frame={frame} />}
+      {!bgImageUrl && <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <BackgroundGlow color={scene.textColor} frame={frame} />
+      </div>}
 
       {/* Scanlines */}
-      <Scanlines />
-
-      {logoUrl && (
-        <LogoLayer
-          logoUrl={logoUrl}
-          position="top-left"
-          size={isNarrow ? 80 : 120}
-          delay={8}
-          scene="intro"
-        />
-      )}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 5 }}>
+        <Scanlines />
+      </div>
 
       {/* Lines — stacked vertically, left-aligned, centered vertically */}
       <AbsoluteFill style={{
@@ -406,6 +401,7 @@ export const KineticScene: React.FC<{
         justifyContent: 'center',
         alignItems:     'flex-start',
         gap:            Math.round(fontSize * 0.15),
+        zIndex:         10,
       }}>
         {allLines.map((line, i) => {
           const isSubtext = scene.subtext && i === allLines.length - 1;
@@ -419,8 +415,8 @@ export const KineticScene: React.FC<{
                 key={i}
                 text={line}
                 fontSize={fs}
-                textColor="#ffffff"
-                barColor={color}
+                textColor={scene.textColor}
+                barColor={scene.backgroundColor}
                 delay={delay}
                 width={width}
                 isSubtext={!!isSubtext}
@@ -454,15 +450,19 @@ export const KineticScene: React.FC<{
       </AbsoluteFill>
 
       {/* Big scene number stamp — transparent watermark */}
-      <SceneStamp
-        index={sceneIndex}
-        color={scene.textColor}
-        width={width}
-        height={height}
-      />
+      <div style={{ position: 'absolute', inset: 0, zIndex: 15 }}>
+        <SceneStamp
+          index={sceneIndex}
+          color={scene.textColor}
+          width={width}
+          height={height}
+        />
+      </div>
 
       {/* Glitch on entry */}
-      <GlitchOverlay accentColor={scene.textColor} seed={sceneIndex} />
+      <div style={{ position: 'absolute', inset: 0, zIndex: 12 }}>
+        <GlitchOverlay accentColor={scene.textColor} seed={sceneIndex} />
+      </div>
 
       {audio && (
         <SceneAudio

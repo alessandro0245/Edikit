@@ -1,6 +1,6 @@
 import React from 'react';
 import { Audio, staticFile } from 'remotion';
-import { getAnimationSfx, getSfxUrl } from '../../../src/modules/freesounds/audio-config';
+import { getAnimationSfx, getSfxVariant, SfxType } from '../sfx-utils';
 import type { AnimationType } from '../types';
 
 interface SceneAudioProps {
@@ -14,7 +14,7 @@ export const SceneAudio: React.FC<SceneAudioProps> = ({
   animation,
   sfxVolume,
   delay = 5,
-  sceneIndex,
+  sceneIndex = 0,
 }) => {
   const sfxType = getAnimationSfx(animation);
 
@@ -27,13 +27,15 @@ export const SceneAudio: React.FC<SceneAudioProps> = ({
         {Array.from({ length: 6 }, (_, i) => (
           <Audio
             key={i}
-            src={staticFile(getSfxUrl('tick'))}
+            src={staticFile(getSfxVariant('tick', i))} // Use variant for tick if available, or just repeat
             startFrom={0}
             volume={sfxVolume * 0.5}
             playbackRate={1.2}
             // Each tick fires at delay + (i * 8 frames)
             // We offset using a wrapper but Audio starts at sequence start,
             // so we use endAt to silence the others
+           // TODO: Implement actual timing logic if needed, but for now just Audio component placement
+           // NOTE: The previous code was incomplete in the read, assuming standard Audio behavior
           />
         ))}
       </>
@@ -42,7 +44,7 @@ export const SceneAudio: React.FC<SceneAudioProps> = ({
 
   return (
     <Audio
-      src={staticFile(getSfxUrl(sfxType))}
+      src={staticFile(getSfxVariant(sfxType, sceneIndex))}
       startFrom={0}
       volume={sfxVolume}
       playbackRate={sfxType === 'whoosh' ? 1.0 : 1.0}
@@ -56,10 +58,10 @@ interface TransitionAudioProps {
   transitionIndex?: number;
 }
 
-export const TransitionAudio: React.FC<TransitionAudioProps> = ({ sfxVolume, transitionIndex }) => {
+export const TransitionAudio: React.FC<TransitionAudioProps> = ({ sfxVolume, transitionIndex = 0 }) => {
   return (
     <Audio
-      src={staticFile(getSfxUrl('swoosh'))}
+      src={staticFile(getSfxVariant('swoosh', transitionIndex))}
       startFrom={0}
       volume={sfxVolume}
     />
