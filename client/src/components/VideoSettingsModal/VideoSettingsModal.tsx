@@ -337,7 +337,7 @@ export function VideoSettingsModal({
         <div className="h-px bg-border/50 shrink-0 mx-6" />
 
         {/* Tab content — scrollable */}
-        <div className="flex-1 overflow-y-auto px-6 py-5
+        <div className="flex-1 overflow-y-auto px-6 py-5 
           [&::-webkit-scrollbar]:w-0.75
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-border/30
