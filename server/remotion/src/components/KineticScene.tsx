@@ -9,6 +9,7 @@ import {
 } from 'remotion';
 import { SceneAudio } from './Sceneaudio';
 import { BgImageLayer } from './BgImageLayer';
+import { MediaLayer } from './MediaLayer';
 import type { Scene, AudioConfig } from '../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -338,7 +339,8 @@ export const KineticScene: React.FC<{
   sceneIndex?: number;
   audio?:      AudioConfig;
   bgImageUrl?: string;
-}> = ({ scene, sceneIndex = 0, audio, bgImageUrl }) => {
+  mediaUrl?:   string;
+}> = ({ scene, sceneIndex = 0, audio, bgImageUrl, mediaUrl }) => {
   const { width, height, fps } = useVideoConfig();
   const frame = useCurrentFrame();
 
@@ -374,7 +376,7 @@ export const KineticScene: React.FC<{
 
   return (
     <AbsoluteFill style={{
-      background:      bgImageUrl ? 'transparent' : scene.backgroundColor,
+      background:      (bgImageUrl || mediaUrl) ? 'transparent' : scene.backgroundColor,
       transform:       `scale(${sceneScale})`,
       transformOrigin: 'center center',
       overflow:        'hidden',
@@ -385,8 +387,13 @@ export const KineticScene: React.FC<{
       </div>}
 
       {/* Background glow — color bleeds from left */}
-      {!bgImageUrl && <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+      {!bgImageUrl && !mediaUrl && <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <BackgroundGlow color={scene.textColor} frame={frame} />
+      </div>}
+
+      {/* Media layer (user-uploaded video/image) */}
+      {mediaUrl && <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+        <MediaLayer mediaUrl={mediaUrl} sceneIndex={sceneIndex} />
       </div>}
 
       {/* Scanlines */}

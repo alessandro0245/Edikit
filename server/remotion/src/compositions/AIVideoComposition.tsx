@@ -136,6 +136,7 @@ export const AIVideoComposition: React.FC<Record<string, unknown>> = (props) => 
                       sceneIndex={index}
                       audio={audio}
                       bgImageUrl={assets?.bgImageUrl}
+                      mediaUrl={scene.mediaUrl ?? (assets?.mediaUrls ? assets.mediaUrls[index % assets.mediaUrls.length] : undefined)}
                     />
                   )}
 
