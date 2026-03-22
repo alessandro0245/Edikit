@@ -592,11 +592,10 @@ function PromptStep({
         <button
           type="submit"
           disabled={
-            prompt.trim().length < 10 ||
             authLoading ||
-            !isLoggedIn ||
             isSubmitting ||
-            canRender === false
+            (isLoggedIn && prompt.trim().length < 10) ||
+            (isLoggedIn && canRender === false)
           }
           className="group flex-1 relative overflow-hidden flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-primary/20 cursor-pointer"
         >
@@ -680,6 +679,20 @@ export default function PromptPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [outputUrl, categoryId],
   );
+
+  const previewAspectRatio =
+    settings.aspectRatio === "9:16"
+      ? "portrait"
+      : settings.aspectRatio === "1:1"
+        ? "square"
+        : "video";
+
+  const previewContainerWidthClass =
+    previewAspectRatio === "portrait"
+      ? "max-w-[360px] sm:max-w-[420px]"
+      : previewAspectRatio === "square"
+        ? "max-w-[640px]"
+        : "max-w-4xl";
 
   const handleResetAndScroll = () => {
     handleReset();
@@ -841,10 +854,14 @@ export default function PromptPage() {
       {/* Main canvas */}
       <main className="flex-1 flex flex-col items-center justify-start py-6 px-4 lg:p-14 gap-6 h-fit md:min-h-[90vh] lg:min-h-screen">
         {isComplete && outputUrl ? (
-          <div className="w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl shadow-black/40 ring-1 ring-border/40 ">
+          <div
+            className={`w-full ${previewContainerWidthClass} rounded-xl overflow-hidden shadow-2xl shadow-black/40 ring-1 ring-border/40`}
+          >
             <VideoPlayer
               src={outputUrl}
               autoPlay
+              loop
+              aspectRatio={previewAspectRatio}
               showDownload={false}
               className="w-full"
             />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Play, Pause, RotateCcw, Maximize2, Volume2, VolumeX, Download } from "lucide-react";
+import { Play, Pause, RotateCcw, Maximize2, Volume2, VolumeX } from "lucide-react";
 import VideoDownloadButton from "./VideoDownloadButton";
 
 interface VideoPlayerProps {
@@ -14,7 +14,7 @@ interface VideoPlayerProps {
   showDownload?: boolean;
   downloadFilename?: string;
   className?: string;
-  aspectRatio?: "video" | "square" | "thumbnail";
+  aspectRatio?: "video" | "portrait" | "square" | "thumbnail";
 }
 
 export default function VideoPlayer({
@@ -22,7 +22,7 @@ export default function VideoPlayer({
   poster,
   autoPlay = false,
   controls = true,
-  loop = false,
+  loop = true,
   muted = false,
   showDownload = true,
   downloadFilename,
@@ -83,6 +83,7 @@ export default function VideoPlayer({
 
   const aspectRatioClasses = {
     video: "aspect-video",
+    portrait: "aspect-[9/16]",
     square: "aspect-square",
     thumbnail: "aspect-[16/9]",
   };
