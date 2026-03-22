@@ -11,7 +11,8 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-background">
       <main>
-        <section className="relative py-16 md:py-22 bg-background overflow-hidden">
+        {false && (
+          <section className="relative py-16 md:py-22 bg-background overflow-hidden">
           {/* Background SVG Decorations */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -230,7 +231,8 @@ export default function Hero() {
               </div>
             </div>
           </div>
-        </section>
+          </section>
+        )}
 
         <Prompt />
         {/* Templates Section */}
