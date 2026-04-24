@@ -72,10 +72,13 @@ export class S3Service {
   async generatePresignedUrl(
     key: string,
     expiresIn: number = 3600,
+    filename?: string,
   ): Promise<string> {
+    const downloadFilename = filename || key.split('/').pop() || 'video.mp4';
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: key,
+      ResponseContentDisposition: `attachment; filename="${downloadFilename}"`,
     });
 
     const url = await getSignedUrl(this.s3Client, command, { expiresIn });

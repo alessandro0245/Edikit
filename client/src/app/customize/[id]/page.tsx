@@ -635,49 +635,21 @@ const CustomizePage = () => {
     if (!renderJob?.outputUrl) return;
 
     setIsDownloading(true);
-    setDownloadProgress(0);
+    setDownloadProgress(50);
 
     try {
-      const xhr = new XMLHttpRequest();
+      // Use direct anchor navigation to avoid CORS issues with S3 presigned URLs
+      const link = document.createElement("a");
+      link.href = renderJob.outputUrl;
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.download = `video-${timestamp}.mp4`;
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-      xhr.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          const percentComplete = Math.round((e.loaded / e.total) * 100);
-          setDownloadProgress(percentComplete);
-        }
-      });
-
-      xhr.addEventListener("load", () => {
-        if (xhr.status === 200) {
-          const blob = new Blob([xhr.response], { type: "video/mp4" });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          const timestamp = new Date().toISOString().slice(0, 10);
-          link.download = `video-${timestamp}.mp4`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-          showInfoToast("Video downloaded successfully!");
-        } else {
-          showErrorToast("Failed to download video");
-        }
-      });
-
-      xhr.addEventListener("error", () => {
-        console.error("Download failed:", xhr.status);
-        showErrorToast("Download failed. Please try again.");
-      });
-
-      xhr.addEventListener("abort", () => {
-        showErrorToast("Download cancelled");
-      });
-
-      xhr.open("GET", renderJob.outputUrl);
-      xhr.responseType = "arraybuffer";
-      // Don't include credentials for public Cloudinary URLs (CORS friendly)
-      xhr.send();
+      setDownloadProgress(100);
+      showInfoToast("Video downloaded successfully!");
     } catch (error) {
       console.error("Failed to download video:", error);
       showErrorToast("Failed to download video");

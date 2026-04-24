@@ -385,22 +385,19 @@ export class RenderController {
   ) {
     const nodeEnv = this.configService.get<string>('NODE_ENV', 'development');
 
-    // ✅ IMPROVED WEBHOOK URL LOGIC
-    let webhookUrl: string;
+    let webhookUrl: string | null = null;
 
     if (nodeEnv === 'production') {
-      // Production: Use your deployed backend URL
       const backendUrl =
         this.configService.get<string>('BACKEND_URL') ||
         this.configService.get<string>('RENDER_EXTERNAL_URL');
-      webhookUrl = `${backendUrl}/render/webhook`;
-    } else {
-      // Development: Use ngrok or your local tunnel
-      const localUrl = `http://localhost:${this.configService.get<string>('PORT', '8000')}`;
-      webhookUrl = `${localUrl}/render/webhook`;
+      webhookUrl = backendUrl ? `${backendUrl}/render/webhook` : null;
     }
+    // In development: webhookUrl stays null — job completion is handled via polling in getJobStatus()
 
-    this.logger.log(`Using webhook URL: ${webhookUrl}`);
+    this.logger.log(
+      `Using webhook URL: ${webhookUrl ?? 'none (polling mode)'}`,
+    );
 
     const job = await this.renderService.createRenderJob(
       userId,

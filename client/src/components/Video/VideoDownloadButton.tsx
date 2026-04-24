@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Download, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-import { downloadVideo } from "@/lib/videoDownload";
 import { showInfoToast, showErrorToast } from "@/components/Toast/showToast";
 
 interface VideoDownloadButtonProps {
@@ -58,29 +57,27 @@ export default function VideoDownloadButton({
         throw new Error("Could not retrieve download link");
       }
 
-      // 2. Start Download
+      // 2. Start Download — use direct navigation for S3 presigned URLs (avoids CORS)
+      //    XHR/fetch to S3 from a different origin gets blocked by browser CORS policy.
+      //    Direct anchor navigation bypasses CORS entirely.
       setState("downloading");
-      await downloadVideo(url, {
-        filename,
-        onProgress: (p) => {
-          // Keep it at 99 max until finalizing
-          setProgress(Math.min(p, 99));
-        },
-        onSuccess: () => {
-          setState("finalizing");
-          setProgress(100);
-          setTimeout(() => {
-            setState("success");
-            showInfoToast("Video downloaded successfully!");
-            setTimeout(() => setState("idle"), 3000);
-          }, 800);
-        },
-        onError: (err) => {
-          setState("error");
-          showErrorToast(err);
-          onError?.(err);
-        },
-      });
+      setProgress(50);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename || `video-${new Date().toISOString().slice(0, 10)}.mp4`;
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setState("finalizing");
+      setProgress(100);
+      setTimeout(() => {
+        setState("success");
+        showInfoToast("Video downloaded successfully!");
+        setTimeout(() => setState("idle"), 3000);
+      }, 800);
     } catch (error: unknown) {
       console.error("Download failed:", error);
       setState("error");
