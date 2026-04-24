@@ -1,7 +1,18 @@
+"use client";
+
+import { useState } from "react";
+
 import TemplateCard from "@/components/Overlay/TemplateCard";
-import {  templates } from "@/utils/constant";
+import { templates } from "@/utils/constant";
+
+const INITIAL_VISIBLE_TEMPLATES = 6;
+const LOAD_MORE_STEP = 6;
 
 const Templates = () => {
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_TEMPLATES);
+  const visibleTemplates = templates.slice(0, visibleCount);
+  const canLoadMore = visibleCount < templates.length;
+
   return (
     <section className="relative py-20">
       <div className="container mx-auto px-4">
@@ -45,10 +56,26 @@ const Templates = () => {
 
           {/* Templates Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ">
-            {templates.map((template) => (
+            {visibleTemplates.map((template) => (
               <TemplateCard key={template.id} {...template} thumbnail={template.thumbnail || template.previewUrl} />
             ))}
           </div>
+
+          {canLoadMore && (
+            <div className="flex justify-center pt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setVisibleCount((currentCount) =>
+                    Math.min(currentCount + LOAD_MORE_STEP, templates.length)
+                  )
+                }
+                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Load more templates
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

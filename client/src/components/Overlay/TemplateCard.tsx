@@ -98,7 +98,7 @@ const TemplateCard = ({
               src={thumbnail}
               alt={name}
               fill
-              className="object-cover"
+              className="object-contain transition-opacity duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={() => setImageError(true)}
               priority={false}
