@@ -889,7 +889,7 @@ export class RenderService {
       value?: string | number[];
       src?: string;
     }>,
-    webhookUrl: string,
+    webhookUrl: string | null,
     fonts: string[] = [],
   ): Promise<NexrenderJobResponse> {
     try {
@@ -903,10 +903,7 @@ export class RenderService {
             },
             assets,
             fonts: fonts.length > 0 ? fonts : undefined,
-            webhook: {
-              url: webhookUrl,
-              method: 'POST',
-            },
+            ...(webhookUrl ? { webhook: { url: webhookUrl, method: 'POST' } } : {}),
             preview: false,
           },
           {
@@ -1612,7 +1609,7 @@ export class RenderService {
     userId: string,
     templateId: number,
     dto: CreateRenderJobDto,
-    webhookUrl: string,
+    webhookUrl: string | null,
   ) {
     // Log incoming DTO for debugging
     this.logger.log(
