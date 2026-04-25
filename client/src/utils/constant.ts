@@ -303,7 +303,7 @@ export const templates: Template[] = [
     },
   },
   {
-    id: 9,
+    id: 9, 
     name: "Animation 9",
     description: "Triple Text Template",
     previewUrl: "/previews/animation-9.mp4",
