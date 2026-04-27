@@ -137,14 +137,6 @@ export class CreateRenderJobDto {
   @IsString()
   video4?: string;
 
-  @IsOptional()
-  @IsString()
-  video3?: string;
-
-  @IsOptional()
-  @IsString()
-  video4?: string;
-
   // Product image (for e-commerce templates, mapped to productImage or image)
   @IsOptional()
   @IsString()

@@ -886,7 +886,7 @@ export class RenderService {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number[];
+      value?: string | number | number[];
       src?: string;
     }>,
     webhookUrl: string | null,
@@ -1139,8 +1139,8 @@ export class RenderService {
         text6: 'txt_2',
         media1_image: 'img_4',
         media1_video: 'video_1.mp4',
-        image1: 'img_5',
         image2: 'img_2',
+        image3: 'img_5',
         background: 'background',
       },
 
@@ -1393,7 +1393,7 @@ export class RenderService {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number[];
+      value?: string | number | number[];
       src?: string;
     }>
   > {
@@ -1401,7 +1401,7 @@ export class RenderService {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number[];
+      value?: string | number | number[];
       src?: string;
     };
     const assets: Asset[] = [];
