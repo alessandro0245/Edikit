@@ -982,116 +982,177 @@ export class RenderService {
     templateId: number,
   ): Record<string, string> | null {
     const predefinedMappings: Record<number, Record<string, string>> = {
-      // Animation 1 - Image & Text Template
-      // Frontend: text1, text2, image1, image2, background
-      // NOTE: Swapped due to client naming layers incorrectly
+      // Animation 1 — 2x dual-media (img/video) + 2x text
       1: {
-        text1: 'txt_2', // swapped: frontend text1 -> AE txt_2
-        text2: 'txt_1', // swapped: frontend text2 -> AE txt_1
-        image1: 'img_2.png', // swapped: frontend image1 -> AE img_2.png
-        image2: 'img_1.png', // swapped: frontend image2 -> AE img_1.png
-        background: 'background.png',
+        text1: 'txt_1',
+        text2: 'txt_2',
+        media1_image: 'img_1',
+        media1_video: 'video_1.mp4',
+        media2_image: 'img_2',
+        media2_video: 'video_2.mp4',
+        background: 'background',
       },
 
-      // Animation 2 - Icon & Text Template
-      // Frontend: text1, icon1, icon2, background
+      // Animation 2 — 4x dual-media + 4x text
       2: {
-        text1: 'txt_1',
-        icon1: 'icon_1.png',
-        icon2: 'icon_2.png',
-        background: 'background.png',
-      },
-
-      // Animation 3 - Icon & Text Template
-      // Frontend: icon1, text1, text2, background
-      3: {
-        text1: 'txt_1',
-        text2: 'txt_2',
-        icon1: 'icon_1.png',
-        background: 'background.png',
-      },
-
-      // Animation 4 - Multiple Icons & Text
-      // Frontend: text1, icon1, icon2, icon3, background
-      4: {
-        text1: 'txt_1',
-        icon1: 'icon_1.png',
-        icon2: 'icon_2.png',
-        icon3: 'icon_3.png',
-        background: 'background.png',
-      },
-
-      // Animation 5 - Two Icons & Text
-      // Frontend: text1, icon1, icon2, background
-      // Note: Template has txt_2 but frontend only asks for text1
-      5: {
-        text1: 'txt_1',
-        text2: 'txt_2',
-        icon1: 'icon_1.png',
-        icon2: 'icon_2.png',
-        background: 'background.png',
-      },
-
-      // Animation 6 - Video & Text Template
-      // Frontend: text1, text2, text3, text4, video1, background
-      6: {
         text1: 'txt_1',
         text2: 'txt_2',
         text3: 'txt_3',
         text4: 'txt_4',
-        video1: 'video_1.mp4',
+        media1_image: 'img_1',
+        media1_video: 'video_1.mp4',
+        media2_image: 'img_2',
+        media2_video: 'video_2.mp4',
+        media3_image: 'img_3',
+        media3_video: 'video_3.mp4',
+        media4_image: 'img_4',
+        media4_video: 'video_4.mp4',
+        background: 'background',
+      },
+
+      // Animation 3 — 3x image-only + 1x dual-media (img_3/video_1) + 4x text
+      3: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        text3: 'txt_3',
+        text4: 'txt_4',
+        image1: 'img_1.png',
+        image2: 'img_2.png',
+        image4: 'img_4.png',
+        media3_image: 'img_3.png',
+        media3_video: 'video_1.mp4',
         background: 'background.png',
       },
 
-      // Animation 7 - Simple Text Template
-      // Frontend: text1, text2, text3, background
+      // Animation 4 — article name + price + image
+      4: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        image1: 'img_1',
+        background: 'background',
+      },
+
+      // Animation 5 — 5x text (txt_1-5) + 2x image (img_2→image1, img_3→image2)
+      5: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        text3: 'txt_3',
+        text4: 'txt_4',
+        text5: 'txt_5',
+        image1: 'img_2',
+        image2: 'img_3',
+        background: 'background',
+      },
+
+      // Animation 6 — 2x text + 3x image (inside nested_sequence_2 ×3)
+      6: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        image1: 'img_2',
+        image2: 'img_3',
+        image3: 'img_4',
+        background: 'background',
+      },
+
+      // Animation 7 — 1x text (txt_5) only
       7: {
-        text1: 'txt_1',
-        text2: 'txt_2',
-        text3: 'txt_3',
-        background: 'background.png',
+        text1: 'txt_5',
+        background: 'background',
       },
 
-      // Animation 8 - Product Showcase
-      // Frontend: image (product), text1, text2, text3, background
+      // Animation 8 — 3x text (txt_2-4) + image + button color via colors
       8: {
-        text1: 'txt_1',
-        text2: 'txt_2',
-        text3: 'txt_3',
-        image: 'img_1.png',
-        // productImage: 'img_1.png',
-        background: 'background.png',
+        text1: 'txt_2',
+        text2: 'txt_3',
+        text3: 'txt_4',
+        image1: 'img_1',
+        background: 'background',
       },
 
-      // Animation 9 - Triple Text Template
-      // Frontend: text1, text2, text3, background
+      // Animation 9 — 5x messages + sender name (txt_2 + 4 siblings) + profile pic (img_1 + 4 siblings)
       9: {
         text1: 'txt_1',
-        text2: 'txt_2',
-        text3: 'txt_3',
-        background: 'background.png',
+        text2: 'txt_4',
+        text3: 'txt_7',
+        text4: 'txt_10',
+        text5: 'txt_13',
+        text6: 'txt_2',   // sender name — buildNexrenderAssets also writes txt_5/8/11/14
+        image1: 'img_1',  // profile pic — buildNexrenderAssets also writes img_2-5
+        background: 'background',
       },
 
-      // Animation 10 - Four Icons & Text
-      // Frontend: icon1, icon2, icon3, icon4, text1, background
+      // Animation 10 — 3x dual-media + 3x text
       10: {
         text1: 'txt_1',
-        icon1: 'icon_1.png',
-        icon2: 'icon_2.png',
-        icon3: 'icon_3.png',
-        icon4: 'icon_4.png',
-        icon5: 'icon_5.png',
-        background: 'background.png',
+        text2: 'txt_2',
+        text3: 'txt_3',
+        media1_image: 'img_1',
+        media1_video: 'video_1',
+        media2_image: 'img_2',
+        media2_video: 'video_2',
+        media3_image: 'img_3',
+        media3_video: 'video_3',
+        background: 'background',
       },
 
-      // Animation 11 - Social Media Style
-      // Frontend: icon1 (profile), text1 (username), video1, text2, background
+      // Animation 11 — video-only + profile pic + 3x text (txt_3, txt_2, txt_6)
       11: {
-        text1: 'txt_2',
-        text2: 'txt_1',
-        icon1: 'icon_1.png',
-        video1: 'video_1.mp4',
-        background: 'background.png',
+        text1: 'txt_3',
+        text2: 'txt_2',
+        text3: 'txt_6',
+        image1: 'img_1',
+        video1: 'video_1',
+        background: 'background',
+      },
+
+      // Animation 12 — channel name + username + subscribers + profile pic (×2 nested_sequence_1)
+      12: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        text3: 'txt_3',
+        image1: 'img_1',
+        background: 'background',
+      },
+
+      // Animation 13 — month (txt_23) + year (txt_24) + text1 (txt_25) + image
+      13: {
+        text1: 'txt_23',
+        text2: 'txt_24',
+        text3: 'txt_25',
+        image1: 'img_3',
+        background: 'background',
+      },
+
+      // Animation 14 — single text + gradient color via colors
+      14: {
+        text1: 'txt_1',
+        background: 'background',
+      },
+
+      // Animation 15 — 6x text + 1x dual-media post (img_4/video_1) + 2x profile pics
+      15: {
+        text1: 'txt_4',
+        text2: 'txt_5',
+        text3: 'txt_6',
+        text4: 'txt_1',
+        text5: 'txt_3',
+        text6: 'txt_2',
+        media1_image: 'img_4',
+        media1_video: 'video_1.mp4',
+        image1: 'img_5',
+        image2: 'img_2',
+        background: 'background',
+      },
+
+      // Animation 16 — video + profile pic + 4x text (likes, username, views, title)
+      16: {
+        text1: 'txt_1',
+        text2: 'txt_2',
+        text3: 'txt_3',
+        text4: 'txt_4',
+        image1: 'img_1',
+        video1: 'video_1',
+        background: 'background',
       },
     };
 
@@ -1336,250 +1397,146 @@ export class RenderService {
       src?: string;
     }>
   > {
-    const assets: Array<{
+    type Asset = {
       type: string;
       layerName?: string;
       property?: string;
       value?: string | number[];
       src?: string;
-    }> = [];
-
-    // Get layer mapping for this template (from database)
+    };
+    const assets: Asset[] = [];
     const layerMapping = await this.getLayerMapping(templateId);
 
+    this.logger.log(`Building assets for template ${templateId}`, `Layer mapping: ${JSON.stringify(layerMapping)}`);
     this.logger.log(
-      `Building assets for template ${templateId}`,
-      `Layer mapping: ${JSON.stringify(layerMapping)}`,
-    );
-    this.logger.log(
-      `DTO fields received:`,
-      `text1=${dto.text1}, text2=${dto.text2}, text3=${dto.text3}, text4=${dto.text4}, ` +
-        `image1=${dto.image1}, image2=${dto.image2}, image3=${dto.image3}, image4=${dto.image4}, image5=${dto.image5}, background=${dto.background}, ` +
-        `icon1=${dto.icon1}, icon2=${dto.icon2}, icon3=${dto.icon3}, icon4=${dto.icon4}, icon5=${dto.icon5}, video1=${dto.video1}`,
+      `DTO fields:`,
+      `text1=${dto.text1} text2=${dto.text2} text3=${dto.text3} text4=${dto.text4} text5=${dto.text5} text6=${dto.text6} ` +
+      `image1=${dto.image1} image2=${dto.image2} image3=${dto.image3} image4=${dto.image4} image5=${dto.image5} ` +
+      `video1=${dto.video1} video2=${dto.video2} video3=${dto.video3} video4=${dto.video4} background=${dto.background}`,
     );
 
-    // Map frontend-friendly field names to backend field names
     const text1 = dto.text1 || dto.headline;
     const text2 = dto.text2 || dto.subheadline;
     const text3 = dto.text3 || dto.description;
     const image1 = dto.image1 || dto.logo;
 
-    // Text replacements - use mapped layer names
-    if (text1) {
-      const layerName = layerMapping.text1 || 'Text 1'; // Fallback to default
-      assets.push({
-        type: 'data',
-        layerName,
-        property: 'Source Text',
-        value: text1,
-      });
-    }
-    if (text2) {
-      const layerName = layerMapping.text2 || 'Text 2';
-      assets.push({
-        type: 'data',
-        layerName,
-        property: 'Source Text',
-        value: text2,
-      });
-    }
-    if (text3) {
-      const layerName = layerMapping.text3 || 'Text 3';
-      assets.push({
-        type: 'data',
-        layerName,
-        property: 'Source Text',
-        value: text3,
-      });
-    }
-    if (dto.text4) {
-      const layerName = layerMapping.text4 || 'Text 4';
-      assets.push({
-        type: 'data',
-        layerName,
-        property: 'Source Text',
-        value: dto.text4,
-      });
+    const pushText = (key: string, value: string) => {
+      const layerName = layerMapping[key];
+      if (layerName) assets.push({ type: 'data', layerName, property: 'Source Text', value });
+    };
+    const pushImage = (key: string, url: string) => {
+      const layerName = layerMapping[key];
+      if (layerName) assets.push({ type: 'image', src: url, layerName });
+    };
+    const pushVideo = (key: string, url: string) => {
+      const layerName = layerMapping[key];
+      if (layerName) assets.push({ type: 'video', src: url, layerName });
+    };
+    const hideLayer = (layerName: string) =>
+      assets.push({ type: 'data', layerName, property: 'Opacity', value: 0 });
+
+    // ── Text slots ──────────────────────────────────────────────────────────
+    if (text1) pushText('text1', text1);
+    if (text2) pushText('text2', text2);
+    if (text3) pushText('text3', text3);
+    if (dto.text4) pushText('text4', dto.text4);
+    if (dto.text5) pushText('text5', dto.text5);
+    if (dto.text6) {
+      pushText('text6', dto.text6);
+      // Template 9: sender's name propagates to all sibling text layers
+      if (templateId === 9) {
+        for (const ln of ['txt_5', 'txt_8', 'txt_11', 'txt_14']) {
+          assets.push({ type: 'data', layerName: ln, property: 'Source Text', value: dto.text6 });
+        }
+      }
     }
 
-    // Image replacements - use mapped layer names
-    if (image1) {
-      const layerName = layerMapping.image1 || 'Image 1';
-      assets.push({
-        type: 'image',
-        src: image1,
-        layerName,
-      });
-    }
-    if (dto.image2) {
-      const layerName = layerMapping.image2 || 'Image 2';
-      assets.push({
-        type: 'image',
-        src: dto.image2,
-        layerName,
-      });
-    }
-    if (dto.image3) {
-      const layerName = layerMapping.image3 || 'Image 3';
-      assets.push({
-        type: 'image',
-        src: dto.image3,
-        layerName,
-      });
-    }
-    if (dto.image4) {
-      const layerName = layerMapping.image4 || 'Image 4';
-      assets.push({
-        type: 'image',
-        src: dto.image4,
-        layerName,
-      });
-    }
-    if (dto.image5) {
-      const layerName = layerMapping.image5 || 'Image 5';
-      assets.push({
-        type: 'image',
-        src: dto.image5,
-        layerName,
-      });
+    // ── Dual-media slots (image OR video — video wins, other layer hidden) ──
+    // Slot N uses dto.imageN for the image layer and dto.videoN for the video layer.
+    // The layer mapping expresses this via media{N}_image / media{N}_video keys.
+    const dualSlots: Array<{ n: number; imgUrl?: string; vidUrl?: string }> = [
+      { n: 1, imgUrl: image1,    vidUrl: dto.video1 },
+      { n: 2, imgUrl: dto.image2, vidUrl: dto.video2 },
+      { n: 3, imgUrl: dto.image3, vidUrl: dto.video3 },
+      { n: 4, imgUrl: dto.image4, vidUrl: dto.video4 },
+    ];
+
+    const isDual: Record<number, boolean> = {};
+    for (const { n, imgUrl, vidUrl } of dualSlots) {
+      const imgLayer = layerMapping[`media${n}_image`];
+      const vidLayer = layerMapping[`media${n}_video`];
+      if (!imgLayer && !vidLayer) continue;
+      isDual[n] = true;
+      if (vidUrl) {
+        if (vidLayer) assets.push({ type: 'video', src: vidUrl, layerName: vidLayer });
+        if (imgLayer) hideLayer(imgLayer);
+      } else if (imgUrl) {
+        if (imgLayer) assets.push({ type: 'image', src: imgUrl, layerName: imgLayer });
+        if (vidLayer) hideLayer(vidLayer);
+      }
     }
 
-    // Icon replacements - use mapped layer names
-    if (dto.icon1) {
-      const layerName = layerMapping.icon1 || 'Icon 1';
-      assets.push({
-        type: 'image',
-        src: dto.icon1,
-        layerName,
-      });
+    // ── Pure image slots (only when NOT handled as dual-media above) ────────
+    if (image1 && !isDual[1]) {
+      pushImage('image1', image1);
+      // Template 9: profile picture goes to all 5 img layers
+      if (templateId === 9) {
+        for (const ln of ['img_2', 'img_3', 'img_4', 'img_5']) {
+          assets.push({ type: 'image', src: image1, layerName: ln });
+        }
+      }
     }
-    if (dto.icon2) {
-      const layerName = layerMapping.icon2 || 'Icon 2';
-      assets.push({
-        type: 'image',
-        src: dto.icon2,
-        layerName,
-      });
-    }
-    if (dto.icon3) {
-      const layerName = layerMapping.icon3 || 'Icon 3';
-      assets.push({
-        type: 'image',
-        src: dto.icon3,
-        layerName,
-      });
-    }
-    if (dto.icon4) {
-      const layerName = layerMapping.icon4 || 'Icon 4';
-      assets.push({
-        type: 'image',
-        src: dto.icon4,
-        layerName,
-      });
-    }
-    if (dto.icon5) {
-      const layerName = layerMapping.icon5 || 'Icon 5';
-      assets.push({
-        type: 'image',
-        src: dto.icon5,
-        layerName,
-      });
-    }
+    if (dto.image2 && !isDual[2]) pushImage('image2', dto.image2);
+    if (dto.image3 && !isDual[3]) pushImage('image3', dto.image3);
+    if (dto.image4 && !isDual[4]) pushImage('image4', dto.image4);
+    if (dto.image5)               pushImage('image5', dto.image5);
 
-    // Video replacements - use mapped layer names
-    if (dto.video1) {
-      const layerName = layerMapping.video1 || 'Video 1';
-      assets.push({
-        type: 'video',
-        src: dto.video1,
-        layerName,
-      });
-    }
-    if (dto.video2) {
-      const layerName = layerMapping.video2 || 'Video 2';
-      assets.push({
-        type: 'video',
-        src: dto.video2,
-        layerName,
-      });
-    }
+    // ── Icons ────────────────────────────────────────────────────────────────
+    if (dto.icon1) pushImage('icon1', dto.icon1);
+    if (dto.icon2) pushImage('icon2', dto.icon2);
+    if (dto.icon3) pushImage('icon3', dto.icon3);
+    if (dto.icon4) pushImage('icon4', dto.icon4);
+    if (dto.icon5) pushImage('icon5', dto.icon5);
 
-    // Product image (single generic image field for e-commerce templates)
+    // ── Pure video slots (only when NOT handled as dual-media above) ─────────
+    if (dto.video1 && !isDual[1]) pushVideo('video1', dto.video1);
+    if (dto.video2 && !isDual[2]) pushVideo('video2', dto.video2);
+    if (dto.video3 && !isDual[3]) pushVideo('video3', dto.video3);
+    if (dto.video4 && !isDual[4]) pushVideo('video4', dto.video4);
+
+    // ── Generic product image ─────────────────────────────────────────────
     if (dto.image) {
-      const layerName =
-        layerMapping.productImage || layerMapping.image || 'Product Image';
-      assets.push({
-        type: 'image',
-        src: dto.image,
-        layerName,
-      });
+      const layerName = layerMapping.productImage || layerMapping.image;
+      if (layerName) assets.push({ type: 'image', src: dto.image, layerName });
     }
 
-    // Background - use mapped layer name
+    // ── Background ───────────────────────────────────────────────────────────
     if (dto.background) {
-      const layerName = layerMapping.background || 'Background';
-      assets.push({
-        type: 'image',
-        src: dto.background,
-        layerName,
-      });
+      const layerName = layerMapping.background;
+      if (layerName) assets.push({ type: 'image', src: dto.background, layerName });
     }
 
-    // Color replacements - use mapped layer names
+    // ── Colors ───────────────────────────────────────────────────────────────
     if (dto.colors) {
-      // Primary color
       if (dto.colors.primary) {
-        const layerName = layerMapping.colorPrimary || 'Primary Color';
-        assets.push({
-          type: 'data',
-          layerName,
-          property: 'Color',
-          value: this.hexToRgb(dto.colors.primary),
-        });
+        const layerName = layerMapping.colorPrimary;
+        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.primary) });
       }
-
-      // Secondary color
       if (dto.colors.secondary) {
-        const layerName = layerMapping.colorSecondary || 'Secondary Color';
-        assets.push({
-          type: 'data',
-          layerName,
-          property: 'Color',
-          value: this.hexToRgb(dto.colors.secondary),
-        });
+        const layerName = layerMapping.colorSecondary;
+        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.secondary) });
       }
-
-      // Accent color
       if (dto.colors.accent) {
-        const layerName = layerMapping.colorAccent || 'Accent Color';
-        assets.push({
-          type: 'data',
-          layerName,
-          property: 'Color',
-          value: this.hexToRgb(dto.colors.accent),
-        });
+        const layerName = layerMapping.colorAccent;
+        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.accent) });
       }
-
-      // Background color
       if (dto.colors.background) {
-        const layerName = layerMapping.colorBackground || 'Background Color';
-        assets.push({
-          type: 'data',
-          layerName,
-          property: 'Color',
-          value: this.hexToRgb(dto.colors.background),
-        });
+        const layerName = layerMapping.colorBackground;
+        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.background) });
       }
-
-      // Text color
       if (dto.colors.text) {
-        const layerName = layerMapping.colorText || 'Text Color';
-        assets.push({
-          type: 'data',
-          layerName,
-          property: 'Color',
-          value: this.hexToRgb(dto.colors.text),
-        });
+        const layerName = layerMapping.colorText;
+        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.text) });
       }
     }
 

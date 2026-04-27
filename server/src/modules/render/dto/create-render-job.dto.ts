@@ -52,6 +52,14 @@ export class CreateRenderJobDto {
   @IsString()
   text4?: string;
 
+  @IsOptional()
+  @IsString()
+  text5?: string;
+
+  @IsOptional()
+  @IsString()
+  text6?: string;
+
   // Frontend-friendly field names (will map to text1, text2, text3)
   @IsOptional()
   @IsString()
@@ -120,6 +128,22 @@ export class CreateRenderJobDto {
   @IsOptional()
   @IsString()
   video2?: string;
+
+  @IsOptional()
+  @IsString()
+  video3?: string;
+
+  @IsOptional()
+  @IsString()
+  video4?: string;
+
+  @IsOptional()
+  @IsString()
+  video3?: string;
+
+  @IsOptional()
+  @IsString()
+  video4?: string;
 
   // Product image (for e-commerce templates, mapped to productImage or image)
   @IsOptional()
