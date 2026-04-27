@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-background">
       <main>
-        {false && (
+        {true && (
           <section className="relative py-16 md:py-22 bg-background overflow-hidden">
           {/* Background SVG Decorations */}
           <div
