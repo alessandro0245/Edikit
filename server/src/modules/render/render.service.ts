@@ -986,8 +986,8 @@ export class RenderService {
       // Frontend: text1, text2, image1, image2, background
       // NOTE: Swapped due to client naming layers incorrectly
       1: {
-        text1: 'txt_2', // swapped: frontend text1 -> AE txt_2
-        text2: 'txt_1', // swapped: frontend text2 -> AE txt_1
+        text1: 'txt_1', // swapped: frontend text1 -> AE txt_1
+        text2: 'txt_2', // swapped: frontend text2 -> AE txt_2
         image1: 'img_2.png', // swapped: frontend image1 -> AE img_2.png
         image2: 'img_1.png', // swapped: frontend image2 -> AE img_1.png
         background: 'background.png',

@@ -92,8 +92,8 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 1.png", // Use video as thumbnail
     category: "Social Media",
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 13, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 13, required: true },
+      text1: { type: "text", label: "Text 1", maxLength: 18, required: true },
+      text2: { type: "text", label: "Text 2", maxLength: 18, required: true },
       image1: {
         type: "image",
         label: "Image 1",
