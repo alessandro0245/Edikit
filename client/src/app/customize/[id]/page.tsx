@@ -564,8 +564,8 @@ const CustomizePage = () => {
 
     return Object.entries(template.fields).every(([key, field]) => {
       if (field.required) {
-        // For image/video fields, check if the upload is complete (URL exists)
-        if (field.type === "image" || field.type === "video") {
+        // For image/video/media fields, check if the upload is complete (URL exists)
+        if (field.type === "image" || field.type === "video" || field.type === "media") {
           return !!uploadedAssets[key];
         }
         // For text fields, check formData
@@ -602,6 +602,17 @@ const CustomizePage = () => {
           if (uploadedAssets[key]) {
             renderDto[key] = uploadedAssets[key];
             console.log(`✅ Adding ${key} to renderDto:`, uploadedAssets[key]);
+          } else {
+            console.log(`⚠️ No uploaded asset for ${key}`);
+          }
+        } else if (field.type === "media") {
+          if (uploadedAssets[key]) {
+            const url = uploadedAssets[key];
+            const n = key.replace("media", "");
+            const isVideo = url.includes("/video/");
+            const dtoKey = isVideo ? `video${n}` : `image${n}`;
+            renderDto[dtoKey] = url;
+            console.log(`✅ Adding ${dtoKey} (from media${n}) to renderDto:`, url);
           } else {
             console.log(`⚠️ No uploaded asset for ${key}`);
           }
@@ -877,6 +888,85 @@ const CustomizePage = () => {
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
                             MP4 (max. 50MB)
+                            {field.dimensions && ` • ${field.dimensions}`}
+                          </p>
+                        </label>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Media Upload (accepts both image and video) */}
+                  {field.type === "media" && (
+                    <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                        onChange={(e) =>
+                          handleFileUpload(
+                            fieldKey,
+                            e.target.files?.[0] || null,
+                            e.target,
+                          )
+                        }
+                        className="hidden"
+                        id={`upload-${fieldKey}`}
+                      />
+
+                      {filePreviews[fieldKey] ? (
+                        <div className="space-y-3">
+                          <div className="relative">
+                            {(formData[fieldKey] as File)?.type?.startsWith("video/") ? (
+                              <video
+                                src={filePreviews[fieldKey]}
+                                className="w-full h-40 object-cover rounded-lg"
+                                controls
+                              />
+                            ) : (
+                              <img
+                                src={filePreviews[fieldKey]}
+                                alt={`${field.label} preview`}
+                                className="w-full h-40 object-cover rounded-lg"
+                              />
+                            )}
+                            <button
+                              onClick={async () => {
+                                if (uploadedAssets[fieldKey]) {
+                                  await deleteAsset(fieldKey);
+                                } else {
+                                  removeFile(fieldKey);
+                                }
+                              }}
+                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+                              type="button"
+                              title={
+                                uploadedAssets[fieldKey]
+                                  ? "Delete from server"
+                                  : "Remove file"
+                              }
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <label
+                            htmlFor={`upload-${fieldKey}`}
+                            className="text-xs text-center block text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                          >
+                            Click to change
+                          </label>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor={`upload-${fieldKey}`}
+                          className="cursor-pointer block text-center"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-2">
+                            <Upload className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm font-medium text-foreground">
+                            Upload {field.label}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Image (PNG, JPG) or Video (MP4)
                             {field.dimensions && ` • ${field.dimensions}`}
                           </p>
                         </label>
