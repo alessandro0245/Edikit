@@ -782,7 +782,7 @@ const CustomizePage = () => {
                                   removeFile(fieldKey);
                                 }
                               }}
-                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
                               type="button"
                               title={
                                 uploadedAssets[fieldKey]
