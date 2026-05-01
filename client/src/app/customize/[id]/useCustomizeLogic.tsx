@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { templates } from "@/utils/constant";
 import api from "@/lib/auth";
+import { downloadVideo } from "@/lib/videoDownload";
 import {
   showInfoToast,
   showErrorToast,
@@ -20,6 +21,15 @@ interface RenderJob {
   progress?: number;
   error?: string;
 }
+
+interface CustomizePersistedState {
+  formData: Record<string, string>;
+  uploadedAssets: Record<string, string>;
+  renderJob: RenderJob | null;
+}
+
+const getCustomizeStorageKey = (templateId: number) =>
+  `customize-template-${templateId}-state`;
 
 export const useCustomizeLogic = () => {
   const params = useParams();
@@ -45,6 +55,11 @@ export const useCustomizeLogic = () => {
   const [uploadingAssets, setUploadingAssets] = useState<Set<string>>(
     new Set(),
   );
+  const [imagePreviewReady, setImagePreviewReady] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [isRestoringState, setIsRestoringState] = useState(true);
+  const hasHydratedStateRef = useRef(false);
 
   // Video & image preview state
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -79,16 +94,88 @@ export const useCustomizeLogic = () => {
     checkAuth();
   }, []);
 
-  // Initialize form data
+  // Restore persisted state for this template, or initialize a clean form.
   useEffect(() => {
     if (template) {
+      hasHydratedStateRef.current = false;
+      setIsRestoringState(true);
+
       const initialData: FormDataState = {};
-      Object.keys(template.fields).forEach((key) => {
-        initialData[key] = "";
+      Object.entries(template.fields).forEach(([key, field]) => {
+        initialData[key] = field.type === "text" ? "" : "";
       });
-      setFormData(initialData);
+
+      try {
+        const savedState = window.localStorage.getItem(
+          getCustomizeStorageKey(templateId),
+        );
+
+        if (savedState) {
+          const parsedState = JSON.parse(
+            savedState,
+          ) as Partial<CustomizePersistedState>;
+
+          Object.entries(template.fields).forEach(([key, field]) => {
+            if (field.type === "text") {
+              initialData[key] =
+                typeof parsedState.formData?.[key] === "string"
+                  ? parsedState.formData[key]
+                  : "";
+            }
+          });
+
+          setFormData(initialData);
+          setUploadedAssets(parsedState.uploadedAssets ?? {});
+          setRenderJob(parsedState.renderJob ?? null);
+        } else {
+          setFormData(initialData);
+          setUploadedAssets({});
+          setRenderJob(null);
+        }
+      } catch (error) {
+        console.error("Failed to restore customize state:", error);
+        setFormData(initialData);
+        setUploadedAssets({});
+        setRenderJob(null);
+      }
+
+      setFilePreviews({});
+      setUploadingAssets(new Set());
+      setImagePreviewReady({});
+      hasNotifiedRef.current = false;
+      hasHydratedStateRef.current = true;
+      setIsRestoringState(false);
     }
   }, [template]);
+
+  // Persist the user-entered state so downloads or refreshes don't wipe it out.
+  useEffect(() => {
+    if (!template || !hasHydratedStateRef.current) return;
+
+    try {
+      const persistedFormData: Record<string, string> = {};
+
+      Object.entries(template.fields).forEach(([key, field]) => {
+        if (field.type !== "text") return;
+
+        const value = formData[key];
+        persistedFormData[key] = typeof value === "string" ? value : "";
+      });
+
+      const stateToPersist: CustomizePersistedState = {
+        formData: persistedFormData,
+        uploadedAssets,
+        renderJob,
+      };
+
+      window.localStorage.setItem(
+        getCustomizeStorageKey(templateId),
+        JSON.stringify(stateToPersist),
+      );
+    } catch (error) {
+      console.error("Failed to persist customize state:", error);
+    }
+  }, [formData, uploadedAssets, renderJob, template, templateId]);
 
   // Poll job status
   useEffect(() => {
@@ -345,6 +432,11 @@ export const useCustomizeLogic = () => {
                 if (inputElement) {
                   inputElement.value = "";
                 }
+                setImagePreviewReady((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
                 return;
               }
             } catch (error) {
@@ -353,6 +445,11 @@ export const useCustomizeLogic = () => {
               if (inputElement) {
                 inputElement.value = "";
               }
+              setImagePreviewReady((prev) => {
+                const next = { ...prev };
+                delete next[fieldKey];
+                return next;
+              });
               return;
             }
           }
@@ -377,6 +474,11 @@ export const useCustomizeLogic = () => {
                 if (inputElement) {
                   inputElement.value = "";
                 }
+                setImagePreviewReady((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
                 return; // Stop upload if dimensions don't match
               }
             } catch (error) {
@@ -386,11 +488,21 @@ export const useCustomizeLogic = () => {
               if (inputElement) {
                 inputElement.value = "";
               }
+              setImagePreviewReady((prev) => {
+                const next = { ...prev };
+                delete next[fieldKey];
+                return next;
+              });
               return;
             }
           }
         }
       }
+
+      setImagePreviewReady((prev) => ({
+        ...prev,
+        [fieldKey]: false,
+      }));
 
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -483,6 +595,11 @@ export const useCustomizeLogic = () => {
       delete newPreviews[fieldKey];
       return newPreviews;
     });
+    setImagePreviewReady((prev) => {
+      const newPreviewState = { ...prev };
+      delete newPreviewState[fieldKey];
+      return newPreviewState;
+    });
     setUploadedAssets((prev) => {
       const newAssets = { ...prev };
       delete newAssets[fieldKey];
@@ -532,6 +649,12 @@ export const useCustomizeLogic = () => {
         const newPreviews = { ...prev };
         delete newPreviews[fieldKey];
         return newPreviews;
+      });
+
+      setImagePreviewReady((prev) => {
+        const newPreviewState = { ...prev };
+        delete newPreviewState[fieldKey];
+        return newPreviewState;
       });
 
       showSuccessToast(`${fieldKey} deleted successfully`);
@@ -619,17 +742,21 @@ export const useCustomizeLogic = () => {
     setDownloadProgress(50);
 
     try {
-      const link = document.createElement("a");
-      link.href = renderJob.outputUrl;
       const timestamp = new Date().toISOString().slice(0, 10);
-      link.download = `video-${timestamp}.mp4`;
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const downloadUrl = renderJob.outputUrl;
 
-      setDownloadProgress(100);
-      showInfoToast("Video downloaded successfully!");
+      await new Promise<void>((resolve, reject) => {
+        downloadVideo(downloadUrl, {
+          filename: `video-${timestamp}.mp4`,
+          onProgress: (progress) => setDownloadProgress(progress),
+          onSuccess: () => {
+            setDownloadProgress(100);
+            showInfoToast("Video downloaded successfully!");
+            resolve();
+          },
+          onError: (message) => reject(new Error(message)),
+        });
+      });
     } catch (error) {
       console.error("Failed to download video:", error);
       showErrorToast("Failed to download video");
@@ -672,6 +799,9 @@ export const useCustomizeLogic = () => {
     hasRequiredFields,
     handleGeneratePreview,
     handleDownload,
+    imagePreviewReady,
+    setImagePreviewReady,
+    isRestoringState,
     setFilePreviews,
     setUploadedAssets,
     setFormData,

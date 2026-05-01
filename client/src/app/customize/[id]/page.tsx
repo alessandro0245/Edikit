@@ -45,6 +45,8 @@ const CustomizePage = () => {
     hasRequiredFields,
     handleGeneratePreview,
     handleDownload,
+    imagePreviewReady,
+    setImagePreviewReady,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -56,7 +58,35 @@ const CustomizePage = () => {
     renderJob?.status === "COMPLETED" && renderJob.outputUrl;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {isDownloading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <div>
+                <p className="font-medium text-foreground">Preparing download</p>
+                <p className="text-sm text-muted-foreground">
+                  Keep this tab open while the file is being prepared.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${Math.max(downloadProgress, 10)}%` }}
+                />
+              </div>
+              <p className="text-xs text-right text-muted-foreground">
+                {downloadProgress}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         <Link
           href="/templates"
@@ -139,12 +169,24 @@ const CustomizePage = () => {
                         id={`upload-${fieldKey}`}
                       />
 
-                      {filePreviews[fieldKey] ? (
+                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
                         <div className="space-y-3">
-                          <div className="relative">
+                          <div className="relative rounded-lg overflow-hidden">
                             <img
-                              src={filePreviews[fieldKey]}
+                              src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
                               alt={`${field.label} preview`}
+                              onLoad={() =>
+                                setImagePreviewReady((prev) => ({
+                                  ...prev,
+                                  [fieldKey]: true,
+                                }))
+                              }
+                              onError={() =>
+                                setImagePreviewReady((prev) => ({
+                                  ...prev,
+                                  [fieldKey]: true,
+                                }))
+                              }
                               className="w-full h-40 object-cover rounded-lg"
                             />
                             <button
@@ -214,11 +256,11 @@ const CustomizePage = () => {
                         id={`upload-${fieldKey}`}
                       />
 
-                      {filePreviews[fieldKey] ? (
+                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
                         <div className="space-y-3">
                           <div className="relative">
                             <video
-                              src={filePreviews[fieldKey]}
+                              src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
                               className="w-full h-40 object-cover rounded-lg"
                               controls
                             />
@@ -287,21 +329,36 @@ const CustomizePage = () => {
                         id={`upload-${fieldKey}`}
                       />
 
-                      {filePreviews[fieldKey] ? (
+                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
                         <div className="space-y-3">
                           <div className="relative">
-                            {(formData[fieldKey] as File)?.type?.startsWith("video/") ? (
+                            {(formData[fieldKey] as File)?.type?.startsWith("video/") ||
+                            uploadedAssets[fieldKey]?.includes("/video/") ? (
                               <video
-                                src={filePreviews[fieldKey]}
+                                src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
                                 className="w-full h-40 object-cover rounded-lg"
                                 controls
                               />
                             ) : (
-                              <img
-                                src={filePreviews[fieldKey]}
-                                alt={`${field.label} preview`}
-                                className="w-full h-40 object-cover rounded-lg"
-                              />
+                              <div className="relative overflow-hidden rounded-lg">
+                                <img
+                                  src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
+                                  alt={`${field.label} preview`}
+                                  onLoad={() =>
+                                    setImagePreviewReady((prev) => ({
+                                      ...prev,
+                                      [fieldKey]: true,
+                                    }))
+                                  }
+                                  onError={() =>
+                                    setImagePreviewReady((prev) => ({
+                                      ...prev,
+                                      [fieldKey]: true,
+                                    }))
+                                  }
+                                  className="w-full h-40 object-cover rounded-lg"
+                                />
+                              </div>
                             )}
                             <button
                               onClick={async () => {
