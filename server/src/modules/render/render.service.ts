@@ -903,7 +903,9 @@ export class RenderService {
             },
             assets,
             fonts: fonts.length > 0 ? fonts : undefined,
-            ...(webhookUrl ? { webhook: { url: webhookUrl, method: 'POST' } } : {}),
+            ...(webhookUrl
+              ? { webhook: { url: webhookUrl, method: 'POST' } }
+              : {}),
             preview: false,
           },
           {
@@ -1076,8 +1078,8 @@ export class RenderService {
         text3: 'txt_7',
         text4: 'txt_10',
         text5: 'txt_13',
-        text6: 'txt_2',   // sender name — buildNexrenderAssets also writes txt_5/8/11/14
-        image1: 'img_1',  // profile pic — buildNexrenderAssets also writes img_2-5
+        text6: 'txt_2', // sender name — buildNexrenderAssets also writes txt_5/8/11/14
+        image1: 'img_1', // profile pic — buildNexrenderAssets also writes img_2-5
         background: 'background',
       },
 
@@ -1095,11 +1097,12 @@ export class RenderService {
         background: 'background',
       },
 
-      // Animation 11 — video-only + profile pic + 3x text (txt_3, txt_2, txt_6)
+      // Animation 11 — video-only + profile pic + 4x text (txt_3, txt_2, txt_6, txt_10)
       11: {
         text1: 'txt_3',
         text2: 'txt_2',
         text3: 'txt_6',
+        text4: 'txt_10',
         image1: 'img_1',
         video1: 'video_1',
         background: 'background',
@@ -1138,7 +1141,7 @@ export class RenderService {
         text5: 'txt_3',
         text6: 'txt_2',
         media1_image: 'img_4',
-        media1_video: 'video_1.mp4',
+        media1_video: 'video_1',
         image2: 'img_2',
         image3: 'img_5',
         background: 'background',
@@ -1407,12 +1410,15 @@ export class RenderService {
     const assets: Asset[] = [];
     const layerMapping = await this.getLayerMapping(templateId);
 
-    this.logger.log(`Building assets for template ${templateId}`, `Layer mapping: ${JSON.stringify(layerMapping)}`);
+    this.logger.log(
+      `Building assets for template ${templateId}`,
+      `Layer mapping: ${JSON.stringify(layerMapping)}`,
+    );
     this.logger.log(
       `DTO fields:`,
       `text1=${dto.text1} text2=${dto.text2} text3=${dto.text3} text4=${dto.text4} text5=${dto.text5} text6=${dto.text6} ` +
-      `image1=${dto.image1} image2=${dto.image2} image3=${dto.image3} image4=${dto.image4} image5=${dto.image5} ` +
-      `video1=${dto.video1} video2=${dto.video2} video3=${dto.video3} video4=${dto.video4} background=${dto.background}`,
+        `image1=${dto.image1} image2=${dto.image2} image3=${dto.image3} image4=${dto.image4} image5=${dto.image5} ` +
+        `video1=${dto.video1} video2=${dto.video2} video3=${dto.video3} video4=${dto.video4} background=${dto.background}`,
     );
 
     const text1 = dto.text1 || dto.headline;
@@ -1422,7 +1428,13 @@ export class RenderService {
 
     const pushText = (key: string, value: string) => {
       const layerName = layerMapping[key];
-      if (layerName) assets.push({ type: 'data', layerName, property: 'Source Text', value });
+      if (layerName)
+        assets.push({
+          type: 'data',
+          layerName,
+          property: 'Source Text',
+          value,
+        });
     };
     const pushImage = (key: string, url: string) => {
       const layerName = layerMapping[key];
@@ -1446,7 +1458,12 @@ export class RenderService {
       // Template 9: sender's name propagates to all sibling text layers
       if (templateId === 9) {
         for (const ln of ['txt_5', 'txt_8', 'txt_11', 'txt_14']) {
-          assets.push({ type: 'data', layerName: ln, property: 'Source Text', value: dto.text6 });
+          assets.push({
+            type: 'data',
+            layerName: ln,
+            property: 'Source Text',
+            value: dto.text6,
+          });
         }
       }
     }
@@ -1455,7 +1472,7 @@ export class RenderService {
     // Slot N uses dto.imageN for the image layer and dto.videoN for the video layer.
     // The layer mapping expresses this via media{N}_image / media{N}_video keys.
     const dualSlots: Array<{ n: number; imgUrl?: string; vidUrl?: string }> = [
-      { n: 1, imgUrl: image1,    vidUrl: dto.video1 },
+      { n: 1, imgUrl: image1, vidUrl: dto.video1 },
       { n: 2, imgUrl: dto.image2, vidUrl: dto.video2 },
       { n: 3, imgUrl: dto.image3, vidUrl: dto.video3 },
       { n: 4, imgUrl: dto.image4, vidUrl: dto.video4 },
@@ -1468,10 +1485,12 @@ export class RenderService {
       if (!imgLayer && !vidLayer) continue;
       isDual[n] = true;
       if (vidUrl) {
-        if (vidLayer) assets.push({ type: 'video', src: vidUrl, layerName: vidLayer });
+        if (vidLayer)
+          assets.push({ type: 'video', src: vidUrl, layerName: vidLayer });
         if (imgLayer) hideLayer(imgLayer);
       } else if (imgUrl) {
-        if (imgLayer) assets.push({ type: 'image', src: imgUrl, layerName: imgLayer });
+        if (imgLayer)
+          assets.push({ type: 'image', src: imgUrl, layerName: imgLayer });
         if (vidLayer) hideLayer(vidLayer);
       }
     }
@@ -1489,7 +1508,7 @@ export class RenderService {
     if (dto.image2 && !isDual[2]) pushImage('image2', dto.image2);
     if (dto.image3 && !isDual[3]) pushImage('image3', dto.image3);
     if (dto.image4 && !isDual[4]) pushImage('image4', dto.image4);
-    if (dto.image5)               pushImage('image5', dto.image5);
+    if (dto.image5) pushImage('image5', dto.image5);
 
     // ── Icons ────────────────────────────────────────────────────────────────
     if (dto.icon1) pushImage('icon1', dto.icon1);
@@ -1513,30 +1532,61 @@ export class RenderService {
     // ── Background ───────────────────────────────────────────────────────────
     if (dto.background) {
       const layerName = layerMapping.background;
-      if (layerName) assets.push({ type: 'image', src: dto.background, layerName });
+      if (layerName)
+        assets.push({ type: 'image', src: dto.background, layerName });
     }
 
     // ── Colors ───────────────────────────────────────────────────────────────
     if (dto.colors) {
       if (dto.colors.primary) {
         const layerName = layerMapping.colorPrimary;
-        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.primary) });
+        if (layerName)
+          assets.push({
+            type: 'data',
+            layerName,
+            property: 'Color',
+            value: this.hexToRgb(dto.colors.primary),
+          });
       }
       if (dto.colors.secondary) {
         const layerName = layerMapping.colorSecondary;
-        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.secondary) });
+        if (layerName)
+          assets.push({
+            type: 'data',
+            layerName,
+            property: 'Color',
+            value: this.hexToRgb(dto.colors.secondary),
+          });
       }
       if (dto.colors.accent) {
         const layerName = layerMapping.colorAccent;
-        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.accent) });
+        if (layerName)
+          assets.push({
+            type: 'data',
+            layerName,
+            property: 'Color',
+            value: this.hexToRgb(dto.colors.accent),
+          });
       }
       if (dto.colors.background) {
         const layerName = layerMapping.colorBackground;
-        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.background) });
+        if (layerName)
+          assets.push({
+            type: 'data',
+            layerName,
+            property: 'Color',
+            value: this.hexToRgb(dto.colors.background),
+          });
       }
       if (dto.colors.text) {
         const layerName = layerMapping.colorText;
-        if (layerName) assets.push({ type: 'data', layerName, property: 'Color', value: this.hexToRgb(dto.colors.text) });
+        if (layerName)
+          assets.push({
+            type: 'data',
+            layerName,
+            property: 'Color',
+            value: this.hexToRgb(dto.colors.text),
+          });
       }
     }
 

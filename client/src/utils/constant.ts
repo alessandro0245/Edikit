@@ -260,6 +260,7 @@ export const templates: Template[] = [
       text1: { type: "text", label: "Text 1", maxLength: 40, required: true },
       text2: { type: "text", label: "Text 2", maxLength: 40, required: false },
       text3: { type: "text", label: "Likes", maxLength: 5, required: false },
+      text4: { type: "text", label: "Username", maxLength: 20, required: false },
       background: { type: "image", label: "Background", dimensions: "2160x3840", required: false },
     },
   },
