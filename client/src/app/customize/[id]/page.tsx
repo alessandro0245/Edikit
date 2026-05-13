@@ -45,6 +45,8 @@ const CustomizePage = () => {
     hasRequiredFields,
     handleGeneratePreview,
     handleDownload,
+    useBackgroundColor,
+    setUseBackgroundColor,
     imagePreviewReady,
     setImagePreviewReady,
   } = useCustomizeLogic();
@@ -113,7 +115,9 @@ const CustomizePage = () => {
 
             <div className="p-6 rounded-lg border border-border bg-card space-y-6">
               {/* Dynamic Fields */}
-              {Object.entries(template.fields).map(([fieldKey, field]) => (
+              {Object.entries(template.fields)
+                .filter(([fieldKey]) => fieldKey !== "background")
+                .map(([fieldKey, field]) => (
                 <div key={fieldKey} className="space-y-2">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     {field.label}
@@ -414,6 +418,45 @@ const CustomizePage = () => {
                   💡 <strong>Note:</strong> Empty fields will keep the
                   template&apos;s default appearance. Files are uploaded
                   automatically when selected.
+                </p>
+              </div>
+
+              {/* Background mode toggle - template flow only */}
+              <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Background Mode</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Colored keeps default template background. Transparent removes background for alpha export.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setUseBackgroundColor(true)}
+                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                      useBackgroundColor
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Colored
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUseBackgroundColor(false)}
+                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                      !useBackgroundColor
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Transparent
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {useBackgroundColor
+                    ? "Export target: MP4"
+                    : "Export target: QuickTime MOV (Animation + Alpha)"}
                 </p>
               </div>
             </div>
