@@ -55,9 +55,9 @@ const Templates = () => {
           </div> */}
 
           {/* Templates Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ">
+          <div className="grid gap-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 ">
             {visibleTemplates.map((template) => (
-              <TemplateCard key={template.id} {...template} thumbnail={template.thumbnail || template.previewUrl} />
+              <TemplateCard key={template.id} template={template} />
             ))}
           </div>
 
@@ -70,7 +70,7 @@ const Templates = () => {
                     Math.min(currentCount + LOAD_MORE_STEP, templates.length)
                   )
                 }
-                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer"
               >
                 Load more templates
               </button>

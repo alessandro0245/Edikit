@@ -886,11 +886,14 @@ export class RenderService {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number | number[];
+      value?: string | number | number[] | Record<string, any>;
       src?: string;
+      name?: string;
+      params?: Record<string, any>;
     }>,
     webhookUrl: string | null,
     fonts: string[] = [],
+    settings?: Record<string, any>,
   ): Promise<NexrenderJobResponse> {
     try {
       const response = await firstValueFrom(
@@ -906,6 +909,7 @@ export class RenderService {
             ...(webhookUrl
               ? { webhook: { url: webhookUrl, method: 'POST' } }
               : {}),
+            ...(settings ? { settings } : {}),
             preview: false,
           },
           {
@@ -1396,16 +1400,20 @@ export class RenderService {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number | number[];
+      value?: string | number | number[] | Record<string, any>;
       src?: string;
+      name?: string;
+      params?: Record<string, any>;
     }>
   > {
     type Asset = {
       type: string;
       layerName?: string;
       property?: string;
-      value?: string | number | number[];
+      value?: string | number | number[] | Record<string, any>;
       src?: string;
+      name?: string;
+      params?: Record<string, any>;
     };
     const assets: Asset[] = [];
     const layerMapping = await this.getLayerMapping(templateId);
@@ -1590,6 +1598,17 @@ export class RenderService {
       }
     }
 
+    if (dto.useBackgroundColor === false) {
+      assets.push({
+        type: 'function',
+        name: 'nx:layer-state-set',
+        params: {
+          layerName: 'background',
+          enabled: false,
+        },
+      });
+    }
+
     return assets;
   }
 
@@ -1670,12 +1689,17 @@ export class RenderService {
     this.logger.log(`Assets:`, JSON.stringify(assets, null, 2));
 
     // Submit job to Nexrender
+    const settings = dto.useBackgroundColor === false 
+      ? { type: 'video', quality: 'full', codec: 'video_prores_4444' } 
+      : undefined;
+
     const nexrenderJob = await this.submitNexrenderJob(
       nexrenderTemplateId,
       composition,
       assets,
       webhookUrl,
       fonts,
+      settings,
     );
 
     // Create job in database
