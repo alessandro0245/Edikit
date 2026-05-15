@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import useCustomizeLogic from "./useCustomizeLogic";
+import MovPreview from "@/components/MovPreview";
 
 const CustomizePage = () => {
   const {
@@ -659,7 +660,13 @@ const CustomizePage = () => {
 
                 <div className="aspect-square bg-muted rounded-lg overflow-hidden relative border border-border">
                   {showRenderedVideo ? (
-                    // Show rendered video with controls
+                    // Show rendered video — use MovPreview for MOV files (transparent exports)
+                    renderJob.outputUrl?.toLowerCase().includes(".mov") ? (
+                      <MovPreview
+                        src={renderJob.outputUrl}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
                     <video
                       src={renderJob.outputUrl}
                       className="w-full h-full object-cover"
@@ -667,6 +674,7 @@ const CustomizePage = () => {
                       autoPlay
                       loop
                     />
+                    )
                   ) : (
                     // Show interactive template preview
                     <>

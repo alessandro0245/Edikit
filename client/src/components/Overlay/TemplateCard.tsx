@@ -97,7 +97,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <div
-      className="group relative h-64 rounded-lg overflow-hidden bg-gray-100 transition-all duration-1000 hover:shadow-lg hover:-translate-y-3 cursor-pointer"
+      className="group relative aspect-2/3 w-full rounded-lg overflow-hidden bg-gray-100 transition-all duration-1000 hover:shadow-lg hover:-translate-y-3 cursor-pointer"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
