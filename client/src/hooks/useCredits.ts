@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '@/redux/store';
 import { refreshCreditsInStore } from '@/lib/credits';
 
-export function useCredits() {
+export function useCredits()  {
   const dispatch = useDispatch<AppDispatch>();
   const credits = useSelector((state: RootState) => state.credits);
   const user = useSelector((state: RootState) => state.user.user);
