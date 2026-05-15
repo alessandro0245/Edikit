@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Loader2 } from "lucide-react";
+import { Play, Loader2, ArrowRight } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 interface TemplateCardProps {
   id: number;
   name: string;
+  description?: string;
   thumbnail?: string | StaticImageData;
   category: string;
   isFeatured?: boolean;
@@ -17,6 +18,7 @@ interface TemplateCardProps {
 export default function Card({
   id,
   name,
+  description,
   thumbnail,
   isFeatured = false,
   previewUrl,
@@ -29,18 +31,13 @@ export default function Card({
 
   const handleMouseEnter = () => {
     setIsHovering(true);
-
-    if (!isVideoLoaded) {
-      setIsVideoLoading(true);
-    }
-
+    if (!isVideoLoaded) setIsVideoLoading(true);
     videoRef.current?.play().catch(() => {});
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
     setIsVideoLoading(false);
-
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -61,12 +58,12 @@ export default function Card({
       <div
         className={`group h-full rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer ${
           isFeatured
-            ? " bg-linear-to-br from-card to-card/80 border-primary"
-            : "border-border bg-card hover:border-primary/50 shadow-lg"
+            ? "bg-linear-to-br from-card to-card/80 border-primary hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.4)] hover:-translate-y-1"
+            : "border-border bg-card hover:border-primary/60 shadow-lg hover:shadow-primary/10 hover:shadow-xl hover:-translate-y-1"
         }`}
       >
         {/* Media */}
-        <div className="relative h-64 overflow-hidden bg-muted">
+        <div className="relative aspect-4/5 w-full overflow-hidden bg-muted">
 
           {/* Thumbnail */}
           {thumbnail && (
@@ -74,7 +71,7 @@ export default function Card({
               src={thumbnail}
               alt={name}
               fill
-              className={`object-cover transition-opacity duration-300 ${
+              className={`object-cover transition-all duration-500 group-hover:scale-105 ${
                 isHovering && isVideoLoaded ? "opacity-0" : "opacity-100"
               }`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -98,7 +95,7 @@ export default function Card({
           {/* Loader */}
           {isHovering && isVideoLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
-              <Loader2 className="h-8 w-8 animate-spin text-white" /> 
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
             </div>
           )}
 
@@ -113,22 +110,30 @@ export default function Card({
         </div>
 
         {/* Content */}
-        <div className={`space-y-4 ${isFeatured ? "p-8" : "p-6"}`}>
+        <div className={`space-y-3 ${isFeatured ? "p-8" : "p-5"}`}>
           <h3
-            className={`font-bold transition-colors group-hover:text-primary ${
+            className={`font-bold transition-colors duration-200 group-hover:text-primary ${
               isFeatured ? "text-2xl" : "text-lg"
             }`}
           >
             {name}
           </h3>
 
-          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+          {description && (
+            <p className={`text-muted-foreground leading-snug ${isFeatured ? "text-base" : "text-sm"}`}>
+              {description}
+            </p>
+          )}
+
+          {/* Explore button — always visible, animates on hover */}
+          <div className="pt-3 border-t border-border/50">
             <span
-              className={`font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity ${
+              className={`inline-flex items-center gap-1.5 font-semibold text-primary transition-all duration-200 ${
                 isFeatured ? "text-base" : "text-sm"
               }`}
             >
-              Explore →
+              Explore
+              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
             </span>
           </div>
         </div>

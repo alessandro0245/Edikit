@@ -1,172 +1,182 @@
-"use client";
-import { useRef, useState, useEffect } from "react";
-import Link from "next/link";
-import { Play, Loader2 } from "lucide-react";
-import Image from "next/image";
+'use client'
+
+import { useState, useRef, useEffect, type MouseEvent } from 'react'
+import { Template } from '@/utils/constant'
+import Link from 'next/link';
 
 interface TemplateCardProps {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  thumbnail: string;
-  previewUrl: string;
+  template: Template
 }
 
-const TemplateCard = ({
-  id,
-  name,
-  description,
-  category,
-  thumbnail,
-  previewUrl,
-}: TemplateCardProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+export default function TemplateCard({ template }: TemplateCardProps) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [isVideoLoading, setIsVideoLoading] = useState(false)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const [videoRequested, setVideoRequested] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const [videoError, setVideoError] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const previewUrl = (template as Template & { previewUrl?: string }).previewUrl
 
-  // Cleanup video on unmount
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.src = "";
-      }
-    };
-  }, []);
-
+  // Request video load on first hover
   const handleMouseEnter = () => {
-    setIsHovering(true);
+    setIsHovered(true)
 
-    const video = videoRef.current;
-    if (!video) return;
-
-    // If video hasn't been loaded yet, load it
-    if (!hasLoadedOnce) {
-      setIsVideoLoading(true);
-      video.src = previewUrl;
-      video.load();
-      setHasLoadedOnce(true);
-    } else if (isVideoLoaded) {
-      // Video already loaded, just play it
-      video.play().catch(() => {
-        // Handle autoplay errors silently
-      });
+    if (!videoRequested && videoRef.current) {
+      setVideoRequested(true)
+      setIsVideoLoading(true)
+      // ensure the video element has a source set for load()
+      try {
+        if (previewUrl) videoRef.current.src = previewUrl
+        videoRef.current.load()
+      } catch {}
     }
-  };
+  }
+
+  // Toggle play/pause when user clicks the video area.
+  // If the video wasn't requested yet, start loading it and set hover state.
+  const handleVideoClick = (e: MouseEvent<HTMLVideoElement>) => {
+    e.stopPropagation()
+    if (!videoRef.current) return
+
+    if (!videoRequested) {
+      setVideoRequested(true)
+      setIsVideoLoading(true)
+      setIsHovered(true)
+      // set src then load so browsers fetch the video
+      try {
+        if (previewUrl) videoRef.current.src = previewUrl
+        videoRef.current.load()
+      } catch {}
+      return
+    }
+
+    if (isVideoLoaded) {
+      try {
+        if (videoRef.current.paused) {
+          videoRef.current.play().catch(() => {})
+          setIsHovered(true)
+        } else {
+          videoRef.current.pause()
+          videoRef.current.currentTime = 0
+          setIsHovered(false)
+        }
+      } catch {}
+    }
+  }
 
   const handleMouseLeave = () => {
-    setIsHovering(false);
+    setIsHovered(false)
     if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+      videoRef.current.pause()
+      videoRef.current.currentTime = 0
     }
-  };
+  }
 
-  const handleVideoLoaded = () => {
-    setIsVideoLoaded(true);
-    setIsVideoLoading(false);
+  // Handle video ready to play
+  const handleVideoCanPlay = () => {
+    setIsVideoLoading(false)
+    setIsVideoLoaded(true)
 
-    // Auto-play if still hovering
-    if (isHovering && videoRef.current) {
+    // Auto-play when loaded
+    if (videoRef.current && isHovered) {
       videoRef.current.play().catch(() => {
-        // Handle autoplay errors
-      });
+        // Silently handle autoplay errors due to browser policies
+      })
     }
-  };
+  }
 
-  const handleVideoError = () => {
-    setIsVideoLoading(false);
-    setIsVideoLoaded(false);
-  };
+  // Play video when hover state changes to true and video is ready
+  useEffect(() => {
+    if (isHovered && isVideoLoaded && videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Silently handle autoplay errors
+      })
+    }
+  }, [isHovered, isVideoLoaded])
 
   return (
-    <div className="group block">
-      <div
-        className="relative overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+    <div
+      className="group relative aspect-2/3 w-full rounded-lg overflow-hidden bg-gray-100 transition-all duration-1000 hover:shadow-lg hover:-translate-y-3 cursor-pointer"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Static Thumbnail */}
+      {(!isVideoLoaded || !isHovered) && (
+        <img
+          src={imageError ? '/images/placeholder.svg' : template.thumbnail}
+          alt={template.name}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+            isHovered && isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          onError={() => setImageError(true)}
+        />
+      )}
+
+      {/* Video Preview */}
+      <video
+        ref={videoRef}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300  cursor-pointer ${
+          isHovered && isVideoLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        muted
+        loop
+        playsInline
+        onCanPlay={handleVideoCanPlay}
+        onError={() => {
+          setVideoError(true)
+          setIsVideoLoading(false)
+        }}
+        onClick={handleVideoClick}
       >
-        {/* Preview Container - Fixed Height */}
-        <div className="relative h-64 overflow-hidden bg-muted">
-          {/* Static Thumbnail */}
-          {!isHovering && !imageError && (
-            <Image
-              src={thumbnail}
-              alt={name}
-              fill
-              className="object-contain transition-opacity duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              onError={() => setImageError(true)}
-              priority={false}
-            />
-          )}
+        {previewUrl ? <source src={previewUrl} type="video/mp4" /> : null}
+      </video>
 
-          {/* Fallback if image fails */}
-          {imageError && !isHovering && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted">
-              <p className="text-sm text-muted-foreground">No preview</p>
-            </div>
-          )}
-
-          {/* Video (lazy loaded on first hover) */}
-          <video
-            ref={videoRef}
-            className={`h-full w-full object-cover transition-opacity duration-300 ${
-              isHovering && isVideoLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            loop
-            muted
-            playsInline
-            preload="none"
-            onLoadedData={handleVideoLoaded}
-            onError={handleVideoError}
-          />
-
-          {/* Play Icon Overlay */}
-          {!isHovering && !isVideoLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/90 backdrop-blur-sm transition-transform group-hover:scale-110">
-                <Play className="h-5 w-5 fill-primary-foreground text-primary-foreground ml-0.5" />
-              </div>
-            </div>
-          )}
-
-          {/* Loading indicator while video loads */}
-          {isHovering && isVideoLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-              <Loader2 className="h-8 w-8 animate-spin text-white" />
-            </div>
-          )}
+      {/* Loading Spinner */}
+      {isVideoLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
         </div>
+      )}
 
-        {/* Content */}
-        <div className="space-y-3 p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold leading-tight transition-colors group-hover:text-primary line-clamp-1">
-              {name}
-            </h3>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs whitespace-nowrap">
-              {category}
-            </span>
+      {/* Play Button - visible on static image */}
+      {(!isVideoLoaded || !isHovered) && !videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors duration-300">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center group-hover:bg-white transition-colors duration-300">
+            <svg
+              className="w-6 h-6 text-gray-900 ml-0.5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {description}
+        </div>
+      )}
+
+      {/* Content Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-4">
+        <div className="space-y-1">
+          <div className="text-xs font-medium text-primary uppercase tracking-wider">
+            {template.category}
+          </div>
+          <h3 className="text-foreground font-semibold text-sm group-hover:text-primary transition-colors duration-300">
+            {template.name}
+          </h3>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {template.description}
           </p>
-
-          {/* Button styled div */}
-            <Link href={`/customize/${id}`} className="group block">
-          <div className="w-full h-9 rounded-lg bg-primary-gradient text-primary-foreground font-medium text-sm flex items-center justify-center cursor-pointer">
-              Customize
-          </div>
-            </Link>
         </div>
       </div>
-    </div>
-  );
-};
 
-export default TemplateCard;
+      {/* Customize Button */}
+      <Link href={`/customize/${template.id}`}>
+        <button
+          className="absolute top-4 right-4 bg-primary hover:bg-primary/90 text-white px-3 py-1.5 rounded text-xs font-medium transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
+        >
+          Customize
+        </button>
+      </Link>
+    </div>
+  )
+}

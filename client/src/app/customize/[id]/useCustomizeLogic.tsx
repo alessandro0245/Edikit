@@ -26,6 +26,7 @@ interface CustomizePersistedState {
   formData: Record<string, string>;
   uploadedAssets: Record<string, string>;
   renderJob: RenderJob | null;
+  useBackgroundColor?: boolean;
 }
 
 const getCustomizeStorageKey = (templateId: number) =>
@@ -68,6 +69,7 @@ export const useCustomizeLogic = () => {
   const [imageError, setImageError] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [useBackgroundColor, setUseBackgroundColor] = useState(true);
 
   // Redirect if template not found
   useEffect(() => {
@@ -127,16 +129,19 @@ export const useCustomizeLogic = () => {
           setFormData(initialData);
           setUploadedAssets(parsedState.uploadedAssets ?? {});
           setRenderJob(parsedState.renderJob ?? null);
+          setUseBackgroundColor(parsedState.useBackgroundColor ?? true);
         } else {
           setFormData(initialData);
           setUploadedAssets({});
           setRenderJob(null);
+          setUseBackgroundColor(true);
         }
       } catch (error) {
         console.error("Failed to restore customize state:", error);
         setFormData(initialData);
         setUploadedAssets({});
         setRenderJob(null);
+        setUseBackgroundColor(true);
       }
 
       setFilePreviews({});
@@ -166,6 +171,7 @@ export const useCustomizeLogic = () => {
         formData: persistedFormData,
         uploadedAssets,
         renderJob,
+        useBackgroundColor,
       };
 
       window.localStorage.setItem(
@@ -175,7 +181,7 @@ export const useCustomizeLogic = () => {
     } catch (error) {
       console.error("Failed to persist customize state:", error);
     }
-  }, [formData, uploadedAssets, renderJob, template, templateId]);
+  }, [formData, uploadedAssets, renderJob, template, templateId, useBackgroundColor]);
 
   // Poll job status
   useEffect(() => {
@@ -671,6 +677,10 @@ export const useCustomizeLogic = () => {
     if (uploadingAssets.size > 0) return false;
 
     return Object.entries(template.fields).every(([key, field]) => {
+      if (key === "background") {
+        return true;
+      }
+
       if (field.required) {
         if (field.type === "image" || field.type === "video" || field.type === "media") {
           return !!uploadedAssets[key];
@@ -695,6 +705,10 @@ export const useCustomizeLogic = () => {
       const renderDto: any = {};
 
       Object.entries(template!.fields).forEach(([key, field]) => {
+        if (key === "background") {
+          return;
+        }
+
         if (field.type === "text") {
           const value = formData[key] as string;
           if (value) {
@@ -717,7 +731,10 @@ export const useCustomizeLogic = () => {
 
       const { data } = await api.post(
         `/render/create-job/${templateId}`,
-        renderDto,
+        {
+          ...renderDto,
+          useBackgroundColor,
+        },
         {
           withCredentials: true,
         },
@@ -746,8 +763,9 @@ export const useCustomizeLogic = () => {
       const downloadUrl = renderJob.outputUrl;
 
       await new Promise<void>((resolve, reject) => {
+        const ext = useBackgroundColor ? "mp4" : "mov";
         downloadVideo(downloadUrl, {
-          filename: `video-${timestamp}.mp4`,
+          filename: `video-${timestamp}.${ext}`,
           onProgress: (progress) => setDownloadProgress(progress),
           onSuccess: () => {
             setDownloadProgress(100);
@@ -799,6 +817,8 @@ export const useCustomizeLogic = () => {
     hasRequiredFields,
     handleGeneratePreview,
     handleDownload,
+    useBackgroundColor,
+    setUseBackgroundColor,
     imagePreviewReady,
     setImagePreviewReady,
     isRestoringState,

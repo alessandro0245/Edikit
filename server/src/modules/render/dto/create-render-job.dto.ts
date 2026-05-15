@@ -4,6 +4,7 @@ import {
   IsObject,
   ValidateNested,
   IsHexColor,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -153,4 +154,8 @@ export class CreateRenderJobDto {
   @ValidateNested()
   @Type(() => ColorCustomization)
   colors?: ColorCustomization;
+
+  @IsOptional()
+  @IsBoolean()
+  useBackgroundColor?: boolean;
 }
