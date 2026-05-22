@@ -1915,6 +1915,25 @@ export class RenderService {
     return job;
   }
 
+  async getUserRenderJobs(userId: string) {
+    return this.prisma.renderJob.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        templateId: true,
+        renderType: true,
+        status: true,
+        outputUrl: true,
+        nexrenderOutputUrl: true,
+        error: true,
+        promptText: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   /**
    * Handle render completion webhook
    */

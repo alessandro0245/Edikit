@@ -3,38 +3,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  Menu,
-  X,
-  LogOut,
-  ChevronDown,
-  Coins,
-  Settings,
-  Trash2,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, ChevronDown, Coins } from "lucide-react";
 import ToogleTheme from "../Theme/theme-toogle";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { getInitialsAvatar } from "@/utils/getInitialsAvatar";
-import { logoutUser } from "@/lib/auth";
-import { cancelSubscription } from "@/lib/payment";
-import type { AppDispatch } from "@/redux/store";
-import { showErrorToast, showSuccessToast } from "@/components/Toast/showToast";
 import CreditsDisplay from "./CreditsDisplay";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [minLoadingTime, setMinLoadingTime] = useState(true);
-  const [isCanceling, setIsCanceling] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector((state: RootState) => state.user.user);
   const isLoading = useSelector((state: RootState) => state.user.isLoading);
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
   const isFreePlan = user?.planType !== "FREE";
 
@@ -71,26 +57,9 @@ const Navbar = () => {
     };
   }, [isUserMenuOpen]);
 
-  const handleLogout = async () => {
-    await logoutUser(dispatch);
-    setIsUserMenuOpen(false);
-    showSuccessToast("Logged out successfully");
-    router.push("/");
-  };
-
-  const handleCancelPlan = async () => {
-    if (!user?.id && !user?.userId) return;
-    setIsCanceling(true);
-    try {
-      await cancelSubscription(user.userId || user.id, dispatch);
-      showSuccessToast("Plan cancelled and downgraded to Free");
-      setIsUserMenuOpen(false);
-    } catch {
-      showErrorToast("Could not cancel plan. Please try again.");
-    } finally {
-      setIsCanceling(false);
-    }
-  };
+  if (isDashboardRoute) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
@@ -169,75 +138,15 @@ const Navbar = () => {
                             <p className="text-xs text-muted-foreground truncate">
                               {user.email}
                             </p>
-                            <span
-                              className={`inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                                user.planType === "PRO"
-                                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                                  : user.planType === "BASIC"
-                                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                                    : user.planType === "STARTER"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                                      : user.planType === "CREATOR"
-                                        ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-                                        : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                              }`}
-                            >
-                              {user.planType} Plan
-                            </span>
                           </div>
 
-                          {/* Credits Link */}
                           <Link
-                            href="/credits"
+                            href="/dashboard"
                             onClick={() => setIsUserMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors border-b border-border/50"
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                           >
-                            <Coins size={16} />
-                            View Credits
+                            Dashboard
                           </Link>
-
-                          {/* Upgrade/Manage Plan Button */}
-                          <div className="">
-                            {user.planType === "FREE" ? (
-                              <Link
-                                href="/pricing"
-                                onClick={() => setIsUserMenuOpen(false)}
-                                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium  bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                              >
-                                Upgrade Plan
-                              </Link>
-                            ) : (
-                              <div className="flex flex-col ">
-                                <Link
-                                  href="/pricing"
-                                  onClick={() => setIsUserMenuOpen(false)}
-                                  className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium  border-b hover:bg-accent transition-colors"
-                                >
-                                  <Settings size={16} />
-                                  Manage Plan
-                                </Link>
-                                <button
-                                  onClick={handleCancelPlan}
-                                  disabled={isCanceling}
-                                  className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-                                >
-                                  <Trash2 size={16} />
-                                  {isCanceling
-                                    ? "Cancelling..."
-                                    : "Cancel Plan"}
-                                </button>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Logout Button */}
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors border-t border-border -mb-2 cursor-pointer"
-                          >
-                            <LogOut size={16} />
-                            Logout
-                          </button>
                         </div>
                       </div>
                     )}
@@ -314,74 +223,17 @@ const Navbar = () => {
                       </div>
                     )}
                     <div className="flex flex-col flex-1">
-                      <span className="text-sm font-medium">
-                        {user.fullName}
-                      </span>
-                      {/* Plan Badge */}
-                      <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full w-fit ${
-                          user.planType === "PRO"
-                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                            : user.planType === "BASIC"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                              : user.planType === "STARTER"
-                                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                                : user.planType === "CREATOR"
-                                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-                                  : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                        }`}
-                      >
-                        {user.planType}
-                      </span>
+                      <span className="text-sm font-medium">{user.fullName}</span>
                     </div>
                   </div>
 
-                  {/* Upgrade button for FREE users */}
-                  {user.planType === "FREE" && (
-                    <Link
-                      href="/pricing"
-                      onClick={() => setIsOpen(false)}
-                      className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-center"
-                    >
-                      Upgrade Plan
-                    </Link>
-                  )}
-
-                  {/* Manage Subscription for paid users */}
-                  {user.planType !== "FREE" && (
-                    <>
-                      <Link
-                        href="/pricing"
-                        onClick={() => setIsOpen(false)}
-                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-accent text-center flex items-center justify-center gap-2"
-                      >
-                        <Settings size={14} />
-                        Manage Plan
-                      </Link>
-                      <button
-                        onClick={() => {
-                          handleCancelPlan();
-                          setIsOpen(false);
-                        }}
-                        disabled={isCanceling}
-                        className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        <Trash2 size={14} />
-                        {isCanceling ? "Cancelling..." : "Cancel Plan"}
-                      </button>
-                    </>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                    className="flex items-center  justify-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="mx-4 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-center"
                   >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
+                    Dashboard
+                  </Link>
                 </>
               ) : (
                 <>

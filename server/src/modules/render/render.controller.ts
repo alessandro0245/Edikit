@@ -424,6 +424,17 @@ export class RenderController {
     return job;
   }
 
+  @Get('jobs')
+  @ApiOperation({ summary: 'Get current user render jobs' })
+  @ApiCookieAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Render jobs retrieved successfully',
+  })
+  async getJobs(@CurrentUser('userId') userId: string) {
+    return this.renderService.getUserRenderJobs(userId);
+  }
+
   @Public()
   @Post('webhook')
   @ApiOperation({ summary: 'Nexrender Cloud webhook handler' })
