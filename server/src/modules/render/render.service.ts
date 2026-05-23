@@ -2086,6 +2086,23 @@ export class RenderService {
     return job.outputUrl;
   }
 
+  async deleteRenderJob(jobId: string, userId: string) {
+    const job = await this.prisma.renderJob.findFirst({
+      where: { id: jobId, userId },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Render job not found');
+    }
+
+    await this.prisma.renderJob.delete({ where: { id: job.id } });
+
+    return {
+      message: 'Render job deleted successfully',
+      jobId: job.id,
+    };
+  }
+
   /**
    * Manually update layer mapping for a template
    */

@@ -435,6 +435,17 @@ export class RenderController {
     return this.renderService.getUserRenderJobs(userId);
   }
 
+  @Delete('job/:id')
+  @ApiOperation({ summary: 'Delete a render job' })
+  @ApiCookieAuth()
+  @ApiResponse({ status: 200, description: 'Render job deleted successfully' })
+  async deleteJob(
+    @Param('id') jobId: string,
+    @CurrentUser('userId') userId: string,
+  ) {
+    return this.renderService.deleteRenderJob(jobId, userId);
+  }
+
   @Public()
   @Post('webhook')
   @ApiOperation({ summary: 'Nexrender Cloud webhook handler' })

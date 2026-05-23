@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { showInfoToast, showErrorToast } from "@/components/Toast/showToast";
+import { downloadVideo } from "@/lib/videoDownload";
 
 interface VideoDownloadButtonProps {
   videoUrl?: string; // Optional if getDownloadUrl is provided
@@ -47,7 +48,6 @@ export default function VideoDownloadButton({
     setProgress(0);
 
     try {
-      // 1. Get URL if needed (This is the 4-5 second part)
       let url = initialVideoUrl;
       if (getDownloadUrl) {
         url = (await getDownloadUrl()) || "";
@@ -57,19 +57,17 @@ export default function VideoDownloadButton({
         throw new Error("Could not retrieve download link");
       }
 
-      // 2. Start Download — use direct navigation for S3 presigned URLs (avoids CORS)
-      //    XHR/fetch to S3 from a different origin gets blocked by browser CORS policy.
-      //    Direct anchor navigation bypasses CORS entirely.
       setState("downloading");
       setProgress(50);
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename || `video-${new Date().toISOString().slice(0, 10)}.mp4`;
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      await new Promise<void>((resolve, reject) => {
+        downloadVideo(url, {
+          filename: filename || `video-${new Date().toISOString().slice(0, 10)}.mp4`,
+          onProgress: (nextProgress) => setProgress(nextProgress),
+          onSuccess: () => resolve(),
+          onError: (message) => reject(new Error(message)),
+        });
+      });
 
       setState("finalizing");
       setProgress(100);
@@ -77,7 +75,7 @@ export default function VideoDownloadButton({
         setState("success");
         showInfoToast("Video downloaded successfully!");
         setTimeout(() => setState("idle"), 3000);
-      }, 800);
+      }, 400);
     } catch (error: unknown) {
       console.error("Download failed:", error);
       setState("error");
