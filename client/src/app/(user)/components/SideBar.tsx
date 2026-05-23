@@ -9,6 +9,7 @@ import {
   CreditCard,
   Zap,
   ChevronDown,
+  ChevronLeft,
   LogOut,
   Menu,
   X,
@@ -23,6 +24,7 @@ import Link from "next/link";
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
@@ -35,33 +37,36 @@ export default function Sidebar() {
 
   const tabs = [
     { id: "renders", label: "Renders", icon: FileText, href: "/dashboard" },
-    { id: "settings", label: "Settings", icon: Settings, href: "/dashboard/settings" },
-    { id: "plans", label: "Manage Plans", icon: CreditCard, href: "/dashboard/plans" },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/settings",
+    },
+    {
+      id: "plans",
+      label: "Manage Plans",
+      icon: CreditCard,
+      href: "/dashboard/plans",
+    },
     { id: "credits", label: "Credits", icon: Zap, href: "/dashboard/credits" },
   ];
 
-  // Close mobile menu when route changes
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    const t = setTimeout(() => setIsMobileMenuOpen(false), 0);
+    return () => clearTimeout(t);
   }, [pathname]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handle = (e: MouseEvent) => {
       if (
         userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
+        !userMenuRef.current.contains(e.target as Node)
+      )
         setIsUserMenuOpen(false);
-      }
     };
-
-    if (isUserMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (isUserMenuOpen) document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
   }, [isUserMenuOpen]);
 
   const handleLogout = async () => {
@@ -72,81 +77,166 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Bar */}
-      <div className="flex items-center justify-between border-b border-sidebar-border bg-primary/5 px-4 py-3 lg:hidden">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-background shadow-sm ring-1 ring-border/70">
+      {/* ── Mobile Top Bar ── */}
+      <div className="flex items-center justify-between border-b border-white/10 bg-[#0d1117] px-4 py-3 lg:hidden">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="flex size-8 items-center justify-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10">
             <Image
               src="/logo.png"
               alt="Edikit"
-              width={32}
-              height={32}
-              className="h-6 w-auto object-contain"
+              width={28}
+              height={28}
+              className="h-5 w-auto object-contain"
               priority
             />
           </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">
-            Edikit
-          </span>
+          <span className="text-base font-semibold text-white">Edikit</span>
         </Link>
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="rounded-md p-2 text-sidebar-foreground hover:bg-sidebar-accent"
+          className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/5 hover:text-white"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="size-5" />
         </button>
       </div>
 
-      {/* Mobile Overlay */}
+      {/* ── Mobile Overlay ── */}
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar Content */}
+      {/* ── Sidebar Panel ── */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col overflow-hidden border-r border-sidebar-border bg-primary/10 transition-transform duration-300 ease-in-out lg:static lg:w-full lg:max-w-sm lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col overflow-x-hidden border-r border-white/[0.07] bg-linear-to-b from-[#0d1117] to-[#090d13] transition-[width,transform] duration-300 ease-in-out lg:static lg:translate-x-0 ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } ${isCollapsed ? "lg:w-16" : "lg:w-52"} w-64`}
       >
-        <div className="flex items-center justify-between border-b border-sidebar-border px-5 py-5 lg:block">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-background shadow-sm ring-1 ring-border/70">
-              <Link href={"/"}>
-                <Image
-                  src="/logo.png"
-                  alt="Edikit"
-                  width={40}
-                  height={40}
-                  className="h-8 w-auto object-contain"
-                  priority
-                />
+        {/* ── Header ── */}
+        <div className="flex h-14 shrink-0 items-center border-b border-white/[0.07] px-3">
+          {/* Logo — desktop */}
+          <div className="hidden shrink-0 lg:block">
+            {isCollapsed ? (
+              <button
+                onClick={() => setIsCollapsed((v) => !v)}
+                title="Expand sidebar"
+                className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-white/12 bg-white/5 text-white/40 transition-all duration-200 hover:border-primary/50 hover:bg-primary/15 hover:text-primary active:scale-95"
+              >
+                <ChevronLeft className="size-4 rotate-180" />
+              </button>
+            ) : (
+              <Link href="/">
+                <div className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10 transition-all duration-200 hover:ring-white/20">
+                  <Image
+                    src="/logo.png"
+                    alt="Edikit"
+                    width={32}
+                    height={32}
+                    className="h-6 w-auto object-contain"
+                    priority
+                  />
+                </div>
               </Link>
-            </div>
-            <div className="min-w-0">
-              <h1 className="truncate text-xl font-semibold text-sidebar-foreground">
-                Edikit
-              </h1>
-              <p className="text-xs text-sidebar-foreground/70">User dashboard</p>
-            </div>
+            )}
           </div>
+
+          {/* Logo — mobile only */}
+          <Link href="/" className="shrink-0 lg:hidden">
+            <div className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10 cursor-pointer">
+              <Image
+                src="/logo.png"
+                alt="Edikit"
+                width={32}
+                height={32}
+                className="h-6 w-auto object-contain"
+                priority
+              />
+            </div>
+          </Link>
+
+          {/* Wordmark */}
+          <span
+            className={`ml-2.5 flex-1 overflow-hidden whitespace-nowrap text-[15px] font-semibold text-white transition-opacity duration-200 ${
+              isCollapsed ? "lg:opacity-0 lg:hidden" : "opacity-100 delay-100"
+            }`}
+          >
+            Edikit
+          </span>
+
+          {/* Collapse toggle — right side, desktop only */}
+          {!isCollapsed && (
+            <button
+              onClick={() => setIsCollapsed((v) => !v)}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="hidden size-6 shrink-0 items-center justify-center rounded-md text-white/30 transition-all duration-200 hover:bg-white/5 hover:text-white/60 lg:flex cursor-pointer"
+            >
+              <ChevronLeft
+                className={`size-3.5 transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`}
+              />
+            </button>
+          )}
+          {/* Mobile close */}
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="rounded-md p-2 text-sidebar-foreground hover:bg-sidebar-accent lg:hidden"
+            className="flex size-7 items-center justify-center rounded-lg text-white/50 hover:bg-white/5 lg:hidden"
           >
-            <X className="h-5 w-5" />
+            <X className="size-5" />
           </button>
         </div>
 
-        <div className="border-b border-sidebar-border px-5 py-4">
-          <p className="text-sm text-sidebar-foreground/80">
-            Welcome, <span className="font-semibold text-sidebar-foreground">{username}</span>
-          </p>
+        {/* ── Welcome ── */}
+        <div className="shrink-0 border-b border-white/[0.07]">
+          {/* Collapsed desktop — hand icon + hover tooltip */}
+          <div
+            className={`group relative items-center justify-center py-3 ${
+              isCollapsed ? "hidden lg:flex" : "hidden"
+            }`}
+          >
+            <Image
+              src="/hand.svg"
+              alt="wave"
+              width={20}
+              height={20}
+              className="animate-wave cursor-default"
+              unoptimized
+            />
+            {/* Tooltip */}
+            <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 translate-x-1 scale-95 whitespace-nowrap rounded-xl border border-white/10 bg-[#111827] px-3.5 py-2.5 opacity-0 shadow-2xl transition-all duration-200 group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100">
+              <p className="text-[10px] uppercase tracking-widest text-white/40">
+                Welcome back
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-white">
+                {username}
+              </p>
+              <span className="absolute left-0 top-1/2 size-2.5 -translate-x-1.25 -translate-y-1/2 rotate-45 border-b border-l border-white/10 bg-[#111827]" />
+            </div>
+          </div>
+
+          {/* Expanded — full welcome row */}
+          <div
+            className={`flex items-center gap-2 px-4 py-3 transition-opacity duration-150 ${
+              isCollapsed ? "lg:hidden" : "opacity-100"
+            }`}
+          >
+            <Image
+              src="/hand.svg"
+              alt="wave"
+              width={17}
+              height={17}
+              className="animate-wave shrink-0"
+              unoptimized
+            />
+            <p className="overflow-hidden whitespace-nowrap text-xs text-white/50">
+              Welcome,{" "}
+              <span className="font-semibold text-white/80">{username}</span>
+            </p>
+          </div>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        {/* ── Navigation ── */}
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = pathname === tab.href;
@@ -154,59 +244,99 @@ export default function Sidebar() {
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition-colors ${
+                title={isCollapsed ? tab.label : undefined}
+                className={`group relative flex w-full items-center rounded-lg py-2.5 transition-all duration-200 ${
+                  isCollapsed ? "lg:justify-center lg:px-0" : "gap-3 px-3"
+                } ${
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:bg-opacity-50"
+                    ? "bg-primary/15 text-primary"
+                    : "text-white/50 hover:bg-white/5 hover:text-white/90"
                 }`}
               >
-                <Icon className="shrink-0 h-5 w-5" />
-                <span className="text-sm font-medium">{tab.label}</span>
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+                )}
+
+                <Icon
+                  className={`size-4 shrink-0 ${isActive ? "text-primary" : ""}`}
+                />
+
+                <span
+                  className={`whitespace-nowrap text-sm font-medium transition-opacity duration-150 ${
+                    isCollapsed
+                      ? "lg:opacity-0 lg:hidden"
+                      : "opacity-100 delay-100"
+                  }`}
+                >
+                  {tab.label}
+                </span>
               </Link>
             );
           })}
         </nav>
 
-        {/* User Profile Section */}
-        <div className="relative mt-auto border-t border-sidebar-border px-4 py-4" ref={userMenuRef}>
+        {/* ── Divider ── */}
+        <div className="mx-3 h-px shrink-0 bg-white/[0.07]" />
+
+        {/* ── User Profile ── */}
+        <div className="relative shrink-0 px-2 py-3" ref={userMenuRef}>
           <button
             type="button"
-            onClick={() => setIsUserMenuOpen((value) => !value)}
-            className="flex w-full items-center gap-3 rounded-xl border border-sidebar-border bg-card px-3 py-2.5 transition-colors hover:bg-accent"
+            onClick={() => setIsUserMenuOpen((v) => !v)}
+            title={isCollapsed ? username : undefined}
+            className={`flex w-full items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.03] px-2.5 py-2 transition-all duration-200 hover:border-white/10 hover:bg-white/[0.06] ${
+              isCollapsed ? "lg:justify-center lg:px-2" : ""
+            }`}
           >
-            <div className="shrink-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-background ring-1 ring-border/60">
+            <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/20">
               {user?.avatar?.startsWith("http") ? (
                 <Image
                   src={user.avatar}
                   alt={user.fullName}
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-full object-cover"
+                  width={28}
+                  height={28}
+                  className="size-7 rounded-full object-cover"
                 />
               ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-xs font-bold text-white">
+                <div className="flex size-7 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
                   {userAvatarValue}
                 </div>
               )}
             </div>
-            <span className="flex-1 truncate text-left text-sm font-medium text-sidebar-foreground">
+
+            <span
+              className={`flex-1 overflow-hidden whitespace-nowrap text-left text-xs font-medium text-white/60 transition-opacity duration-150 ${
+                isCollapsed ? "lg:hidden lg:opacity-0" : "opacity-100 delay-100"
+              }`}
+            >
               {username}
             </span>
-            <ChevronDown className="h-4 w-4 shrink-0 text-sidebar-foreground/80" />
+
+            <ChevronDown
+              className={`size-3.5 shrink-0 text-white/30 transition-all duration-200 ${
+                isCollapsed ? "lg:hidden lg:opacity-0" : "opacity-100 delay-100"
+              } ${isUserMenuOpen ? "rotate-180" : ""}`}
+            />
           </button>
 
-          {isUserMenuOpen ? (
-            <div className="absolute bottom-16 left-4 right-4 rounded-xl border border-sidebar-border bg-card p-2 shadow-lg">
+          {isUserMenuOpen && (
+            <div
+              className={`absolute z-10 rounded-xl border border-white/[0.07] bg-[#111827] p-1.5 shadow-2xl ${
+                isCollapsed
+                  ? "bottom-14 left-full ml-2 w-40"
+                  : "bottom-14 left-2 right-2"
+              }`}
+            >
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-lg bg-red-500/80 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-red-500/60"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="size-4" />
                 Logout
               </button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </>

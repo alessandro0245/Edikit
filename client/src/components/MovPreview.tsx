@@ -17,11 +17,14 @@ function toMp4PreviewUrl(url: string): string | null {
 
 function Fallback({ className }: { className: string }) {
   return (
-    <div className={`flex flex-col items-center justify-center gap-3 bg-black/20 ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center gap-3 bg-black/20 ${className}`}
+    >
       <Film className="w-8 h-8 text-white/50" />
       <p className="text-xs text-white/60 text-center px-4">
         MOV preview not available in browser.
-        <br />Download to view.
+        <br />
+        Download to view.
       </p>
     </div>
   );
