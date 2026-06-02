@@ -2,23 +2,33 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
-import { CreditCard, AlertCircle, ArrowRight, Zap } from "lucide-react";
+import { CreditCard,  Zap } from "lucide-react";
 import { plans } from "@/utils/constant";
 import { handlePayment, cancelSubscription } from "@/lib/payment";
 import { useState } from "react";
-import { showSuccessToast, showErrorToast } from "@/components/Toast/showToast";
+import { showSuccessToast } from "@/components/Toast/showToast";
 
 export default function ManagePlansPage() {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch<AppDispatch>();
-  const [isCancelling, setIsCancelling] = useState(false);
   const currentPlanType = user?.planType || "FREE";
-  
+  const [isCanceling, setIsCanceling] = useState(false);
+    
   // Try to find the detailed plan info from constant, if not FREE
   const activePlanDetails = plans.find(p => p.planType.toUpperCase() === currentPlanType.toUpperCase());
 
-  
-
+  const handleCancelPlan = async () => {
+    if (!user?.id && !user?.userId) return;
+    setIsCanceling(true);
+    try {
+      await cancelSubscription(user.userId || user.id, dispatch);
+      showSuccessToast("Plan cancelled and downgraded to Free");
+    } catch(error) {
+      console.log(error);
+    } finally {
+      setIsCanceling(false);
+    }
+  };
   const currentPlanIndex = plans.findIndex(p => p.planType.toUpperCase() === currentPlanType.toUpperCase());
 
   return (
@@ -69,11 +79,11 @@ export default function ManagePlansPage() {
               {currentPlanType.toUpperCase() !== "FREE" && (
                 <div className="flex shrink-0">
                   <button
-                    
-                    disabled={isCancelling}
+                    onClick={handleCancelPlan}
+                    disabled={isCanceling}
                     className="px-5 py-2.5 bg-background border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                   >
-                    {isCancelling ? "Cancelling..." : "Cancel Subscription"}
+                    {isCanceling ? "Cancelling..." : "Cancel Subscription"}
                   </button>
                 </div>
               )}
