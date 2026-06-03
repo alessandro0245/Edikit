@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import MovPreview from "@/components/MovPreview";
 import VideoDownloadButton from "@/components/Video/VideoDownloadButton";
 import { useDashboardJobs } from "./useDashboardJobs";
 import type { DashboardJob } from "./useDashboardJobs";
@@ -61,13 +62,16 @@ const getJobIcon = (job: DashboardJob) => {
   );
 };
 
-const formatFileName = (title: string) =>
+const isMovUrl = (url: string | null | undefined) =>
+  Boolean(url?.toLowerCase().includes(".mov"));
+
+const formatFileName = (title: string, outputUrl?: string | null) =>
   `${
     title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "video"
-  }.mp4`;
+  }.${isMovUrl(outputUrl) ? "mov" : "mp4"}`;
 
 const JobsSkeleton = () => (
   <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
@@ -476,12 +480,19 @@ export default function DashboardJobsPage() {
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
                 {previewJob.outputUrl ? (
-                  <video
-                    src={previewJob.outputUrl}
-                    controls
-                    autoPlay
-                    className="h-full w-full max-h-[70vh] object-contain"
-                  />
+                  isMovUrl(previewJob.outputUrl) ? (
+                    <MovPreview
+                      src={previewJob.outputUrl}
+                      className="h-full w-full max-h-[70vh] object-contain"
+                    />
+                  ) : (
+                    <video
+                      src={previewJob.outputUrl}
+                      controls
+                      autoPlay
+                      className="h-full w-full max-h-[70vh] object-contain"
+                    />
+                  )
                 ) : (
                   <div className="flex min-h-80 items-center justify-center text-sm text-muted-foreground">
                     Preview unavailable
@@ -508,7 +519,7 @@ export default function DashboardJobsPage() {
                 {previewJob.outputUrl && (
                   <VideoDownloadButton
                     videoUrl={previewJob.outputUrl}
-                    filename={formatFileName(previewJob.title)}
+                    filename={formatFileName(previewJob.title, previewJob.outputUrl)}
                   />
                 )}
 
