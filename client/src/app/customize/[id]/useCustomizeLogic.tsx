@@ -181,7 +181,14 @@ export const useCustomizeLogic = () => {
     } catch (error) {
       console.error("Failed to persist customize state:", error);
     }
-  }, [formData, uploadedAssets, renderJob, template, templateId, useBackgroundColor]);
+  }, [
+    formData,
+    uploadedAssets,
+    renderJob,
+    template,
+    templateId,
+    useBackgroundColor,
+  ]);
 
   // Poll job status
   useEffect(() => {
@@ -399,6 +406,67 @@ export const useCustomizeLogic = () => {
     });
   };
 
+  const resizeAndStretchImage = (
+    file: File,
+    targetWidth: number,
+    targetHeight: number,
+  ): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Could not get canvas context"));
+            return;
+          }
+
+          // ── Step 1: Fill entire canvas with black ──
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+          // ── Step 2: Scale image to fit inside (contain), centered ──
+          const zoomFactor = 1.2;
+
+          const scale =
+            Math.min(targetWidth / img.width, targetHeight / img.height) *
+            zoomFactor;
+
+          const drawW = img.width * scale;
+          const drawH = img.height * scale;
+          const drawX = (targetWidth - drawW) / 2;
+          const drawY = (targetHeight - drawH) / 2;
+
+          ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const resizedFile = new File([blob], file.name, {
+                  type: file.type || "image/png",
+                  lastModified: Date.now(),
+                });
+                resolve(resizedFile);
+              } else {
+                reject(new Error("Canvas toBlob returned null"));
+              }
+            },
+            file.type || "image/png",
+            1.0,
+          );
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (
     fieldKey: string,
     file: File | null,
@@ -406,7 +474,9 @@ export const useCustomizeLogic = () => {
   ) => {
     if (!file) return;
 
-    if (file.type.startsWith("image/")) {
+    let processedFile = file;
+
+    if (processedFile.type.startsWith("image/")) {
       // Get the field to check if it has required dimensions
       const field = template?.fields[fieldKey];
       if (field && field.dimensions) {
@@ -424,26 +494,33 @@ export const useCustomizeLogic = () => {
           if (minWidth && minHeight && maxWidth && maxHeight) {
             try {
               const result = await validateImageDimensionsRange(
-                file,
+                processedFile,
                 minWidth,
                 minHeight,
                 maxWidth,
                 maxHeight,
               );
               if (!result.isValid) {
-                showErrorToast(
-                  `❌ Invalid dimensions! Required: ${field.dimensions} (Got: ${result.actualWidth}x${result.actualHeight})`,
-                );
-                // Clear the file input so user can try again
-                if (inputElement) {
-                  inputElement.value = "";
+                showInfoToast("Auto-resizing image to fit dimensions...");
+                try {
+                  processedFile = await resizeAndStretchImage(
+                    processedFile,
+                    maxWidth,
+                    maxHeight,
+                  );
+                } catch (resizeErr) {
+                  console.error("Auto-resize failed", resizeErr);
+                  showErrorToast("Failed to resize image automatically");
+                  if (inputElement) {
+                    inputElement.value = "";
+                  }
+                  setImagePreviewReady((prev) => {
+                    const next = { ...prev };
+                    delete next[fieldKey];
+                    return next;
+                  });
+                  return;
                 }
-                setImagePreviewReady((prev) => {
-                  const next = { ...prev };
-                  delete next[fieldKey];
-                  return next;
-                });
-                return;
               }
             } catch (error) {
               console.error("Image range validation failed", error);
@@ -468,24 +545,33 @@ export const useCustomizeLogic = () => {
           if (width && height) {
             try {
               const isValid = await validateImageDimensions(
-                file,
+                processedFile,
                 width,
                 height,
               );
               if (!isValid) {
-                showErrorToast(
-                  `❌ Invalid dimensions! Required: ${field.dimensions}`,
+                showInfoToast(
+                  `Auto-resizing image to target ${field.dimensions}...`,
                 );
-                // Clear the file input so user can try again
-                if (inputElement) {
-                  inputElement.value = "";
+                try {
+                  processedFile = await resizeAndStretchImage(
+                    processedFile,
+                    width,
+                    height,
+                  );
+                } catch (resizeErr) {
+                  console.error("Auto-resize failed", resizeErr);
+                  showErrorToast("Failed to resize image automatically");
+                  if (inputElement) {
+                    inputElement.value = "";
+                  }
+                  setImagePreviewReady((prev) => {
+                    const next = { ...prev };
+                    delete next[fieldKey];
+                    return next;
+                  });
+                  return;
                 }
-                setImagePreviewReady((prev) => {
-                  const next = { ...prev };
-                  delete next[fieldKey];
-                  return next;
-                });
-                return; // Stop upload if dimensions don't match
               }
             } catch (error) {
               console.error("Image validation failed", error);
@@ -517,8 +603,8 @@ export const useCustomizeLogic = () => {
           [fieldKey]: reader.result as string,
         }));
       };
-      reader.readAsDataURL(file);
-    } else if (file.type.startsWith("video/")) {
+      reader.readAsDataURL(processedFile);
+    } else if (processedFile.type.startsWith("video/")) {
       // Get the field to check if it has required dimensions
       const field = template?.fields[fieldKey];
       if (field && field.dimensions) {
@@ -529,7 +615,11 @@ export const useCustomizeLogic = () => {
 
         if (width && height) {
           try {
-            const isValid = await validateVideoDimensions(file, width, height);
+            const isValid = await validateVideoDimensions(
+              processedFile,
+              width,
+              height,
+            );
             if (!isValid) {
               showErrorToast(
                 `❌ Invalid video dimensions! Required: ${field.dimensions}`,
@@ -552,12 +642,12 @@ export const useCustomizeLogic = () => {
         }
       }
 
-      const videoUrl = URL.createObjectURL(file);
+      const videoUrl = URL.createObjectURL(processedFile);
       setFilePreviews((prev) => ({ ...prev, [fieldKey]: videoUrl }));
     }
 
-    setFormData((prev) => ({ ...prev, [fieldKey]: file }));
-    await uploadSingleAsset(fieldKey, file);
+    setFormData((prev) => ({ ...prev, [fieldKey]: processedFile }));
+    await uploadSingleAsset(fieldKey, processedFile);
   };
 
   const uploadSingleAsset = async (fieldKey: string, file: File) => {
@@ -682,7 +772,11 @@ export const useCustomizeLogic = () => {
       }
 
       if (field.required) {
-        if (field.type === "image" || field.type === "video" || field.type === "media") {
+        if (
+          field.type === "image" ||
+          field.type === "video" ||
+          field.type === "media"
+        ) {
           return !!uploadedAssets[key];
         }
         const value = formData[key];

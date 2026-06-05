@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Mail, Lock, User, LoaderCircle, Check, X } from "lucide-react";
 import Image from "next/image";
 import { GoogleIcon } from "@/components/Overlay/Svg";
-import { signupUser, handleGoogleLogin} from "@/lib/auth";
+import { signupUser, handleGoogleLogin } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "@/components/Toast/showToast";
 import { useDispatch } from "react-redux";
@@ -36,6 +36,8 @@ const signupSchema = z.object({
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
+
+
 // Password validation criteria
 const passwordCriteria = [
   { label: "At least 8 characters", test: (pwd: string) => pwd.length >= 8 },
@@ -62,7 +64,7 @@ export default function SignUpPage() {
   const handleFieldChange = (field: keyof SignupFormData, value: string) => {
     setFormData({ ...formData, [field]: value });
     setTouched({ ...touched, [field]: true });
-    
+
     // Clear error for this field
     if (errors[field]) {
       setErrors({ ...errors, [field]: undefined });
@@ -112,30 +114,28 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto">
-          <div className="p-8 rounded-lg border border-border bg-card">
-            {/* Header */}
-            <div className="text-center space-y-5 mb-8">
-              <div className="w-30 h-12 rounded-lg flex items-center justify-center mx-auto">
-                <Image src="/logo.png" alt="Logo" width={120} height={50} />
+    <div className="min-h-screen bg-background flex flex-col justify-center items-center py-6 sm:py-12">
+      <main className="container mx-auto px-4 w-full">
+        <div className="max-w-md mx-auto w-full">
+          <div className="p-6 sm:p-8 rounded-xl border border-border bg-card shadow-sm">
+            {/* Header - Tightened spacing */}
+            <div className="text-center space-y-2 mb-6">
+              <div className="h-10 flex items-center justify-center mx-auto mb-2">
+                <Image src="/logo.png" alt="Logo" width={100} height={40} className="object-contain" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 Create your account
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Start creating stunning motion graphics today
               </p>
             </div>
 
             {/* Sign Up Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="name"
-                  className="text-sm font-medium text-foreground"
-                >
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              {/* Full Name */}
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-xs font-medium text-foreground">
                   Full Name
                 </label>
                 <div className="relative">
@@ -146,23 +146,19 @@ export default function SignUpPage() {
                     placeholder="John Doe"
                     value={formData.fullName}
                     onChange={(e) => handleFieldChange("fullName", e.target.value)}
-                    className={`w-full h-10 pl-10 pr-3 rounded-lg border ${
-                      errors.fullName ? "border-red-500" : "border-border"
-                    } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
-                      errors.fullName ? "focus:ring-red-500" : "focus:ring-ring"
-                    }`}
+                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.fullName ? "border-red-500" : "border-border"
+                      } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.fullName ? "focus:ring-red-500" : "focus:ring-ring"
+                      }`}
                   />
                 </div>
                 {errors.fullName && (
-                  <p className="text-xs text-red-500">{errors.fullName}</p>
+                  <p className="text-[11px] text-red-500">{errors.fullName}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium text-foreground"
-                >
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="text-xs font-medium text-foreground">
                   Email
                 </label>
                 <div className="relative">
@@ -173,23 +169,19 @@ export default function SignUpPage() {
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
-                    className={`w-full h-10 pl-10 pr-3 rounded-lg border ${
-                      errors.email ? "border-red-500" : "border-border"
-                    } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
-                      errors.email ? "focus:ring-red-500" : "focus:ring-ring"
-                    }`}
+                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.email ? "border-red-500" : "border-border"
+                      } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.email ? "focus:ring-red-500" : "focus:ring-ring"
+                      }`}
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-xs text-red-500">{errors.email}</p>
+                  <p className="text-[11px] text-red-500">{errors.email}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium text-foreground"
-                >
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="text-xs font-medium text-foreground">
                   Password
                 </label>
                 <div className="relative">
@@ -200,30 +192,28 @@ export default function SignUpPage() {
                     placeholder="Create a strong password"
                     value={formData.password}
                     onChange={(e) => handleFieldChange("password", e.target.value)}
-                    className={`w-full h-10 pl-10 pr-3 rounded-lg border ${
-                      errors.password ? "border-red-500" : "border-border"
-                    } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
-                      errors.password ? "focus:ring-red-500" : "focus:ring-ring"
-                    }`}
+                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.password ? "border-red-500" : "border-border"
+                      } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.password ? "focus:ring-red-500" : "focus:ring-ring"
+                      }`}
                   />
                 </div>
-                
-                {/* Password Requirements */}
-                <div className="space-y-1 mt-2">
+
+                {/* Password Requirements - Made inline/grid to save vertical space */}
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1.5">
                   {passwordCriteria.map((criterion, index) => {
                     const isValid = criterion.test(formData.password);
                     const showCheck = formData.password.length > 0;
-                    
+
                     return (
-                      <div key={index} className="flex items-center gap-2 text-xs">
+                      <div key={index} className="flex items-center gap-1.5 text-[11px]">
                         {showCheck ? (
                           isValid ? (
-                            <Check className="w-4 h-4 text-green-500" />
+                            <Check className="w-3.5 h-3.5 text-green-500" />
                           ) : (
-                            <X className="w-4 h-4 text-red-500" />
+                            <X className="w-3.5 h-3.5 text-red-500" />
                           )
                         ) : (
-                          <div className="w-4 h-4 rounded-full border border-muted-foreground" />
+                          <div className="w-3.5 h-3.5 rounded-full border border-muted-foreground/50" />
                         )}
                         <span className={showCheck && isValid ? "text-green-500" : "text-muted-foreground"}>
                           {criterion.label}
@@ -234,12 +224,13 @@ export default function SignUpPage() {
                 </div>
 
                 {errors.password && (
-                  <p className="text-xs text-red-500 mt-2">{errors.password}</p>
+                  <p className="text-[11px] text-red-500 mt-1">{errors.password}</p>
                 )}
               </div>
 
-              <div className="pt-2">
-                <p className="text-sm text-muted-foreground leading-relaxed">
+              {/* Terms */}
+              <div className="pt-1">
+                <p className="text-xs text-muted-foreground leading-normal">
                   By creating an account, you agree to our{" "}
                   <Link href="#" className="text-primary hover:underline">
                     Terms of Service
@@ -251,15 +242,16 @@ export default function SignUpPage() {
                 </p>
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 rounded-lg bg-primary-gradient text-primary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-10 px-4 rounded-lg bg-primary-gradient text-primary-foreground text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 transition-opacity"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
-                    Creating Account...
-                    <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-foreground" />
+                    <LoaderCircle className="animate-spin h-4 w-4 text-primary-foreground" />
+                    {/* Creating Account... */}
                   </div>
                 ) : (
                   "Create Account"
@@ -268,31 +260,31 @@ export default function SignUpPage() {
             </form>
 
             {/* Divider */}
-            <div className="relative my-6">
+            <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-card px-2 text-muted-foreground">
+              <div className="relative flex justify-center text-[11px]">
+                <span className="bg-card px-2 text-muted-foreground uppercase tracking-wider">
                   Or continue with
                 </span>
               </div>
             </div>
 
             {/* Social Sign Up */}
-            <div className="space-y-3">
+            <div>
               <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-border bg-background text-foreground font-medium hover:bg-accent transition-colors"
+                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors"
               >
-                <GoogleIcon size={20} />
+                <GoogleIcon size={18} />
                 Continue with Google
               </button>
             </div>
 
             {/* Login Link */}
-            <p className="text-center text-sm text-muted-foreground mt-6">
+            <p className="text-center text-xs text-muted-foreground mt-4">
               Already have an account?{" "}
               <Link
                 href="/login"
@@ -305,5 +297,5 @@ export default function SignUpPage() {
         </div>
       </main>
     </div>
-  );
+ );
 }
