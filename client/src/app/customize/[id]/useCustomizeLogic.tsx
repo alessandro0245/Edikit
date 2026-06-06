@@ -9,6 +9,7 @@ import {
   showErrorToast,
   showSuccessToast,
 } from "@/components/Toast/showToast";
+import { resizeVideo } from "@/utils/videoResize";
 
 interface FormDataState {
   [key: string]: string | File | null;
@@ -70,6 +71,9 @@ export const useCustomizeLogic = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
+  const [videoResizeProgress, setVideoResizeProgress] = useState<{
+    [key: string]: number;
+  }>({});
 
   // Redirect if template not found
   useEffect(() => {
@@ -621,14 +625,33 @@ export const useCustomizeLogic = () => {
               height,
             );
             if (!isValid) {
-              showErrorToast(
-                `❌ Invalid video dimensions! Required: ${field.dimensions}`,
-              );
-              // Clear the file input so user can try again
-              if (inputElement) {
-                inputElement.value = "";
+              showInfoToast("Auto-resizing video using FFmpeg...");
+              try {
+                processedFile = await resizeVideo(
+                  processedFile,
+                  width,
+                  height,
+                  (progress) => {
+                    setVideoResizeProgress((prev) => ({
+                      ...prev,
+                      [fieldKey]: progress,
+                    }));
+                  },
+                );
+              } catch (resizeErr) {
+                console.error("Video auto-resize failed", resizeErr);
+                showErrorToast("Failed to resize video automatically");
+                if (inputElement) {
+                  inputElement.value = "";
+                }
+                return;
+              } finally {
+                setVideoResizeProgress((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
               }
-              return; // Stop upload if dimensions don't match
             }
           } catch (error) {
             console.error("Video validation failed", error);
@@ -920,6 +943,7 @@ export const useCustomizeLogic = () => {
     setUploadedAssets,
     setFormData,
     setUploadingAssets,
+    videoResizeProgress,
   } as const;
 };
 

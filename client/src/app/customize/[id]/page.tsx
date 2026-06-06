@@ -50,6 +50,7 @@ const CustomizePage = () => {
     setUseBackgroundColor,
     imagePreviewReady,
     setImagePreviewReady,
+    videoResizeProgress,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -261,7 +262,17 @@ const CustomizePage = () => {
                         id={`upload-${fieldKey}`}
                       />
 
-                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
+                      {videoResizeProgress[fieldKey] !== undefined ? (
+                        <div className="flex flex-col items-center justify-center py-6">
+                          <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                          <p className="text-sm font-medium text-foreground">
+                            Resizing video... {videoResizeProgress[fieldKey]}%
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Optimizing and cropping to {field.dimensions}
+                          </p>
+                        </div>
+                      ) : filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
                         <div className="space-y-3">
                           <div className="relative">
                             <video
@@ -334,7 +345,17 @@ const CustomizePage = () => {
                         id={`upload-${fieldKey}`}
                       />
 
-                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
+                      {videoResizeProgress[fieldKey] !== undefined ? (
+                        <div className="flex flex-col items-center justify-center py-6">
+                          <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                          <p className="text-sm font-medium text-foreground">
+                            Resizing video... {videoResizeProgress[fieldKey]}%
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Optimizing and cropping to {field.dimensions}
+                          </p>
+                        </div>
+                      ) : filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
                         <div className="space-y-3">
                           <div className="relative">
                             {(formData[fieldKey] as File)?.type?.startsWith("video/") ||
