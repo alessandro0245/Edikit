@@ -625,7 +625,7 @@ export const useCustomizeLogic = () => {
               height,
             );
             if (!isValid) {
-              showInfoToast("Auto-resizing video using FFmpeg...");
+              showInfoToast("Resizing video to fit template dimensions...");
               try {
                 processedFile = await resizeVideo(
                   processedFile,

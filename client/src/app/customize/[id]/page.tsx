@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   ArrowLeft,
   Upload,
@@ -48,7 +48,6 @@ const CustomizePage = () => {
     handleDownload,
     useBackgroundColor,
     setUseBackgroundColor,
-    imagePreviewReady,
     setImagePreviewReady,
     videoResizeProgress,
   } = useCustomizeLogic();
@@ -69,7 +68,9 @@ const CustomizePage = () => {
             <div className="flex items-center gap-3">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
               <div>
-                <p className="font-medium text-foreground">Preparing download</p>
+                <p className="font-medium text-foreground">
+                  Preparing download
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Keep this tab open while the file is being prepared.
                 </p>
@@ -100,7 +101,7 @@ const CustomizePage = () => {
           Back to Templates
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[575px_1fr] gap-8 max-w-7xl mx-auto">
           {/* Left Column - Dynamic Form */}
           <div className="space-y-6">
             <div>
@@ -120,255 +121,277 @@ const CustomizePage = () => {
               {Object.entries(template.fields)
                 .filter(([fieldKey]) => fieldKey !== "background")
                 .map(([fieldKey, field]) => (
-                <div key={fieldKey} className="space-y-2">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    {field.label}
-                    {field.required && (
-                      <span className="text-red-500 text-xs">*</span>
-                    )}
-                    {field.dimensions && (
-                      <span className="text-xs text-muted-foreground font-normal">
-                        ({field.dimensions})
-                      </span>
-                    )}
-                    {uploadedAssets[fieldKey] && (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    )}
-                  </label>
-
-                  {/* Text Input */}
-                  {field.type === "text" && (
-                    <div>
-                      <input
-                        type="text"
-                        value={(formData[fieldKey] as string) || ""}
-                        onChange={(e) =>
-                          handleTextChange(fieldKey, e.target.value)
-                        }
-                        maxLength={field.maxLength}
-                        className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                        placeholder={`Enter ${field.label.toLowerCase()}`}
-                      />
-                      {field.maxLength && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {((formData[fieldKey] as string) || "").length} /{" "}
-                          {field.maxLength} characters
-                        </p>
+                  <div key={fieldKey} className="space-y-2">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                      {field.label}
+                      {field.required && (
+                        <span className="text-red-500 text-xs">*</span>
                       )}
-                    </div>
-                  )}
-
-                  {/* Image Upload */}
-                  {field.type === "image" && (
-                    <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg,image/webp"
-                        onChange={(e) =>
-                          handleFileUpload(
-                            fieldKey,
-                            e.target.files?.[0] || null,
-                            e.target,
-                          )
-                        }
-                        className="hidden"
-                        id={`upload-${fieldKey}`}
-                      />
-
-                      {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
-                        <div className="space-y-3">
-                          <div className="relative rounded-lg overflow-hidden">
-                            <img
-                              src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
-                              alt={`${field.label} preview`}
-                              onLoad={() =>
-                                setImagePreviewReady((prev) => ({
-                                  ...prev,
-                                  [fieldKey]: true,
-                                }))
-                              }
-                              onError={() =>
-                                setImagePreviewReady((prev) => ({
-                                  ...prev,
-                                  [fieldKey]: true,
-                                }))
-                              }
-                              className="w-full h-40 object-cover rounded-lg"
-                            />
-                            <button
-                              onClick={async () => {
-                                // If uploaded, delete from server first
-                                if (uploadedAssets[fieldKey]) {
-                                  await deleteAsset(fieldKey);
-                                } else {
-                                  // If not uploaded, just remove locally
-                                  removeFile(fieldKey);
-                                }
-                              }}
-                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
-                              type="button"
-                              title={
-                                uploadedAssets[fieldKey]
-                                  ? "Delete from server"
-                                  : "Remove file"
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <label
-                              htmlFor={`upload-${fieldKey}`}
-                              className="text-xs text-center flex-1 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                            >
-                              Click to change image
-                            </label>
-                          </div>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor={`upload-${fieldKey}`}
-                          className="cursor-pointer block text-center"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-2">
-                            <Upload className="w-6 h-6 text-muted-foreground" />
-                          </div>
-                          <p className="text-sm font-medium text-foreground">
-                            Upload {field.label}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            PNG, JPG (max. 5MB)
-                            {field.dimensions && ` • ${field.dimensions}`}
-                          </p>
-                        </label>
+                      {field.dimensions && (
+                        <span className="text-xs text-muted-foreground font-normal">
+                          ({field.dimensions})
+                        </span>
                       )}
-                    </div>
-                  )}
+                      {uploadedAssets[fieldKey] && (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      )}
+                    </label>
 
-                  {/* Video Upload */}
-                  {field.type === "video" && (
-                    <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="video/mp4,video/quicktime"
-                        onChange={(e) =>
-                          handleFileUpload(
-                            fieldKey,
-                            e.target.files?.[0] || null,
-                            e.target,
-                          )
-                        }
-                        className="hidden"
-                        id={`upload-${fieldKey}`}
-                      />
-
-                      {videoResizeProgress[fieldKey] !== undefined ? (
-                        <div className="flex flex-col items-center justify-center py-6">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
-                          <p className="text-sm font-medium text-foreground">
-                            Resizing video... {videoResizeProgress[fieldKey]}%
-                          </p>
+                    {/* Text Input */}
+                    {field.type === "text" && (
+                      <div>
+                        <input
+                          type="text"
+                          value={(formData[fieldKey] as string) || ""}
+                          onChange={(e) =>
+                            handleTextChange(fieldKey, e.target.value)
+                          }
+                          maxLength={field.maxLength}
+                          className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                          placeholder={`Enter ${field.label.toLowerCase()}`}
+                        />
+                        {field.maxLength && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Optimizing and cropping to {field.dimensions}
+                            {((formData[fieldKey] as string) || "").length} /{" "}
+                            {field.maxLength} characters
                           </p>
-                        </div>
-                      ) : filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
-                        <div className="space-y-3">
-                          <div className="relative">
-                            <video
-                              src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
-                              className="w-full h-40 object-cover rounded-lg"
-                              controls
-                            />
-                            <button
-                              onClick={async () => {
-                                // If uploaded, delete from server first
-                                if (uploadedAssets[fieldKey]) {
-                                  await deleteAsset(fieldKey);
-                                } else {
-                                  // If not uploaded, just remove locally
-                                  removeFile(fieldKey);
+                        )}
+                      </div>
+                    )}
+
+                    {/* Image Upload */}
+                    {field.type === "image" && (
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              fieldKey,
+                              e.target.files?.[0] || null,
+                              e.target,
+                            )
+                          }
+                          className="hidden"
+                          id={`upload-${fieldKey}`}
+                        />
+                        {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
+                          <div className="rounded-xl overflow-hidden border border-border">
+                            <div className="bg-checker aspect-square flex items-center justify-center p-3">
+                              <img
+                                src={
+                                  filePreviews[fieldKey] ||
+                                  uploadedAssets[fieldKey]
                                 }
-                              }}
-                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-                              type="button"
-                              title={
-                                uploadedAssets[fieldKey]
-                                  ? "Delete from server"
-                                  : "Remove file"
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
+                                alt={`${field.label} preview`}
+                                onLoad={() =>
+                                  setImagePreviewReady((prev) => ({
+                                    ...prev,
+                                    [fieldKey]: true,
+                                  }))
+                                }
+                                onError={() =>
+                                  setImagePreviewReady((prev) => ({
+                                    ...prev,
+                                    [fieldKey]: true,
+                                  }))
+                                }
+                                className="max-h-full max-w-full object-contain"
+                              />
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                              <label
+                                htmlFor={`upload-${fieldKey}`}
+                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
+                              >
+                                <Upload className="w-3 h-3" /> Click to change
+                              </label>
+                              <button
+                                onClick={async () => {
+                                  uploadedAssets[fieldKey]
+                                    ? await deleteAsset(fieldKey)
+                                    : removeFile(fieldKey);
+                                }}
+                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                type="button"
+                              >
+                                <X className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
                           </div>
+                        ) : (
                           <label
                             htmlFor={`upload-${fieldKey}`}
-                            className="text-xs text-center block text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                            className="cursor-pointer block"
                           >
-                            Click to change video
+                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
+                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                <Upload className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <p className="text-sm font-medium text-foreground">
+                                Upload {field.label}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                PNG, JPG (max. 5MB)
+                                {field.dimensions && ` • ${field.dimensions}`}
+                              </p>
+                            </div>
                           </label>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor={`upload-${fieldKey}`}
-                          className="cursor-pointer block text-center"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-2">
-                            <Upload className="w-6 h-6 text-muted-foreground" />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Video Upload */}
+                    {field.type === "video" && (
+                      <div>
+                        <input
+                          type="file"
+                          accept="video/mp4,video/quicktime"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              fieldKey,
+                              e.target.files?.[0] || null,
+                              e.target,
+                            )
+                          }
+                          className="hidden"
+                          id={`upload-${fieldKey}`}
+                        />
+                        {videoResizeProgress[fieldKey] !== undefined ? (
+                          <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            <div className="text-center">
+                              <p className="text-sm font-medium text-foreground">
+                                Resizing video...{" "}
+                                {videoResizeProgress[fieldKey]}%
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Cropping to {field.dimensions}
+                              </p>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5">
+                              <div
+                                className="bg-primary h-full rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${videoResizeProgress[fieldKey]}%`,
+                                }}
+                              />
+                            </div>
                           </div>
-                          <p className="text-sm font-medium text-foreground">
-                            Upload {field.label}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            MP4 (max. 50MB)
-                            {field.dimensions && ` • ${field.dimensions}`}
-                          </p>
-                        </label>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Media Upload (accepts both image and video) */}
-                  {field.type === "media" && (
-                    <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
-                        onChange={(e) =>
-                          handleFileUpload(
-                            fieldKey,
-                            e.target.files?.[0] || null,
-                            e.target,
-                          )
-                        }
-                        className="hidden"
-                        id={`upload-${fieldKey}`}
-                      />
-
-                      {videoResizeProgress[fieldKey] !== undefined ? (
-                        <div className="flex flex-col items-center justify-center py-6">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
-                          <p className="text-sm font-medium text-foreground">
-                            Resizing video... {videoResizeProgress[fieldKey]}%
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Optimizing and cropping to {field.dimensions}
-                          </p>
-                        </div>
-                      ) : filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
-                        <div className="space-y-3">
-                          <div className="relative">
-                            {(formData[fieldKey] as File)?.type?.startsWith("video/") ||
-                            uploadedAssets[fieldKey]?.includes("/video/") ? (
+                        ) : filePreviews[fieldKey] ||
+                          uploadedAssets[fieldKey] ? (
+                          <div className="rounded-xl overflow-hidden border border-border">
+                            <div className="bg-checker aspect-square flex items-center justify-center">
                               <video
-                                src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
-                                className="w-full h-40 object-cover rounded-lg"
+                                src={
+                                  filePreviews[fieldKey] ||
+                                  uploadedAssets[fieldKey]
+                                }
+                                className="w-full h-full object-contain"
                                 controls
                               />
-                            ) : (
-                              <div className="relative overflow-hidden rounded-lg">
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                              <label
+                                htmlFor={`upload-${fieldKey}`}
+                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
+                              >
+                                <Upload className="w-3 h-3" /> Click to change
+                              </label>
+                              <button
+                                onClick={async () => {
+                                  uploadedAssets[fieldKey]
+                                    ? await deleteAsset(fieldKey)
+                                    : removeFile(fieldKey);
+                                }}
+                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                type="button"
+                              >
+                                <X className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor={`upload-${fieldKey}`}
+                            className="cursor-pointer block"
+                          >
+                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
+                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                <Upload className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <p className="text-sm font-medium text-foreground">
+                                Upload {field.label}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                MP4 (max. 50MB)
+                                {field.dimensions && ` • ${field.dimensions}`}
+                              </p>
+                            </div>
+                          </label>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Media Upload (accepts both image and video) */}
+                    {field.type === "media" && (
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              fieldKey,
+                              e.target.files?.[0] || null,
+                              e.target,
+                            )
+                          }
+                          className="hidden"
+                          id={`upload-${fieldKey}`}
+                        />
+                        {videoResizeProgress[fieldKey] !== undefined ? (
+                          <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            <div className="text-center">
+                              <p className="text-sm font-medium text-foreground">
+                                Resizing video...{" "}
+                                {videoResizeProgress[fieldKey]}%
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Cropping to {field.dimensions}
+                              </p>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5">
+                              <div
+                                className="bg-primary h-full rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${videoResizeProgress[fieldKey]}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ) : filePreviews[fieldKey] ||
+                          uploadedAssets[fieldKey] ? (
+                          <div className="rounded-xl overflow-hidden border border-border">
+                            <div className="bg-checker aspect-square flex items-center justify-center p-3">
+                              {(formData[fieldKey] as File)?.type?.startsWith(
+                                "video/",
+                              ) ||
+                              uploadedAssets[fieldKey]?.includes("/video/") ? (
+                                <video
+                                  src={
+                                    filePreviews[fieldKey] ||
+                                    uploadedAssets[fieldKey]
+                                  }
+                                  className="max-h-full max-w-full object-contain"
+                                  controls
+                                />
+                              ) : (
                                 <img
-                                  src={filePreviews[fieldKey] || uploadedAssets[fieldKey]}
+                                  src={
+                                    filePreviews[fieldKey] ||
+                                    uploadedAssets[fieldKey]
+                                  }
                                   alt={`${field.label} preview`}
                                   onLoad={() =>
                                     setImagePreviewReady((prev) => ({
@@ -382,57 +405,53 @@ const CustomizePage = () => {
                                       [fieldKey]: true,
                                     }))
                                   }
-                                  className="w-full h-40 object-cover rounded-lg"
+                                  className="max-h-full max-w-full object-contain"
                                 />
-                              </div>
-                            )}
-                            <button
-                              onClick={async () => {
-                                if (uploadedAssets[fieldKey]) {
-                                  await deleteAsset(fieldKey);
-                                } else {
-                                  removeFile(fieldKey);
-                                }
-                              }}
-                              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-                              type="button"
-                              title={
-                                uploadedAssets[fieldKey]
-                                  ? "Delete from server"
-                                  : "Remove file"
-                              }
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                              <label
+                                htmlFor={`upload-${fieldKey}`}
+                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
+                              >
+                                <Upload className="w-3 h-3" /> Click to change
+                              </label>
+                              <button
+                                onClick={async () => {
+                                  uploadedAssets[fieldKey]
+                                    ? await deleteAsset(fieldKey)
+                                    : removeFile(fieldKey);
+                                }}
+                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                type="button"
+                              >
+                                <X className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
                           </div>
+                        ) : (
                           <label
                             htmlFor={`upload-${fieldKey}`}
-                            className="text-xs text-center block text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                            className="cursor-pointer block"
                           >
-                            Click to change
+                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
+                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                <Upload className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <p className="text-sm font-medium text-foreground">
+                                Upload {field.label}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Image (PNG, JPG) or Video (MP4)
+                                {field.dimensions && ` • ${field.dimensions}`}
+                              </p>
+                            </div>
                           </label>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor={`upload-${fieldKey}`}
-                          className="cursor-pointer block text-center"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-2">
-                            <Upload className="w-6 h-6 text-muted-foreground" />
-                          </div>
-                          <p className="text-sm font-medium text-foreground">
-                            Upload {field.label}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Image (PNG, JPG) or Video (MP4)
-                            {field.dimensions && ` • ${field.dimensions}`}
-                          </p>
-                        </label>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
 
               {/* Dimension Disclaimer */}
               <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
@@ -446,9 +465,12 @@ const CustomizePage = () => {
               {/* Background mode toggle - template flow only */}
               <div className="p-4 rounded-lg border border-border bg-card space-y-3">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Background Mode</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    Background Mode
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Colored keeps default template background. Transparent removes background for alpha export.
+                    Colored keeps default template background. Transparent
+                    removes background for alpha export.
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -688,13 +710,13 @@ const CustomizePage = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                    <video
-                      src={renderJob.outputUrl}
-                      className="w-full h-full object-cover"
-                      controls
-                      autoPlay
-                      loop
-                    />
+                      <video
+                        src={renderJob.outputUrl}
+                        className="w-full h-full object-cover"
+                        controls
+                        autoPlay
+                        loop
+                      />
                     )
                   ) : (
                     // Show interactive template preview
