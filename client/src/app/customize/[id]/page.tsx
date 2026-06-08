@@ -451,7 +451,6 @@ const CustomizePage = () => {
                         )}
                       </div>
                     )}
-
                     {field.type !== "text" && field.dimensions && (
                       <p className="flex items-start gap-1.5 text-xs text-muted-foreground/60 mt-1">
                         <Info className="w-3 h-3 shrink-0 mt-px" />
