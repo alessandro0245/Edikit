@@ -157,15 +157,10 @@ export default function TemplateCard({ template }: TemplateCardProps) {
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-4">
         <div className="space-y-1">
-          <div className="text-xs font-medium text-primary uppercase tracking-wider">
-            {template.category}
-          </div>
+          
           <h3 className="text-foreground font-semibold text-sm group-hover:text-primary transition-colors duration-300">
             {template.name}
           </h3>
-          <p className="text-muted-foreground text-xs line-clamp-2">
-            {template.description}
-          </p>
         </div>
       </div>
 

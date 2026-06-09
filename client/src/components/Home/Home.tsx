@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { templates } from "@/utils/constant";
 import Card from "./Card";
-import Prompt from "./Prompt";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const featuredTemplates = [templates[0], templates[1], templates[7]];
@@ -12,7 +11,7 @@ export default function Hero() {
   return (
     <div className="min-h-screen bg-background">
       <main>
-        <Prompt />
+        {/* <Prompt /> */}
 
         {/* Gradient divider */}
         <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
@@ -143,11 +142,12 @@ export default function Hero() {
                   </span>
                 </h2>
 
-                <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
+                {/* <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
                   Every template is professionally crafted by motion designers.
                   Customize text, colors, and logos, then export instantly. No
                   animation experience needed.
-                </p>
+                </p> */}
+                <p className="text-base md:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed" >vertical templates</p>
               </div>
 
               {/* Cards */}

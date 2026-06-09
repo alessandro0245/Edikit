@@ -109,12 +109,6 @@ const CustomizePage = () => {
               <h1 className="text-3xl font-bold text-foreground mb-2">
                 {template.name}
               </h1>
-              <p className="text-muted-foreground">{template.description}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
-                  {template.category}
-                </span>
-              </div>
             </div>
 
             <div className="p-6 rounded-lg border border-border bg-card space-y-6">
@@ -472,7 +466,14 @@ const CustomizePage = () => {
               </div>
 
               {/* Background mode toggle - template flow only */}
-              <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+              {template.hasTransprentBackground == false ? (
+                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                    ⚠️ This template does not support transparent background. The exported video will have a colored background.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg border border-border bg-card space-y-3">
                 <div>
                   <p className="text-sm font-semibold text-foreground">
                     Background Mode
@@ -512,6 +513,9 @@ const CustomizePage = () => {
                     : "Export target: QuickTime MOV (Animation + Alpha)"}
                 </p>
               </div>
+                  )
+                }
+            
             </div>
 
             {/* Render Status */}

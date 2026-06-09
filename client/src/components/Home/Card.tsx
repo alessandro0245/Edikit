@@ -8,9 +8,7 @@ import { useRef, useState } from "react";
 interface TemplateCardProps {
   id: number;
   name: string;
-  description?: string;
   thumbnail?: string | StaticImageData;
-  category: string;
   isFeatured?: boolean;
   previewUrl: string;
 }
@@ -18,7 +16,6 @@ interface TemplateCardProps {
 export default function Card({
   id,
   name,
-  description,
   thumbnail,
   isFeatured = false,
   previewUrl,
@@ -64,7 +61,6 @@ export default function Card({
       >
         {/* Media */}
         <div className="relative aspect-4/5 w-full overflow-hidden bg-muted">
-
           {/* Thumbnail */}
           {thumbnail && (
             <Image
@@ -118,12 +114,6 @@ export default function Card({
           >
             {name}
           </h3>
-
-          {description && (
-            <p className={`text-muted-foreground leading-snug ${isFeatured ? "text-base" : "text-sm"}`}>
-              {description}
-            </p>
-          )}
 
           {/* Explore button — always visible, animates on hover */}
           <div className="pt-3 border-t border-border/50">
