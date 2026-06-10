@@ -17,6 +17,7 @@ import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
 import { getTemplateOrientation } from "@/utils/templateOrientation";
+import FileDropZone from "@/components/Upload/FileDropZone";
 
 const CustomizePage = () => {
   const {
@@ -158,21 +159,15 @@ const CustomizePage = () => {
                     {/* Image Upload */}
                     {field.type === "image" && (
                       <div>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg,image/webp"
-                          onChange={(e) =>
-                            handleFileUpload(
-                              fieldKey,
-                              e.target.files?.[0] || null,
-                              e.target,
-                            )
-                          }
-                          className="hidden"
-                          id={`upload-${fieldKey}`}
-                        />
                         {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
-                          <div className="rounded-xl overflow-hidden border border-border">
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="overflow-hidden rounded-xl border border-border"
+                          >
                             <div className="bg-checker aspect-square flex items-center justify-center p-3">
                               <img
                                 src={
@@ -192,18 +187,17 @@ const CustomizePage = () => {
                                     [fieldKey]: true,
                                   }))
                                 }
-                                className="max-h-full max-w-full object-contain"
+                                className="max-h-full max-w-full object-contain pointer-events-none"
                               />
                             </div>
                             <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <label
-                                htmlFor={`upload-${fieldKey}`}
-                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
-                              >
-                                <Upload className="w-3 h-3" /> Click to change
-                              </label>
+                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <Upload className="w-3 h-3" /> Click or drag to
+                                replace
+                              </span>
                               <button
-                                onClick={async () => {
+                                onClick={async (event) => {
+                                  event.stopPropagation();
                                   uploadedAssets[fieldKey]
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
@@ -214,25 +208,27 @@ const CustomizePage = () => {
                                 <X className="w-3 h-3" /> Remove
                               </button>
                             </div>
-                          </div>
+                          </FileDropZone>
                         ) : (
-                          <label
-                            htmlFor={`upload-${fieldKey}`}
-                            className="cursor-pointer block"
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
                           >
-                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
-                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                                <Upload className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                              <p className="text-sm font-medium text-foreground">
-                                Upload {field.label}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                PNG, JPG (max. 5MB)
-                                {field.dimensions && ` • ${field.dimensions}`}
-                              </p>
+                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                              <Upload className="w-5 h-5 text-muted-foreground" />
                             </div>
-                          </label>
+                            <p className="text-sm font-medium text-foreground">
+                              Upload {field.label}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Click or drag to upload • PNG, JPG (max. 5MB)
+                              {field.dimensions && ` • ${field.dimensions}`}
+                            </p>
+                          </FileDropZone>
                         )}
                       </div>
                     )}
@@ -240,19 +236,6 @@ const CustomizePage = () => {
                     {/* Video Upload */}
                     {field.type === "video" && (
                       <div>
-                        <input
-                          type="file"
-                          accept="video/mp4,video/quicktime"
-                          onChange={(e) =>
-                            handleFileUpload(
-                              fieldKey,
-                              e.target.files?.[0] || null,
-                              e.target,
-                            )
-                          }
-                          className="hidden"
-                          id={`upload-${fieldKey}`}
-                        />
                         {videoResizeProgress[fieldKey] !== undefined ? (
                           <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -276,26 +259,33 @@ const CustomizePage = () => {
                           </div>
                         ) : filePreviews[fieldKey] ||
                           uploadedAssets[fieldKey] ? (
-                          <div className="rounded-xl overflow-hidden border border-border">
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="video/mp4,video/quicktime"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="overflow-hidden rounded-xl border border-border"
+                          >
                             <div className="bg-checker aspect-square flex items-center justify-center">
                               <video
                                 src={
                                   filePreviews[fieldKey] ||
                                   uploadedAssets[fieldKey]
                                 }
-                                className="w-full h-full object-contain"
+                                className="h-full w-full object-contain"
                                 controls
+                                onClick={(event) => event.stopPropagation()}
                               />
                             </div>
                             <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <label
-                                htmlFor={`upload-${fieldKey}`}
-                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
-                              >
-                                <Upload className="w-3 h-3" /> Click to change
-                              </label>
+                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <Upload className="w-3 h-3" /> Click or drag to
+                                replace
+                              </span>
                               <button
-                                onClick={async () => {
+                                onClick={async (event) => {
+                                  event.stopPropagation();
                                   uploadedAssets[fieldKey]
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
@@ -306,25 +296,27 @@ const CustomizePage = () => {
                                 <X className="w-3 h-3" /> Remove
                               </button>
                             </div>
-                          </div>
+                          </FileDropZone>
                         ) : (
-                          <label
-                            htmlFor={`upload-${fieldKey}`}
-                            className="cursor-pointer block"
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="video/mp4,video/quicktime"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
                           >
-                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
-                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                                <Upload className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                              <p className="text-sm font-medium text-foreground">
-                                Upload {field.label}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                MP4 (max. 50MB)
-                                {field.dimensions && ` • ${field.dimensions}`}
-                              </p>
+                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                              <Upload className="w-5 h-5 text-muted-foreground" />
                             </div>
-                          </label>
+                            <p className="text-sm font-medium text-foreground">
+                              Upload {field.label}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Click or drag to upload • MP4 (max. 50MB)
+                              {field.dimensions && ` • ${field.dimensions}`}
+                            </p>
+                          </FileDropZone>
                         )}
                       </div>
                     )}
@@ -332,19 +324,6 @@ const CustomizePage = () => {
                     {/* Media Upload (accepts both image and video) */}
                     {field.type === "media" && (
                       <div>
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
-                          onChange={(e) =>
-                            handleFileUpload(
-                              fieldKey,
-                              e.target.files?.[0] || null,
-                              e.target,
-                            )
-                          }
-                          className="hidden"
-                          id={`upload-${fieldKey}`}
-                        />
                         {videoResizeProgress[fieldKey] !== undefined ? (
                           <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -368,7 +347,14 @@ const CustomizePage = () => {
                           </div>
                         ) : filePreviews[fieldKey] ||
                           uploadedAssets[fieldKey] ? (
-                          <div className="rounded-xl overflow-hidden border border-border">
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="overflow-hidden rounded-xl border border-border"
+                          >
                             <div className="bg-checker aspect-square flex items-center justify-center p-3">
                               {(formData[fieldKey] as File)?.type?.startsWith(
                                 "video/",
@@ -381,6 +367,7 @@ const CustomizePage = () => {
                                   }
                                   className="max-h-full max-w-full object-contain"
                                   controls
+                                  onClick={(event) => event.stopPropagation()}
                                 />
                               ) : (
                                 <img
@@ -401,19 +388,18 @@ const CustomizePage = () => {
                                       [fieldKey]: true,
                                     }))
                                   }
-                                  className="max-h-full max-w-full object-contain"
+                                  className="max-h-full max-w-full object-contain pointer-events-none"
                                 />
                               )}
                             </div>
                             <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <label
-                                htmlFor={`upload-${fieldKey}`}
-                                className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1.5 transition-colors"
-                              >
-                                <Upload className="w-3 h-3" /> Click to change
-                              </label>
+                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <Upload className="w-3 h-3" /> Click or drag to
+                                replace
+                              </span>
                               <button
-                                onClick={async () => {
+                                onClick={async (event) => {
+                                  event.stopPropagation();
                                   uploadedAssets[fieldKey]
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
@@ -424,25 +410,28 @@ const CustomizePage = () => {
                                 <X className="w-3 h-3" /> Remove
                               </button>
                             </div>
-                          </div>
+                          </FileDropZone>
                         ) : (
-                          <label
-                            htmlFor={`upload-${fieldKey}`}
-                            className="cursor-pointer block"
+                          <FileDropZone
+                            inputId={`upload-${fieldKey}`}
+                            accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                            onFileSelect={(file, input) =>
+                              handleFileUpload(fieldKey, file, input)
+                            }
+                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
                           >
-                            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-colors">
-                              <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                                <Upload className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                              <p className="text-sm font-medium text-foreground">
-                                Upload {field.label}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Image (PNG, JPG) or Video (MP4)
-                                {field.dimensions && ` • ${field.dimensions}`}
-                              </p>
+                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                              <Upload className="w-5 h-5 text-muted-foreground" />
                             </div>
-                          </label>
+                            <p className="text-sm font-medium text-foreground">
+                              Upload {field.label}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Click or drag to upload • Image (PNG, JPG) or
+                              Video (MP4)
+                              {field.dimensions && ` • ${field.dimensions}`}
+                            </p>
+                          </FileDropZone>
                         )}
                       </div>
                     )}

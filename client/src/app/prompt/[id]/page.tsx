@@ -30,6 +30,9 @@ import { useRef, useMemo, useState, useEffect, useLayoutEffect } from "react";
 import api from "@/lib/auth";
 import type { UploadedAssets } from "@/components/Home/AssetUploadStep";
 import { SceneAssignmentCanvas } from "./SceneAssignmentCanvas";
+import FileDropZone, {
+  type FileDropZoneHandle,
+} from "@/components/Upload/FileDropZone";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AssetType = "background" | "media";
@@ -70,7 +73,7 @@ function AssetUploader({
 }) {
   const [uploading, setUploading] = useState<AssetType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const dropZoneRefs = useRef<Record<string, FileDropZoneHandle | null>>({});
 
   const handleUpload = async (type: AssetType, file: File) => {
     if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
@@ -145,22 +148,6 @@ function AssetUploader({
 
           return (
             <div key={slot.type} className="space-y-2">
-              <input
-                ref={(el) => {
-                  inputRefs.current[slot.type] = el;
-                }}
-                type="file"
-                multiple={isMedia}
-                accept="image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,video/webm"
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files) {
-                    handleFilesArray(slot.type, e.target.files);
-                  }
-                  e.target.value = "";
-                }}
-              />
-
               {urls.length > 0 ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
@@ -170,7 +157,7 @@ function AssetUploader({
                     {isMedia && (
                       <button
                         type="button"
-                        onClick={() => inputRefs.current[slot.type]?.click()}
+                        onClick={() => dropZoneRefs.current[slot.type]?.open()}
                         className="text-xs text-primary hover:underline"
                       >
                         + Add more
@@ -233,35 +220,65 @@ function AssetUploader({
                       </div>
                     ))}
                   </div>
+                  <FileDropZone
+                    ref={(el) => {
+                      dropZoneRefs.current[slot.type] = el;
+                    }}
+                    inputId={`prompt-upload-${slot.type}-more`}
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,video/webm"
+                    multiple={isMedia}
+                    disabled={isActive}
+                    onFileSelect={(file) => {
+                      if (file) {
+                        void handleFilesArray(slot.type, [file]);
+                      }
+                    }}
+                    onFilesSelect={(files) => {
+                      void handleFilesArray(slot.type, files);
+                    }}
+                    className="hidden"
+                  >
+                    <span />
+                  </FileDropZone>
                 </div>
               ) : (
-                // ── Upload zone ──
-                <button
-                  type="button"
-                  onClick={() => inputRefs.current[slot.type]?.click()}
+                <FileDropZone
+                  ref={(el) => {
+                    dropZoneRefs.current[slot.type] = el;
+                  }}
+                  inputId={`prompt-upload-${slot.type}`}
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,video/webm"
+                  multiple={isMedia}
                   disabled={isActive}
-                  className="w-full flex items-center gap-4 p-3.5 rounded-xl border border-dashed border-border/50 hover:border-border hover:bg-muted/20 transition-all duration-200 cursor-pointer group text-left disabled:cursor-wait"
+                  onFileSelect={(file) => {
+                    if (file) {
+                      void handleFilesArray(slot.type, [file]);
+                    }
+                  }}
+                  onFilesSelect={(files) => {
+                    void handleFilesArray(slot.type, files);
+                  }}
+                  className="group w-full rounded-xl border border-dashed border-border/50 p-3.5 text-left hover:border-border hover:bg-muted/20"
                 >
-                  {/* Icon box */}
-                  <div className="w-10 h-10 rounded-lg bg-muted/40 border border-border/40 flex items-center justify-center text-muted-foreground group-hover:text-foreground group-hover:border-border transition-colors shrink-0">
-                    {isActive ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    ) : (
-                      slot.icon
-                    )}
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/40 bg-muted/40 text-muted-foreground transition-colors group-hover:border-border group-hover:text-foreground">
+                      {isActive ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      ) : (
+                        slot.icon
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground">
+                        {slot.label}
+                      </p>
+                      <p className="mt-0.5 font-mono text-[11px] text-muted-foreground/60">
+                        Click or drag to upload • {slot.hint}
+                      </p>
+                    </div>
+                    <Upload className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40 transition-colors group-hover:text-muted-foreground" />
                   </div>
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {slot.label}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground/60 font-mono mt-0.5">
-                      {slot.hint}
-                    </p>
-                  </div>
-                  {/* Arrow */}
-                  <Upload className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
-                </button>
+                </FileDropZone>
               )}
             </div>
           );
