@@ -2,23 +2,21 @@
 
 import Link from "next/link";
 import { templates } from "@/utils/constant";
-import Card from "./Card";
+import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
-  const featuredTemplates = [templates[0], templates[1], templates[7]];
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#191919]">
       <main>
         {/* <Prompt /> */}
 
         {/* Gradient divider */}
-        <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
+        {/* <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" /> */}
 
         {/* Templates Section */}
         <section
-          className="relative py-16 md:py-24 bg-muted/30 overflow-hidden"
+          className="relative overflow-hidden bg-gray-950 py-16 md:py-24"
           id="templates"
         >
           {/* ── Background decorations ── */}
@@ -27,7 +25,7 @@ export default function Hero() {
             aria-hidden="true"
           >
             {/* Dot grid */}
-            <svg className="absolute inset-0 w-full h-full opacity-[0.035]">
+            {/* <svg className="absolute inset-0 w-full h-full ">
               <defs>
                 <pattern
                   id="dot-grid"
@@ -39,12 +37,12 @@ export default function Hero() {
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#dot-grid)" />
-            </svg>
+            </svg> */}
 
             {/* Glow top-right */}
-            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" />
+            {/* <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" /> */}
             {/* Glow bottom-left */}
-            <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" />
+            {/* <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" /> */}
 
             {/* Floating circle outline — top left */}
             <svg
@@ -112,7 +110,7 @@ export default function Hero() {
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-6xl mx-auto">
               {/* Section Header */}
-              <div className="text-center space-y-5 mb-16 md:mb-20">
+              <div className="mb-10 space-y-4 text-center sm:mb-14 sm:space-y-5 md:mb-20">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium">
                   <span className="relative flex h-1.5 w-1.5">
@@ -122,7 +120,7 @@ export default function Hero() {
                   16 professionally crafted animations
                 </div>
 
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground text-balance">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance">
                   Templates designed for{" "}
                   <span className="relative inline-block">
                     creators
@@ -147,43 +145,22 @@ export default function Hero() {
                   Customize text, colors, and logos, then export instantly. No
                   animation experience needed.
                 </p> */}
-                <p className="text-base md:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed" >vertical templates</p>
+                <p className="mx-auto max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-2xl">
+                  vertical templates
+                </p>
               </div>
+            </div>
 
-              {/* Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div className="md:col-span-1">
-                  <Card
-                    {...featuredTemplates[0]}
-                    backgroundDimensions={
-                      featuredTemplates[0].fields.background?.dimensions
-                    }
-                  />
-                </div>
-                <div className="md:col-span-1 md:scale-110 md:origin-center">
-                  <Card
-                    {...featuredTemplates[1]}
-                    isFeatured={true}
-                    backgroundDimensions={
-                      featuredTemplates[1].fields.background?.dimensions
-                    }
-                  />
-                </div>
-                <div className="md:col-span-1">
-                  <Card
-                    {...featuredTemplates[2]}
-                    backgroundDimensions={
-                      featuredTemplates[2].fields.background?.dimensions
-                    }
-                  />
-                </div>
-              </div>
+            {/* Template slider — wider than header for large cards */}
+            <div className="relative z-10 mx-auto mb-4 w-full max-w-7xl px-2 sm:px-4">
+              <TemplatesSlider templates={templates} />
+            </div>
 
-              {/* CTA */}
-              <div className="flex justify-center pt-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex justify-center pt-6 sm:pt-8">
                 <Link
                   href="/templates"
-                  className="group inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium border border-border hover:border-primary/60 bg-background text-foreground hover:text-primary rounded-xl transition-all duration-200 hover:shadow-md hover:shadow-primary/10 hover:-translate-y-0.5"
+                  className="group inline-flex items-center gap-2 rounded-xl border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:text-primary hover:shadow-md hover:shadow-primary/10 sm:px-8 sm:py-3.5"
                 >
                   Browse All Templates
                   <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
