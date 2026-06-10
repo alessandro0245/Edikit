@@ -37,7 +37,6 @@ export const useCustomizeLogic = () => {
   const params = useParams();
   const router = useRouter();
   const templateId = parseInt(params.id as string);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const hasNotifiedRef = useRef(false);
 
   const template = templates.find((t) => t.id === templateId);
@@ -63,11 +62,6 @@ export const useCustomizeLogic = () => {
   const [isRestoringState, setIsRestoringState] = useState(true);
   const hasHydratedStateRef = useRef(false);
 
-  // Video & image preview state
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
@@ -240,63 +234,6 @@ export const useCustomizeLogic = () => {
 
     return () => clearInterval(pollInterval);
   }, [renderJob]);
-
-  // Cleanup video on unmount
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.src = "";
-      }
-    };
-  }, []);
-
-  const handleVideoClick = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (!isVideoPlaying) {
-      // Start playing
-      if (!isVideoLoaded) {
-        setIsVideoLoading(true);
-        video.src = template!.previewUrl;
-        video.load();
-      } else {
-        video.play().catch(() => {
-          console.error("Play failed");
-        });
-      }
-      setIsVideoPlaying(true);
-    } else {
-      // Pause video
-      video.pause();
-      setIsVideoPlaying(false);
-    }
-  };
-
-  const handleVideoLoaded = () => {
-    setIsVideoLoaded(true);
-    setIsVideoLoading(false);
-
-    if (isVideoPlaying && videoRef.current) {
-      videoRef.current.play().catch(() => {
-        console.error("Autoplay failed");
-      });
-    }
-  };
-
-  const handleVideoError = () => {
-    setIsVideoLoading(false);
-    setIsVideoLoaded(false);
-    showErrorToast("Failed to load video preview");
-  };
-
-  const handleVideoEnded = () => {
-    setIsVideoPlaying(false);
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-    }
-  };
 
   const handleTextChange = (fieldKey: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldKey]: value }));
@@ -910,22 +847,12 @@ export const useCustomizeLogic = () => {
     filePreviews,
     uploadedAssets,
     uploadingAssets,
-    isVideoPlaying,
-    isVideoLoaded,
-    isVideoLoading,
-    imageError,
-    setImageError,
     isDownloading,
     downloadProgress,
     authLoading,
     isGenerating,
     isUploading,
     isLoggedIn,
-    videoRef,
-    handleVideoClick,
-    handleVideoLoaded,
-    handleVideoError,
-    handleVideoEnded,
     handleTextChange,
     handleFileUpload,
     uploadSingleAsset,

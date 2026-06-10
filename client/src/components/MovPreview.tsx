@@ -8,7 +8,7 @@ interface MovPreviewProps {
   className?: string;
 }
 
-function toMp4PreviewUrl(url: string): string | null {
+export function toMp4PreviewUrl(url: string): string | null {
   if (!url.includes("res.cloudinary.com")) return null;
   return url
     .replace(/\/upload\//, "/upload/f_mp4,vc_h264,q_auto/")

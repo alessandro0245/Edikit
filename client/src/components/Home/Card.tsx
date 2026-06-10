@@ -1,9 +1,12 @@
 "use client";
 
-import { Play, Loader2, ArrowRight } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
+import { ArrowRight } from "lucide-react";
+import { StaticImageData } from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import AnimationPreview from "@/components/Video/AnimationPreview";
+import {
+  getOrientationFromDimensions,
+} from "@/utils/templateOrientation";
 
 interface TemplateCardProps {
   id: number;
@@ -11,6 +14,7 @@ interface TemplateCardProps {
   thumbnail?: string | StaticImageData;
   isFeatured?: boolean;
   previewUrl: string;
+  backgroundDimensions?: string;
 }
 
 export default function Card({
@@ -19,39 +23,12 @@ export default function Card({
   thumbnail,
   isFeatured = false,
   previewUrl,
+  backgroundDimensions,
 }: TemplateCardProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(false);
-
-  const handleMouseEnter = () => {
-    setIsHovering(true);
-    if (!isVideoLoaded) setIsVideoLoading(true);
-    videoRef.current?.play().catch(() => {});
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    setIsVideoLoading(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
-  const handleLoaded = () => {
-    setIsVideoLoaded(true);
-    setIsVideoLoading(false);
-  };
+  const orientation = getOrientationFromDimensions(backgroundDimensions);
 
   return (
-    <Link
-      href={`/customize/${id}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <Link href={`/customize/${id}`}>
       <div
         className={`group h-full rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer ${
           isFeatured
@@ -59,53 +36,18 @@ export default function Card({
             : "border-border bg-card hover:border-primary/60 shadow-lg hover:shadow-primary/10 hover:shadow-xl hover:-translate-y-1"
         }`}
       >
-        {/* Media */}
-        <div className="relative aspect-4/5 w-full overflow-hidden bg-muted">
-          {/* Thumbnail */}
-          {thumbnail && (
-            <Image
-              src={thumbnail}
-              alt={name}
-              fill
-              className={`object-cover transition-all duration-500 group-hover:scale-105 ${
-                isHovering && isVideoLoaded ? "opacity-0" : "opacity-100"
-              }`}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          )}
-
-          {/* Video */}
-          <video
-            ref={videoRef}
+        <div className="relative w-full overflow-hidden bg-black">
+          <AnimationPreview
             src={previewUrl}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
-              isHovering && isVideoLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            onLoadedData={handleLoaded}
+            poster={thumbnail}
+            orientation={orientation}
+            fit="native"
+            trigger="hover"
+            showControls={false}
+            playOverlay
           />
-
-          {/* Loader */}
-          {isHovering && isVideoLoading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
-              <Loader2 className="h-8 w-8 animate-spin text-white" />
-            </div>
-          )}
-
-          {/* Play Overlay */}
-          {!isHovering && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/90 backdrop-blur-sm transition-transform group-hover:scale-110">
-                <Play className="h-5 w-5 fill-primary-foreground text-primary-foreground ml-0.5" />
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Content */}
         <div className={`space-y-3 ${isFeatured ? "p-8" : "p-5"}`}>
           <h3
             className={`font-bold transition-colors duration-200 group-hover:text-primary ${
@@ -115,7 +57,6 @@ export default function Card({
             {name}
           </h3>
 
-          {/* Explore button — always visible, animates on hover */}
           <div className="pt-3 border-t border-border/50">
             <span
               className={`inline-flex items-center gap-1.5 font-semibold text-primary transition-all duration-200 ${

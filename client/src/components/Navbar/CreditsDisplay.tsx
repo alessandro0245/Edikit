@@ -26,7 +26,7 @@ export default function CreditsDisplay() {
 
   return (
     <Link
-      href="/credits"
+      href="/dashboard/credits"
       className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent hover:bg-accent/80 transition-colors border border-border group"
       title={`${credits} of ${limit} credits remaining`}
     >

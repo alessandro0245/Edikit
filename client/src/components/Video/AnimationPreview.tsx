@@ -1,0 +1,369 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
+import {
+  Loader2,
+  Maximize2,
+  Minimize2,
+  Pause,
+  Play,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import Image, { type StaticImageData } from "next/image";
+import {
+  orientationContainerClass,
+  type VideoOrientation,
+} from "@/utils/templateOrientation";
+
+interface AnimationPreviewProps {
+  src: string;
+  poster?: string | StaticImageData;
+  orientation?: VideoOrientation;
+  fit?: "native" | "contain";
+  trigger?: "hover" | "click" | "auto";
+  className?: string;
+  showFullscreen?: boolean;
+  showControls?: boolean;
+  prefetchOnVisible?: boolean;
+  playOverlay?: boolean;
+  onClickHint?: string;
+}
+
+export default function AnimationPreview({
+  src,
+  poster,
+  orientation = "portrait",
+  fit = "native",
+  trigger = "hover",
+  className = "",
+  showFullscreen = false,
+  showControls = true,
+  prefetchOnVisible = true,
+  playOverlay = true,
+  onClickHint,
+}: AnimationPreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [isActive, setIsActive] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [videoRequested, setVideoRequested] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [posterError, setPosterError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  const posterSrc =
+    typeof poster === "string" ? poster : poster?.src ?? undefined;
+
+  const requestVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || videoRequested) return;
+
+    setVideoRequested(true);
+    setIsLoading(true);
+    video.src = src;
+    video.load();
+  }, [src, videoRequested]);
+
+  const playVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || !isLoaded) return;
+    video.play().catch(() => {});
+    setIsPlaying(true);
+  }, [isLoaded]);
+
+  const pauseVideo = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    setIsPlaying(false);
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (trigger !== "hover") return;
+    setIsActive(true);
+    requestVideo();
+  };
+
+  const handleMouseLeave = () => {
+    if (trigger !== "hover") return;
+    setIsActive(false);
+    pauseVideo();
+  };
+
+  useEffect(() => {
+    if (trigger !== "auto") return;
+    setIsActive(true);
+    requestVideo();
+  }, [trigger, requestVideo]);
+
+  const handleContainerClick = (event: MouseEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest("[data-preview-control]")) {
+      return;
+    }
+
+    if (trigger === "click") {
+      if (!videoRequested) {
+        setIsActive(true);
+        requestVideo();
+        return;
+      }
+
+      if (isLoaded) {
+        if (isPlaying) {
+          pauseVideo();
+          setIsActive(false);
+        } else {
+          setIsActive(true);
+          playVideo();
+        }
+      }
+      return;
+    }
+
+    if (trigger === "hover" && isLoaded) {
+      if (isPlaying) {
+        pauseVideo();
+      } else {
+        playVideo();
+      }
+    }
+  };
+
+  const handleCanPlay = () => {
+    setIsLoading(false);
+    setIsLoaded(true);
+
+    const shouldPlay =
+      trigger === "auto" ||
+      (trigger === "hover" ? isActive : trigger === "click" && isActive);
+
+    if (shouldPlay && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      pauseVideo();
+    } else {
+      if (!videoRequested) {
+        setIsActive(true);
+        requestVideo();
+        return;
+      }
+      playVideo();
+    }
+  };
+
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      await containerRef.current.requestFullscreen?.().catch(() => {});
+    } else {
+      await document.exitFullscreen?.().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    if ((trigger === "hover" || trigger === "auto") && isActive && isLoaded) {
+      playVideo();
+    }
+  }, [trigger, isActive, isLoaded, playVideo]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!prefetchOnVisible || videoRequested || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          requestVideo();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [prefetchOnVisible, requestVideo, videoRequested]);
+
+  const containerAspectClass =
+    fit === "native" ? orientationContainerClass[orientation] : "h-full w-full";
+
+  const showPoster = !isLoaded || !isPlaying;
+  const showPlayOverlay =
+    playOverlay &&
+    trigger !== "auto" &&
+    ((trigger === "click" && !isPlaying && !isLoading) ||
+      (trigger === "hover" && !isActive && !isLoading));
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative overflow-hidden bg-black group/preview ${
+        isFullscreen
+          ? "flex min-h-screen w-full items-center justify-center"
+          : containerAspectClass
+      } ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleContainerClick}
+    >
+      {posterSrc && showPoster && !posterError && (
+        typeof poster === "object" && poster ? (
+          <Image
+            src={poster}
+            alt=""
+            fill
+            className={`object-contain transition-opacity duration-300 ${
+              isPlaying && isLoaded ? "opacity-0" : "opacity-100"
+            }`}
+            sizes="(max-width: 768px) 100vw, 33vw"
+            onError={() => setPosterError(true)}
+          />
+        ) : (
+          <img
+            src={posterSrc}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${
+              isPlaying && isLoaded ? "opacity-0" : "opacity-100"
+            }`}
+            onError={() => setPosterError(true)}
+          />
+        )
+      )}
+
+      {!posterSrc && !isLoaded && !videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <p className="text-xs text-white/60">No preview</p>
+        </div>
+      )}
+
+      <video
+        ref={videoRef}
+        poster={posterSrc}
+        className={
+          isFullscreen
+            ? "max-h-[100vh] max-w-[100vw] object-contain"
+            : `absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${
+                isPlaying && isLoaded ? "opacity-100" : "opacity-0"
+              }`
+        }
+        loop
+        muted={isMuted}
+        playsInline
+        preload="none"
+        onCanPlay={handleCanPlay}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onError={() => {
+          setVideoError(true);
+          setIsLoading(false);
+        }}
+      />
+
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      )}
+
+      {showPlayOverlay && !videoError && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90">
+            <Play className="ml-0.5 h-6 w-6 text-gray-900" fill="currentColor" />
+          </div>
+        </div>
+      )}
+
+      {onClickHint && trigger === "click" && !isPlaying && !isLoading && (
+        <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur-sm">
+          <p className="text-xs font-medium text-white">{onClickHint}</p>
+        </div>
+      )}
+
+      {showControls && isLoaded && (
+        <div
+          className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-linear-to-t from-black/80 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover/preview:opacity-100"
+          data-preview-control
+        >
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              data-preview-control
+              onClick={togglePlay}
+              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              aria-label={isPlaying ? "Pause" : "Play"}
+            >
+              {isPlaying ? (
+                <Pause className="h-4 w-4 fill-white text-white" />
+              ) : (
+                <Play className="h-4 w-4 fill-white text-white" />
+              )}
+            </button>
+            <button
+              type="button"
+              data-preview-control
+              onClick={toggleMute}
+              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              aria-label={isMuted ? "Unmute" : "Mute"}
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4 text-white" />
+              ) : (
+                <Volume2 className="h-4 w-4 text-white" />
+              )}
+            </button>
+          </div>
+
+          {showFullscreen && (
+            <button
+              type="button"
+              data-preview-control
+              onClick={toggleFullscreen}
+              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4 text-white" />
+              ) : (
+                <Maximize2 className="h-4 w-4 text-white" />
+              )}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

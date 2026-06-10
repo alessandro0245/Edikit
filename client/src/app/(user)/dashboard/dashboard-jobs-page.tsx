@@ -12,7 +12,8 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import MovPreview from "@/components/MovPreview";
+import VideoPlayer from "@/components/Video/VideoPlayer";
+import { toMp4PreviewUrl } from "@/components/MovPreview";
 import VideoDownloadButton from "@/components/Video/VideoDownloadButton";
 import { useDashboardJobs } from "./useDashboardJobs";
 import type { DashboardJob } from "./useDashboardJobs";
@@ -480,19 +481,25 @@ export default function DashboardJobsPage() {
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
                 {previewJob.outputUrl ? (
-                  isMovUrl(previewJob.outputUrl) ? (
-                    <MovPreview
-                      src={previewJob.outputUrl}
-                      className="h-full w-full max-h-[70vh] object-contain"
-                    />
-                  ) : (
-                    <video
-                      src={previewJob.outputUrl}
-                      controls
-                      autoPlay
-                      className="h-full w-full max-h-[70vh] object-contain"
-                    />
-                  )
+                  (() => {
+                    const src =
+                      toMp4PreviewUrl(previewJob.outputUrl) ??
+                      previewJob.outputUrl;
+                    return (
+                      <VideoPlayer
+                        src={src}
+                        autoPlay
+                        loop
+                        muted
+                        controls
+                        variant="minimal"
+                        aspectRatio="none"
+                        showDownload={false}
+                        showFullscreen
+                        className="max-h-[70vh] w-full rounded-none"
+                      />
+                    );
+                  })()
                 ) : (
                   <div className="flex min-h-80 items-center justify-center text-sm text-muted-foreground">
                     Preview unavailable

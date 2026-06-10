@@ -8,13 +8,15 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Play,
   Info,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import useCustomizeLogic from "./useCustomizeLogic";
-import MovPreview from "@/components/MovPreview";
+import AnimationPreview from "@/components/Video/AnimationPreview";
+import VideoPlayer from "@/components/Video/VideoPlayer";
+import { toMp4PreviewUrl } from "@/components/MovPreview";
+import { getTemplateOrientation } from "@/utils/templateOrientation";
 
 const CustomizePage = () => {
   const {
@@ -24,22 +26,12 @@ const CustomizePage = () => {
     filePreviews,
     uploadedAssets,
     uploadingAssets,
-    isVideoPlaying,
-    isVideoLoaded,
-    isVideoLoading,
-    imageError,
-    setImageError,
     isDownloading,
     downloadProgress,
     authLoading,
     isGenerating,
     isUploading,
     isLoggedIn,
-    videoRef,
-    handleVideoClick,
-    handleVideoLoaded,
-    handleVideoError,
-    handleVideoEnded,
     handleTextChange,
     handleFileUpload,
     removeFile,
@@ -60,6 +52,12 @@ const CustomizePage = () => {
   // Check if we should show rendered video or template preview
   const showRenderedVideo =
     renderJob?.status === "COMPLETED" && renderJob.outputUrl;
+
+  const templateOrientation = getTemplateOrientation(template);
+
+  const renderedVideoSrc = showRenderedVideo
+    ? toMp4PreviewUrl(renderJob.outputUrl!) ?? renderJob.outputUrl!
+    : null;
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -109,6 +107,9 @@ const CustomizePage = () => {
               <h1 className="text-3xl font-bold text-foreground mb-2">
                 {template.name}
               </h1>
+              <p className="text-muted-foreground">
+                Customize this template and generate a video in seconds.
+              </p>
             </div>
 
             <div className="p-6 rounded-lg border border-border bg-card space-y-6">
@@ -714,104 +715,31 @@ const CustomizePage = () => {
                   Preview
                 </h2>
 
-                <div className="aspect-square bg-muted rounded-lg overflow-hidden relative border border-border">
-                  {showRenderedVideo ? (
-                    // Show rendered video — use MovPreview for MOV files (transparent exports)
-                    renderJob.outputUrl?.toLowerCase().includes(".mov") ? (
-                      <MovPreview
-                        src={renderJob.outputUrl}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <video
-                        src={renderJob.outputUrl}
-                        className="w-full h-full object-cover"
-                        controls
-                        autoPlay
-                        loop
-                      />
-                    )
+                <div className="aspect-square overflow-hidden rounded-lg border border-border bg-black relative">
+                  {showRenderedVideo && renderedVideoSrc ? (
+                    <VideoPlayer
+                      src={renderedVideoSrc}
+                      autoPlay
+                      loop
+                      muted
+                      controls
+                      variant="minimal"
+                      aspectRatio="none"
+                      showDownload={false}
+                      showFullscreen
+                      className="h-full w-full rounded-none"
+                    />
                   ) : (
-                    // Show interactive template preview
-                    <>
-                      {/* Static Thumbnail - shown when video not playing */}
-                      {!isVideoPlaying && !imageError && template.thumbnail && (
-                        <Image
-                          src={template.thumbnail}
-                          alt={template.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                          onError={() => setImageError(true)}
-                          priority={false}
-                        />
-                      )}
-
-                      {/* Fallback if image fails or no thumbnail */}
-                      {(imageError || !template.thumbnail) &&
-                        !isVideoPlaying && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                            <p className="text-sm text-muted-foreground">
-                              No preview
-                            </p>
-                          </div>
-                        )}
-
-                      {/* Video (lazy loaded on first click) */}
-                      <video
-                        ref={videoRef}
-                        className={`w-full h-full object-cover transition-opacity duration-300 ${
-                          isVideoPlaying && isVideoLoaded
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                        onLoadedData={handleVideoLoaded}
-                        onError={handleVideoError}
-                        onEnded={handleVideoEnded}
-                      />
-
-                      {/* Play/Pause Overlay */}
-                      <div
-                        className="absolute inset-0 cursor-pointer"
-                        onClick={handleVideoClick}
-                      >
-                        {!isVideoPlaying && !isVideoLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/90 backdrop-blur-sm transition-transform hover:scale-110">
-                              <Play className="h-8 w-8 fill-primary-foreground text-primary-foreground ml-1" />
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Loading indicator while video loads */}
-                        {isVideoLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-                            <Loader2 className="h-12 w-12 animate-spin text-white" />
-                          </div>
-                        )}
-
-                        {/* Subtle pause indicator when playing */}
-                        {isVideoPlaying && isVideoLoaded && (
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/10">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
-                              <div className="flex gap-1">
-                                <div className="w-1.5 h-5 bg-white rounded-full" />
-                                <div className="w-1.5 h-5 bg-white rounded-full" />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Click hint */}
-                      {!isVideoPlaying && !isVideoLoading && (
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm">
-                          <p className="text-xs text-white font-medium">
-                            Click to preview
-                          </p>
-                        </div>
-                      )}
-                    </>
+                    <AnimationPreview
+                      src={template.previewUrl}
+                      poster={template.thumbnail}
+                      orientation={templateOrientation}
+                      fit="contain"
+                      trigger="click"
+                      showFullscreen
+                      onClickHint="Click to preview"
+                      className="h-full w-full"
+                    />
                   )}
                 </div>
               </div>

@@ -192,7 +192,7 @@ const Navbar = () => {
             <NavLink href="/pricing" onClick={() => setIsOpen(false)}>
               Pricing
             </NavLink>
-            <NavLink href="/credits" onClick={() => setIsOpen(false)}>
+            <NavLink href="/dashboard/credits" onClick={() => setIsOpen(false)}>
               Credits
             </NavLink>
 

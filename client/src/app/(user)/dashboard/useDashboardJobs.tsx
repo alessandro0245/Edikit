@@ -80,9 +80,7 @@ const resolveSubtitle = (job: RenderJobRecord) => {
   if (job.renderType === "AI_PROMPT") {
     return "AI prompt render";
   }
-
-  const template = templates.find((item) => item.id === job.templateId);
-  return template?.description || "Template render";
+ 
 };
 
 export const useDashboardJobs = () => {

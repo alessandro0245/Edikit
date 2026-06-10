@@ -153,13 +153,29 @@ export default function Hero() {
               {/* Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div className="md:col-span-1">
-                  <Card {...featuredTemplates[0]} />
+                  <Card
+                    {...featuredTemplates[0]}
+                    backgroundDimensions={
+                      featuredTemplates[0].fields.background?.dimensions
+                    }
+                  />
                 </div>
                 <div className="md:col-span-1 md:scale-110 md:origin-center">
-                  <Card {...featuredTemplates[1]} isFeatured={true} />
+                  <Card
+                    {...featuredTemplates[1]}
+                    isFeatured={true}
+                    backgroundDimensions={
+                      featuredTemplates[1].fields.background?.dimensions
+                    }
+                  />
                 </div>
                 <div className="md:col-span-1">
-                  <Card {...featuredTemplates[2]} />
+                  <Card
+                    {...featuredTemplates[2]}
+                    backgroundDimensions={
+                      featuredTemplates[2].fields.background?.dimensions
+                    }
+                  />
                 </div>
               </div>
 
