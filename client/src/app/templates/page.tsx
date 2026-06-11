@@ -1,11 +1,12 @@
-import Templates from './Templates'
+import { Suspense } from "react";
+import Templates from "./Templates";
 
 const page = () => {
   return (
-    <div>
+    <Suspense>
       <Templates />
-    </div>
-  )
-}
+    </Suspense>
+  );
+};
 
-export default page
+export default page;

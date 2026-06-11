@@ -63,6 +63,7 @@ export const categories = [
 export interface Template {
   id: number;
   name: string;
+  description?: string;
   previewUrl: string;
   thumbnail?: string;
   hasTransprentBackground?: boolean;
