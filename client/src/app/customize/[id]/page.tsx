@@ -57,7 +57,7 @@ const CustomizePage = () => {
   const templateOrientation = getTemplateOrientation(template);
 
   const renderedVideoSrc = showRenderedVideo
-    ? toMp4PreviewUrl(renderJob.outputUrl!) ?? renderJob.outputUrl!
+    ? (toMp4PreviewUrl(renderJob.outputUrl!) ?? renderJob.outputUrl!)
     : null;
 
   return (
@@ -95,6 +95,7 @@ const CustomizePage = () => {
       <main className="container mx-auto px-4 py-8">
         <Link
           href="/templates"
+          style={{ border: "1px" }}
           className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-accent transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -459,53 +460,52 @@ const CustomizePage = () => {
               {template.hasTransprentBackground == false ? (
                 <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                   <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                    ⚠️ This template does not support transparent background. The exported video will have a colored background.
+                    ⚠️ This template does not support transparent background.
+                    The exported video will have a colored background.
                   </p>
                 </div>
               ) : (
                 <div className="p-4 rounded-lg border border-border bg-card space-y-3">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    Background Mode
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Colored keeps default template background. Transparent
-                    removes background for alpha export.
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      Background Mode
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Colored keeps default template background. Transparent
+                      removes background for alpha export.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setUseBackgroundColor(true)}
+                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                        useBackgroundColor
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Colored
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUseBackgroundColor(false)}
+                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                        !useBackgroundColor
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Transparent
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {useBackgroundColor
+                      ? "Export target: MP4"
+                      : "Export target: QuickTime MOV (Animation + Alpha)"}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setUseBackgroundColor(true)}
-                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                      useBackgroundColor
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Colored
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUseBackgroundColor(false)}
-                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                      !useBackgroundColor
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Transparent
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {useBackgroundColor
-                    ? "Export target: MP4"
-                    : "Export target: QuickTime MOV (Animation + Alpha)"}
-                </p>
-              </div>
-                  )
-                }
-            
+              )}
             </div>
 
             {/* Render Status */}

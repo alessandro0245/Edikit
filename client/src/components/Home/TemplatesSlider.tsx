@@ -42,12 +42,12 @@ function useCardsPerView() {
 
 function getEdgeMask(cardsPerView: number) {
   if (cardsPerView === 1) {
-    return "linear-gradient(to right, transparent, black 3%, black 97%, transparent)";
+    return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 3%, black 6%, black 94%, rgba(0,0,0,0.4) 97%, transparent 100%)";
   }
   if (cardsPerView === 2) {
-    return "linear-gradient(to right, transparent, black 5%, black 95%, transparent)";
+    return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 4%, rgba(0,0,0,0.75) 8%, black 13%, black 87%, rgba(0,0,0,0.75) 92%, rgba(0,0,0,0.3) 96%, transparent 100%)";
   }
-  return "linear-gradient(to right, transparent, black 8%, black 92%, transparent)";
+  return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 4%, rgba(0,0,0,0.65) 8%, black 14%, black 86%, rgba(0,0,0,0.65) 92%, rgba(0,0,0,0.25) 96%, transparent 100%)";
 }
 
 function wrapIndex(index: number, length: number) {
@@ -70,37 +70,51 @@ function SliderCard({ template, isCenter, cardsPerView }: SliderCardProps) {
   const orientation = getTemplateOrientation(template);
 
   return (
-    <div className="flex h-full justify-center px-1.5 sm:px-2 md:px-3">
+    <div className="flex justify-center px-1.5 sm:px-2 md:px-3">
       <Link
         href={`/customize/${template.id}`}
-        className={`group block h-full w-full transition-transform duration-300 ease-in-out ${
+        className={`group block w-full transition-transform duration-300 ease-in-out ${
           cardsPerView === 1
             ? "max-w-[min(75vw,280px)] sm:max-w-[320px] md:max-w-[360px]"
             : ""
         }`}
         style={{ transform: isCenter ? "scale(1)" : "scale(0.97)" }}
       >
-        <div className="flex h-full origin-center flex-col overflow-hidden rounded-xl border-2  bg-white shadow-lg shadow-black/20 transition-colors duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl">
+        <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 bg-white shadow-lg shadow-black/20 transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl">
+          {/* Media area */}
           <div
             className={`relative overflow-hidden bg-black ${orientationContainerClass[orientation]}`}
+            onMouseEnter={(e) => {
+              const v = e.currentTarget.querySelector("video");
+              if (v) void v.play();
+            }}
+            onMouseLeave={(e) => {
+              const v = e.currentTarget.querySelector("video");
+              if (v) { v.pause(); v.currentTime = 0; }
+            }}
           >
+            {/* Static thumbnail — always visible as base layer */}
+            {template.thumbnail && (
+              <img
+                src={template.thumbnail}
+                alt={template.name}
+                className="absolute inset-0 h-full w-full object-cover"
+                draggable={false}
+              />
+            )}
+            {/* Video — fades in on hover */}
             <video
               src={template.previewUrl}
-              poster={template.thumbnail}
               muted
               loop
               playsInline
-              preload="metadata"
-              className="absolute inset-0 h-full w-full object-cover"
-              onMouseEnter={(event) => void event.currentTarget.play()}
-              onMouseLeave={(event) => {
-                event.currentTarget.pause();
-                event.currentTarget.currentTime = 0;
-              }}
+              preload="none"
+              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />
           </div>
 
-          <div className="bg-background p-3 text-white sm:p-4">
+          {/* Label — hardcoded dark bg to avoid global bg-color transition flickering */}
+          <div className="bg-[#111827] p-3 transition-none sm:p-4">
             <p className="line-clamp-2 text-xs leading-relaxed text-white sm:text-sm md:text-base">
               {template.name}
             </p>

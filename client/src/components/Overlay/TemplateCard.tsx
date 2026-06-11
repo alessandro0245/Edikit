@@ -13,11 +13,8 @@ export default function TemplateCard({ template }: TemplateCardProps) {
   const orientation = getTemplateOrientation(template);
 
   return (
-    <Link
-      href={`/customize/${template.id}`}
-      className="group block w-full"
-    >
-      <div className="overflow-hidden rounded-3xl border-2 border-transparent bg-black transition-colors duration-300 group-hover:border-primary">
+    <Link href={`/customize/${template.id}`} className="group block w-full">
+      <div className="overflow-hidden rounded-2xl border border-border bg-black transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-black/10">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}
@@ -28,11 +25,12 @@ export default function TemplateCard({ template }: TemplateCardProps) {
           playOverlay={false}
           className="w-full"
         />
+        <div className="border-t border-border bg-card px-3.5 py-2.5">
+          <h3 className="truncate text-sm font-medium text-foreground transition-colors duration-300 group-hover:text-primary">
+            {template.name}
+          </h3>
+        </div>
       </div>
-
-      <h3 className="mt-3 text-sm font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
-        {template.name}
-      </h3>
     </Link>
   );
 }

@@ -80,7 +80,7 @@ export interface Template {
 export const templates: Template[] = [
   {
     id: 1,
-    name: "2 cards joined by a line",
+    name: "Two Cards Linked Together",
     previewUrl: "/previews/animation-1.mp4",
     thumbnail: "/previews/animation 1.png",
     hasTransprentBackground: true,
@@ -109,7 +109,7 @@ export const templates: Template[] = [
   },
   {
     id: 2,
-    name: "1 card branching into 3",
+    name: "Card Tree Branch Layout",
     previewUrl: "/previews/animation-2.mp4",
     thumbnail: "/previews/animation 2.png",
     hasTransprentBackground: true,
@@ -152,7 +152,7 @@ export const templates: Template[] = [
   },
   {
     id: 3,
-    name: "swipeable stack of cards",
+    name: "Swipeable Stack of Cards",
     previewUrl: "/previews/animation-3.mp4",
     thumbnail: "/previews/animation 3.png",
     hasTransprentBackground: true,
@@ -195,7 +195,7 @@ export const templates: Template[] = [
   },
   {
     id: 4,
-    name: "product card showing price, rating and add-to-cart",
+    name: "Product Price Showcase Card",
     previewUrl: "/previews/animation-4.mp4",
     thumbnail: "/previews/animation 4.png",
     hasTransprentBackground: true,
@@ -228,7 +228,7 @@ export const templates: Template[] = [
   },
   {
     id: 5,
-    name: "Search result showing a website and two images",
+    name: "Google Search Results Layout",
     previewUrl: "/previews/animation-5.mp4",
     thumbnail: "/previews/animation 5.png",
     hasTransprentBackground: true,
@@ -280,7 +280,7 @@ export const templates: Template[] = [
   },
   {
     id: 6,
-    name: "Folder opens to reveal 3 images",
+    name: "Folder Opening Image Reveal",
     previewUrl: "/previews/animation-6.mp4",
     thumbnail: "/previews/animation 6.png",
     hasTransprentBackground: true,
@@ -320,7 +320,7 @@ export const templates: Template[] = [
   },
   {
     id: 7,
-    name: "Clock with text banner sliding in",
+    name: "Clock with Sliding Banner",
     previewUrl: "/previews/animation-7.mp4",
     thumbnail: "/previews/animation 7.png",
     hasTransprentBackground: true,
@@ -336,7 +336,7 @@ export const templates: Template[] = [
   },
   {
     id: 8,
-    name: "Dark product card with add-to-cart button",
+    name: "Dark Product Showcase Card",
     previewUrl: "/previews/animation-8.mp4",
     thumbnail: "/previews/animation 8.png",
     hasTransprentBackground: true,
@@ -360,7 +360,7 @@ export const templates: Template[] = [
   },
   {
     id: 9,
-    name: "5 notifications stacking up",
+    name: "Chat Message Notification Stack",
     previewUrl: "/previews/animation-9.mp4",
     thumbnail: "/previews/animation 9.png",
     hasTransprentBackground: true,
@@ -417,7 +417,7 @@ export const templates: Template[] = [
   },
   {
     id: 10,
-    name: "2 cards joined by a line",
+    name: "Three Cards Linked Together",
     previewUrl: "/previews/animation-10.mp4",
     thumbnail: "/previews/animation 10.png",
     hasTransprentBackground: true,
@@ -453,7 +453,7 @@ export const templates: Template[] = [
   },
   {
     id: 11,
-    name: "Social media post",
+    name: "Animated Social Media Post",
     previewUrl: "/previews/animation-11.mp4",
     thumbnail: "/previews/animation 11.png",
     hasTransprentBackground: false,
@@ -489,7 +489,7 @@ export const templates: Template[] = [
   },
   {
     id: 12,
-    name: "Creator channel header with subscribe button",
+    name: "Creator Channel Subscribe Header",
     previewUrl: "/previews/animation-12.mp4",
     thumbnail: "/previews/animation 12.png",
     hasTransprentBackground: false,
@@ -523,7 +523,7 @@ export const templates: Template[] = [
   },
   {
     id: 13,
-    name: "Calendar event pinned to a date",
+    name: "Pinned Calendar Event Card",
     previewUrl: "/previews/animation-13.mp4",
     thumbnail: "/previews/animation 13.png",
     hasTransprentBackground: false,
@@ -552,7 +552,7 @@ export const templates: Template[] = [
   },
   {
     id: 14,
-    name: "single line bouncing text",
+    name: "Single Line Bouncing Text",
     previewUrl: "/previews/animation-14.mp4",
     thumbnail: "/previews/animation 14.png",
     hasTransprentBackground: true,
@@ -568,7 +568,7 @@ export const templates: Template[] = [
   },
   {
     id: 15,
-    name: "Two-post thread",
+    name: "Two-Post Social Thread",
     previewUrl: "/previews/animation-15.mp4",
     thumbnail: "/previews/animation 15.png",
     hasTransprentBackground: false,
@@ -627,7 +627,7 @@ export const templates: Template[] = [
   },
   {
     id: 16,
-    name: "Video card with player, title, channel and views",
+    name: "Social Video Player Card",
     previewUrl: "/previews/animation-16.mp4",
     thumbnail: "/previews/animation 16.png",
     hasTransprentBackground: false,
