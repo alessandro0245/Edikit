@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Template } from "@/utils/constant";
+import AnimationPreview from "@/components/Video/AnimationPreview";
 import {
   getTemplateOrientation,
   orientationContainerClass,
@@ -40,15 +41,15 @@ function useCardsPerView() {
   return cardsPerView;
 }
 
-function getEdgeMask(cardsPerView: number) {
-  if (cardsPerView === 1) {
-    return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 3%, black 6%, black 94%, rgba(0,0,0,0.4) 97%, transparent 100%)";
-  }
-  if (cardsPerView === 2) {
-    return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 4%, rgba(0,0,0,0.75) 8%, black 13%, black 87%, rgba(0,0,0,0.75) 92%, rgba(0,0,0,0.3) 96%, transparent 100%)";
-  }
-  return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 4%, rgba(0,0,0,0.65) 8%, black 14%, black 86%, rgba(0,0,0,0.65) 92%, rgba(0,0,0,0.25) 96%, transparent 100%)";
-}
+// function getEdgeMask(cardsPerView: number) {
+//   if (cardsPerView === 1) {
+//     return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 3%, black 6%, black 94%, rgba(0,0,0,0.4) 97%, transparent 100%)";
+//   }
+//   if (cardsPerView === 2) {
+//     return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 4%, rgba(0,0,0,0.75) 8%, black 13%, black 87%, rgba(0,0,0,0.75) 92%, rgba(0,0,0,0.3) 96%, transparent 100%)";
+//   }
+//   return "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 4%, rgba(0,0,0,0.65) 8%, black 14%, black 86%, rgba(0,0,0,0.65) 92%, rgba(0,0,0,0.25) 96%, transparent 100%)";
+// }
 
 function wrapIndex(index: number, length: number) {
   return ((index % length) + length) % length;
@@ -60,13 +61,33 @@ function getTranslateIndex(centerIndex: number, cardsPerView: number) {
   return centerIndex;
 }
 
+function isSlideVisible(
+  slideIndex: number,
+  centerIndex: number,
+  cardsPerView: number,
+) {
+  if (cardsPerView === 3) {
+    return slideIndex >= centerIndex - 1 && slideIndex <= centerIndex + 1;
+  }
+  if (cardsPerView === 2) {
+    return slideIndex >= centerIndex && slideIndex <= centerIndex + 1;
+  }
+  return slideIndex === centerIndex;
+}
+
 interface SliderCardProps {
   template: Template;
   isCenter: boolean;
   cardsPerView: number;
+  isVisible: boolean;
 }
 
-function SliderCard({ template, isCenter, cardsPerView }: SliderCardProps) {
+function SliderCard({
+  template,
+  isCenter,
+  cardsPerView,
+  isVisible,
+}: SliderCardProps) {
   const orientation = getTemplateOrientation(template);
 
   return (
@@ -80,41 +101,35 @@ function SliderCard({ template, isCenter, cardsPerView }: SliderCardProps) {
         }`}
         style={{ transform: isCenter ? "scale(1)" : "scale(0.97)" }}
       >
-        <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 bg-white shadow-lg shadow-black/20 transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl">
-          {/* Media area */}
-          <div
-            className={`relative overflow-hidden bg-black ${orientationContainerClass[orientation]}`}
-            onMouseEnter={(e) => {
-              const v = e.currentTarget.querySelector("video");
-              if (v) void v.play();
-            }}
-            onMouseLeave={(e) => {
-              const v = e.currentTarget.querySelector("video");
-              if (v) { v.pause(); v.currentTime = 0; }
-            }}
-          >
-            {/* Static thumbnail — always visible as base layer */}
-            {template.thumbnail && (
-              <img
-                src={template.thumbnail}
-                alt={template.name}
-                className="absolute inset-0 h-full w-full object-cover"
-                draggable={false}
-              />
-            )}
-            {/* Video — fades in on hover */}
-            <video
+        <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white  transition-[border-color] duration-300 ease-in-out group-hover:border-primary hover:border-[3.5px] sm:rounded-2xl ">
+          {isVisible ? (
+            <AnimationPreview
               src={template.previewUrl}
-              muted
-              loop
-              playsInline
-              preload="none"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              poster={template.thumbnail}
+              orientation={orientation}
+              fit="native"
+              trigger="auto"
+              showControls={false}
+              playOverlay={false}
+              className="w-full"
             />
-          </div>
+          ) : (
+            <div
+              className={`relative overflow-hidden bg-black ${orientationContainerClass[orientation]}`}
+            >
+              {template.thumbnail && (
+                <img
+                  src={template.thumbnail}
+                  alt={template.name}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  draggable={false}
+                />
+              )}
+            </div>
+          )}
 
           {/* Label — hardcoded dark bg to avoid global bg-color transition flickering */}
-          <div className="bg-[#111827] p-3 transition-none sm:p-4">
+          <div className="bg-background p-3 transition-none sm:p-4">
             <p className="line-clamp-2 text-xs leading-relaxed text-white sm:text-sm md:text-base">
               {template.name}
             </p>
@@ -227,7 +242,7 @@ export default function TemplatesSlider({ templates }: TemplatesSliderProps) {
 
   if (total === 0) return null;
 
-  const edgeMask = getEdgeMask(cardsPerView);
+  // const edgeMask = getEdgeMask(cardsPerView);
 
   return (
     <div
@@ -256,10 +271,10 @@ export default function TemplatesSlider({ templates }: TemplatesSliderProps) {
       <div
         ref={viewportRef}
         className="overflow-hidden"
-        style={{
-          WebkitMaskImage: edgeMask,
-          maskImage: edgeMask,
-        }}
+        // style={{
+        //   WebkitMaskImage: edgeMask,
+        //   maskImage: edgeMask,
+        // }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -283,6 +298,7 @@ export default function TemplatesSlider({ templates }: TemplatesSliderProps) {
                 template={template}
                 isCenter={index === centerIndex}
                 cardsPerView={cardsPerView}
+                isVisible={isSlideVisible(index, centerIndex, cardsPerView)}
               />
             </div>
           ))}

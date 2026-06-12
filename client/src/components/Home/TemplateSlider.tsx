@@ -51,11 +51,11 @@ function Slide({ template, role }: SlideProps) {
         }`}
       >
         <div
-          className={`overflow-hidden rounded-3xl bg-black transition-all duration-300 ${
+          className={`overflow-hidden rounded-3xl transition-all duration-300 ${
             isCenter
               ? "border border-primary/30 shadow-[0_28px_70px_-18px_rgba(26,115,232,0.45)]"
-              : "border border-white/6"
-          } group-hover:border-primary/50`}
+              : "border border-white/6 "
+          } group-hover:border-primary/50 `}
         >
           <AnimationPreview
             src={template.previewUrl}

@@ -12,11 +12,11 @@ export default function Hero() {
         {/* <Prompt /> */}
 
         {/* Gradient divider */}
-        {/* <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" /> */}
+        <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
 
         {/* Templates Section */}
         <section
-          className="relative overflow-hidden bg-gray-950 py-16 md:py-24"
+          className="relative overflow-hidden bg-[#191919] py-16 md:py-24"
           id="templates"
         >
           {/* ── Background decorations ── */}
@@ -25,7 +25,7 @@ export default function Hero() {
             aria-hidden="true"
           >
             {/* Dot grid */}
-            {/* <svg className="absolute inset-0 w-full h-full ">
+            {/* <svg className="absolute inset-0 w-full h-full opacity-5">
               <defs>
                 <pattern
                   id="dot-grid"
@@ -40,9 +40,9 @@ export default function Hero() {
             </svg> */}
 
             {/* Glow top-right */}
-            {/* <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" /> */}
+            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" />
             {/* Glow bottom-left */}
-            {/* <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" /> */}
+            <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" />
 
             {/* Floating circle outline — top left */}
             <svg
@@ -145,8 +145,8 @@ export default function Hero() {
                   Customize text, colors, and logos, then export instantly. No
                   animation experience needed.
                 </p> */}
-                <p className="mx-auto max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-2xl">
-                  vertical templates
+                <p className="mx-auto max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
+                Every template is professionally crafted by motion designers. Customize text, colors, and logos, then export instantly. No animation experience needed.
                 </p>
               </div>
             </div>

@@ -14,7 +14,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <Link href={`/customize/${template.id}`} className="group block w-full">
-      <div className="overflow-hidden rounded-2xl border border-border bg-black transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-black/10">
+      <div className="overflow-hidden rounded-2xl border-2 border-[#4B4B4B] bg-black transition-all duration-300 group-hover:border-primary hover:border-[3.5px] ">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}

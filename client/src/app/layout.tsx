@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
-import { Google_Sans_Flex } from "next/font/google";
 
 // Google Sans Flex Variable Font
 // const googleSansFlex = localFont({
@@ -23,7 +22,7 @@ import { Google_Sans_Flex } from "next/font/google";
 // });
 
 export const metadata: Metadata = {
-  title: "Edikit : Create Production-Level Motion Graphics in Seconds",
+  title: "Edikit | Create Production-Level Motion Graphics in Seconds",
   description:
     "Edikit lets you create viral, production-level motion graphics in seconds. Choose a template, customize it, and generate videos automatically.",
   icons: {

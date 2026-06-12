@@ -16,7 +16,7 @@ import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
-import { getTemplateOrientation } from "@/utils/templateOrientation";
+import { getTemplateOrientation, orientationContainerClass } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 
 const CustomizePage = () => {
@@ -704,30 +704,32 @@ const CustomizePage = () => {
                   Preview
                 </h2>
 
-                <div className="aspect-square overflow-hidden rounded-lg border border-border bg-black relative">
+                <div className="overflow-hidden rounded-lg border border-border bg-black relative">
                   {showRenderedVideo && renderedVideoSrc ? (
-                    <VideoPlayer
-                      src={renderedVideoSrc}
-                      autoPlay
-                      loop
-                      muted
-                      controls
-                      variant="minimal"
-                      aspectRatio="none"
-                      showDownload={false}
-                      showFullscreen
-                      className="h-full w-full rounded-none"
-                    />
+                    <div className={orientationContainerClass[templateOrientation]}>
+                      <VideoPlayer
+                        src={renderedVideoSrc}
+                        autoPlay
+                        loop
+                        muted
+                        controls
+                        variant="minimal"
+                        aspectRatio="none"
+                        showDownload={false}
+                        showFullscreen
+                        className="h-full w-full rounded-none"
+                      />
+                    </div>
                   ) : (
                     <AnimationPreview
                       src={template.previewUrl}
                       poster={template.thumbnail}
                       orientation={templateOrientation}
-                      fit="contain"
-                      trigger="click"
+                      fit="native"
                       showFullscreen
-                      onClickHint="Click to preview"
-                      className="h-full w-full"
+                      playOverlay={false}
+                      trigger="auto"
+                      className="w-full"
                     />
                   )}
                 </div>

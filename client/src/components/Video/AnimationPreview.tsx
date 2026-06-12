@@ -246,7 +246,7 @@ export default function AnimationPreview({
             src={poster}
             alt=""
             fill
-            className={`object-contain transition-opacity duration-300 ${
+            className={`object-cover transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
             }`}
             sizes="(max-width: 768px) 100vw, 33vw"
@@ -256,7 +256,7 @@ export default function AnimationPreview({
           <img
             src={posterSrc}
             alt=""
-            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
             }`}
             onError={() => setPosterError(true)}
@@ -275,8 +275,8 @@ export default function AnimationPreview({
         poster={posterSrc}
         className={
           isFullscreen
-            ? "max-h-[100vh] max-w-[100vw] object-contain"
-            : `absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${
+            ? "max-h-screen max-w-[100vw] object-cover"
+            : `absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
                 isPlaying && isLoaded ? "opacity-100" : "opacity-0"
               }`
         }
