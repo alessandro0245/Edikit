@@ -65,13 +65,13 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between relative">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 ml-4">
             <Image
               src="/logo.png"
               alt="Logo"
-              width={115}
-              height={30}
-              className="lg:w-28.75 w-20"
+              width={100}
+              height={20}
+              className="lg:w-20 w-16"
               priority
             />
           </Link>

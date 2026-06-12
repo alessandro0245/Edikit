@@ -96,7 +96,7 @@ function SliderCard({
         href={`/customize/${template.id}`}
         className={`group block w-full transition-transform duration-300 ease-in-out ${
           cardsPerView === 1
-            ? "max-w-[min(75vw,280px)] sm:max-w-[320px] md:max-w-[360px]"
+            ? "max-w-[min(75vw,280px)] sm:max-w-[320px] md:max-w-90"
             : ""
         }`}
         style={{ transform: isCenter ? "scale(1)" : "scale(0.97)" }}

@@ -4,13 +4,14 @@ import Link from "next/link";
 import { templates } from "@/utils/constant";
 import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
+import EdikitHero from "./Hero";
 
 export default function Hero() {
   return (
     <div className="min-h-screen bg-[#191919]">
       <main>
         {/* <Prompt /> */}
-
+      <EdikitHero />
         {/* Gradient divider */}
         <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
 
@@ -40,12 +41,12 @@ export default function Hero() {
             </svg> */}
 
             {/* Glow top-right */}
-            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" />
+            {/* <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-hero-glow" /> */}
             {/* Glow bottom-left */}
-            <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" />
+            {/* <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/6 blur-[80px] animate-hero-glow-delayed" /> */}
 
             {/* Floating circle outline — top left */}
-            <svg
+            {/* <svg
               className="absolute top-12 left-[6%] w-14 h-14 text-primary/20 animate-float-slow"
               viewBox="0 0 56 56"
               fill="none"
@@ -58,10 +59,10 @@ export default function Hero() {
                 strokeWidth="1.5"
                 strokeDasharray="6 4"
               />
-            </svg>
+            </svg> */}
 
             {/* Floating cross — top right */}
-            <svg
+            {/* <svg
               className="absolute top-20 right-[8%] w-8 h-8 text-primary/25 animate-float-delayed"
               viewBox="0 0 32 32"
               fill="none"
@@ -72,10 +73,10 @@ export default function Hero() {
                 strokeWidth="2"
                 strokeLinecap="round"
               />
-            </svg>
+            </svg> */}
 
             {/* Floating diamond — bottom right */}
-            <svg
+            {/* <svg
               className="absolute bottom-16 right-[12%] w-10 h-10 text-primary/15 animate-float"
               viewBox="0 0 40 40"
               fill="none"
@@ -90,10 +91,10 @@ export default function Hero() {
                 strokeWidth="1.5"
                 transform="rotate(45 20 20)"
               />
-            </svg>
+            </svg> */}
 
             {/* Floating dots cluster — bottom left */}
-            <svg
+            {/* <svg
               className="absolute bottom-24 left-[10%] w-16 h-16 text-primary/15 animate-float-slow"
               viewBox="0 0 64 64"
               fill="currentColor"
@@ -103,7 +104,7 @@ export default function Hero() {
               <circle cx="48" cy="20" r="3" />
               <circle cx="20" cy="44" r="2" />
               <circle cx="44" cy="48" r="3" />
-            </svg>
+            </svg> */}
           </div>
 
           {/* ── Content ── */}
@@ -140,14 +141,11 @@ export default function Hero() {
                   </span>
                 </h2>
 
-                {/* <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
+                <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
                   Every template is professionally crafted by motion designers.
                   Customize text, colors, and logos, then export instantly. No
                   animation experience needed.
-                </p> */}
-                <p className="mx-auto max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
-                Every template is professionally crafted by motion designers. Customize text, colors, and logos, then export instantly. No animation experience needed.
-                </p>
+                </p>         
               </div>
             </div>
 

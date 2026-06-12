@@ -31,7 +31,7 @@ const Prompt = () => {
         </svg>
 
         {/* Primary glow — top center */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-64 rounded-full bg-primary/10 blur-[120px] animate-hero-glow" />
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-150 h-64 rounded-full bg-primary/10 blur-[120px] animate-hero-glow" />
 
         {/* Accent glow — bottom right */}
         <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full bg-primary/7 blur-[80px] animate-hero-glow-delayed" />
