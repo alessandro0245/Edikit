@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edikit — Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   EDIKIT HERO — sezione autonoma, droppabile in qualsiasi pagina.
+   Classi con prefisso .ek- per non collidere col resto del sito.
+   ============================================================ */
+
+.ek-hero{
+  --ek-blue:        #1A73E8;
+  --ek-blue-2:      #5EB5FC;
+  --ek-ink:         #FFFFFF;
+  --ek-ink-soft:    #CFCFCF;
+  --ek-card-radius: clamp(12px, 1.6vw, 18px);
+  --ek-cardw:       clamp(115px, 15.5vw, 185px);
+  --ek-font: 'Google Sans Flex', 'Google Sans', 'Figtree', system-ui, -apple-system, sans-serif;
+
+  position: relative;
+  font-family: var(--ek-font);
+  background: #191919;
+  color: var(--ek-ink);
+  overflow: hidden;
+  padding: clamp(28px, 4vh, 44px) 24px clamp(26px, 4vh, 40px);
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ek-hero__inner{
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+/* ---------- Headline: parole una alla volta, sfocate -> a fuoco ---------- */
+.ek-hero__title{
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 auto;
+  max-width: 20ch;
+}
+.ek-hero__title .ek-line{ display: block; }
+.ek-hero__title .ek-w{
+  display: inline-block;
+  will-change: opacity, filter, transform; /* layer GPU: il blur animato non fa repaint */
+}
+.ek-hero.ek-anim .ek-hero__title .ek-w{ opacity: 0; }
+.ek-hero.ek-on .ek-hero__title .ek-w{
+  animation: ek-word .9s cubic-bezier(.22,.55,.25,1) both;
+  animation-delay: calc(.05s + var(--w) * .11s);
+}
+@keyframes ek-word{
+  from { opacity: 0; filter: blur(6px); transform: translateY(5px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+}
+.ek-hero__title em{
+  font-style: normal;
+  background: linear-gradient(92deg, var(--ek-blue), var(--ek-blue-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Deck: 5 video quadrati a ventaglio ---------- */
+.ek-deck{
+  position: relative;
+  height: clamp(150px, 20.5vw, 250px);
+  margin: clamp(8px, 1.2vh, 14px) auto clamp(48px, 7vh, 58px);
+  max-width: 920px;
+}
+
+.ek-card{
+  /* posizione calcolata dai fattori inline: niente !important, niente
+     conflitti con gli style inline nelle integrazioni */
+  --x: calc(var(--fx) * var(--ek-cardw));
+  --y: var(--fy);
+  --r: var(--fr);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--ek-cardw);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--ek-card-radius);
+  overflow: hidden;
+  background: #232323;
+  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r));
+  z-index: var(--z);
+  will-change: transform, opacity;
+}
+
+/* stato pre-animazione: attivato via JS (.ek-anim), parte con .ek-on */
+.ek-hero.ek-anim .ek-card{ opacity: 0; }
+
+/* ============================================================
+   ANIMAZIONE CARD — keyframe ricavati dal tracking frame-by-frame
+   del video di riferimento (30fps, posizioni e rotazioni misurate).
+
+   Fasi della protagonista (durata 1.9s):
+   - 0 -> 0.9s  (47%): entra da sotto il banner, ~0.35 card a sinistra
+                       del centro, inclinata -21° costante; sale
+                       decelerando, si raddrizza e scala 1.2 -> 1.08
+   - 0.9 -> 1.18s (62%): si assesta al centro-sinistra, dritta, scala 1
+   - 1.18 -> 1.9s (100%): scivola a destra nel suo slot, ruota a +14°
+   ============================================================ */
+.ek-hero.ek-on .ek-card--hero{
+  animation: ek-heroFly 1.9s linear forwards;
+}
+@keyframes ek-heroFly{
+  /* salita + raddrizzamento in un unico segmento con decelerazione
+     continua: niente keyframe intermedi = niente scatti */
+  0%   { transform: translate(-50%, 200%) rotate(-21deg) scale(1.2);
+         opacity: 0;
+         animation-timing-function: cubic-bezier(.16,.6,.25,1); }
+  /* invisibile finché non è COMPLETAMENTE emersa dal bordo inferiore
+     (emerge al 13.5% della timeline nel caso peggiore misurato),
+     poi fade-in rapido mentre continua a salire */
+  15%  { opacity: 0; }
+  27%  { opacity: 1; }
+  62%  { transform: translate(-50%, -50%) rotate(0deg) scale(1);
+         animation-timing-function: cubic-bezier(.5,.08,.3,1); }
+  100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r)) scale(1);
+         opacity: 1; }
+}
+
+/* Le altre 4 card partono ESATTAMENTE nella posizione della protagonista
+   (coperte da lei, z-index inferiore) e sgusciano fuori verso i loro slot
+   mentre lei scivola a destra — come nel video, dove vengono "scoperte".
+   Stagger inverso: esce per prima la card adiacente (i=3), per ultima
+   la più lontana (i=0). */
+.ek-hero.ek-on .ek-card:not(.ek-card--hero){
+  animation: ek-burst .6s cubic-bezier(.35,.1,.25,1) both;
+  animation-delay: calc(1.17s + (3 - var(--i)) * 60ms);
+}
+@keyframes ek-burst{
+  0%   { transform: translate(-50%, -50%) rotate(0deg) scale(1); opacity: 0; }
+  6%   { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r)) scale(1); opacity: 1; }
+}
+
+.ek-card video,
+.ek-card .ek-card__ph{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* placeholder animato finché non inserisci i tuoi loop —
+   solo i due colori brand, direzione alternata */
+.ek-card .ek-card__ph{
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: .72rem;
+  letter-spacing: .06em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ek-blue), var(--ek-blue-2));
+  background-size: 220% 220%;
+  animation: ek-drift 7s ease-in-out infinite;
+}
+.ek-card:nth-child(even) .ek-card__ph{
+  background: linear-gradient(315deg, var(--ek-blue), var(--ek-blue-2));
+  background-size: 220% 220%;
+}
+@keyframes ek-drift{
+  0%,100%{ background-position: 0% 50%; }
+  50%    { background-position: 100% 50%; }
+}
+
+@media (hover:hover){
+  .ek-card{ transition: filter .3s ease; }
+  .ek-card:hover{ filter: brightness(1.04); }
+}
+
+/* ---------- Sottotitolo + CTA ---------- */
+.ek-hero__sub{
+  max-width: 46ch;
+  margin: 0 auto;
+  font-size: clamp(.88rem, 1.5vw, 1rem);
+  line-height: 1.55;
+  color: var(--ek-ink-soft);
+}
+.ek-hero.ek-anim .ek-hero__sub{ opacity: 0; }
+.ek-hero.ek-on .ek-hero__sub{ animation: ek-fade .7s ease 1.45s forwards; }
+
+.ek-hero__cta{
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: clamp(14px, 2vh, 20px);
+}
+.ek-hero.ek-anim .ek-hero__cta{ opacity: 0; }
+.ek-hero.ek-on .ek-hero__cta{ animation: ek-fade .7s ease 1.65s forwards; }
+@keyframes ek-fade{ to{ opacity:1; } }
+
+.ek-btn{
+  font: inherit;
+  font-weight: 600;
+  font-size: .92rem;
+  border-radius: 999px;
+  padding: .8em 1.6em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.ek-btn--primary{
+  color: #fff;
+  border: none;
+  background: linear-gradient(92deg, var(--ek-blue), var(--ek-blue-2));
+  box-shadow: 0 12px 26px -10px rgba(26,115,232,.55);
+}
+.ek-btn--primary:hover{ transform: translateY(-2px); box-shadow: 0 16px 30px -10px rgba(26,115,232,.6); }
+.ek-btn--ghost{
+  color: var(--ek-ink);
+  background: transparent;
+  border: none;
+}
+.ek-btn--ghost:hover{ text-decoration: underline; }
+.ek-btn:focus-visible{ outline: 3px solid var(--ek-blue-2); outline-offset: 3px; }
+
+/* ---------- Responsive: mobile ---------- */
+@media (max-width: 640px){
+  .ek-card:nth-child(1),
+  .ek-card:nth-child(4){ display:none; } /* 3 card sul mobile */
+  .ek-hero{ --ek-cardw: clamp(110px, 27vw, 140px); }
+  .ek-deck{ height: clamp(160px, 44vw, 210px); margin-bottom: 26px; }
+  /* su mobile ogni card usa la variante -m se definita inline
+     (la protagonista atterra nello slot destro del ventaglio a 3) */
+  .ek-card{
+    --x: calc(var(--fx-m, var(--fx)) * var(--ek-cardw));
+    --y: var(--fy-m, var(--fy));
+    --r: var(--fr-m, var(--fr));
+  }
+}
+
+/* ---------- Accessibilità: riduzione movimento (via JS) ---------- */
+.ek-hero.ek-reduced *{ animation-duration: .01ms !important; animation-delay: 0s !important; }
+</style>
+</head>
+<body style="margin:0; background:#191919; min-height:100vh">
+
+<section class="ek-hero">
+  <div class="ek-hero__inner">
+
+    <h1 class="ek-hero__title">
+      <span class="ek-line"><span class="ek-w" style="--w:0">Pro</span> <span class="ek-w" style="--w:1">motion</span> <span class="ek-w" style="--w:2">graphics</span></span>
+      <span class="ek-line"><span class="ek-w" style="--w:3">in</span> <span class="ek-w" style="--w:4"><em>2 clicks</em>.</span></span>
+    </h1>
+
+    <div class="ek-deck" id="ekDeck">
+      <!-- 5 card statiche: visibili anche senza JavaScript.
+           Lo script sotto inserisce i tuoi video in loop. -->
+      <div class="ek-card" style="--i:0; --fx:-1.6;  --fy:30px; --fr:-14deg; --z:1"><div class="ek-card__ph">TEMPLATE 01</div></div>
+      <div class="ek-card" style="--i:1; --fx:-0.85; --fy:8px;  --fr:-7deg;  --z:2"><div class="ek-card__ph">TEMPLATE 02</div></div>
+      <div class="ek-card" style="--i:2; --fx:0;     --fy:0px;  --fr:0deg;   --z:3"><div class="ek-card__ph">TEMPLATE 03</div></div>
+      <div class="ek-card" style="--i:3; --fx:0.85;  --fy:8px;  --fr:7deg;   --z:4"><div class="ek-card__ph">TEMPLATE 04</div></div>
+      <div class="ek-card ek-card--hero" style="--i:4; --fx:1.6; --fy:30px; --fr:14deg; --fx-m:0.85; --fy-m:8px; --fr-m:7deg; --z:5"><div class="ek-card__ph">TEMPLATE 05</div></div>
+    </div>
+
+    <p class="ek-hero__sub">
+      Pick a template, customize text and colors in your browser, and
+      download the rendered video. That's it.
+    </p>
+
+    <div class="ek-hero__cta">
+      <a class="ek-btn ek-btn--primary" href="/pricing">See pricing</a>
+      <a class="ek-btn ek-btn--ghost" href="#templates">Explore templates</a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+
+/* Se true, rispetta l'impostazione di sistema "Riduci movimento"
+   (consigliato in produzione). Metti false per forzare l'animazione
+   anche con quella impostazione attiva, utile in fase di test. */
+const EK_RISPETTA_RIDUCI_MOVIMENTO = false;
+
+/* Sostituisci i src con i tuoi 5 loop quadrati (.mp4/.webm).
+   Se src è vuoto resta il placeholder animato. */
+const EK_TEMPLATES = [
+  { src: "", poster: "" },
+  { src: "", poster: "" },
+  { src: "", poster: "" },
+  { src: "", poster: "" },
+  { src: "", poster: "" },
+];
+
+(function(){
+  const hero = document.querySelector('.ek-hero');
+  const deck = document.getElementById('ekDeck');
+  const cards = deck.querySelectorAll('.ek-card');
+
+  EK_TEMPLATES.forEach((t, i) => {
+    if (!t.src || !cards[i]) return;
+    const v = document.createElement('video');
+    v.muted = true; v.loop = true; v.autoplay = true;
+    v.playsInline = true; v.setAttribute('playsinline','');
+    v.preload = 'metadata';
+    if (t.poster) v.poster = t.poster;
+    v.src = t.src;
+    v.addEventListener('canplay', () => v.play().catch(()=>{}));
+    cards[i].innerHTML = '';
+    cards[i].appendChild(v);
+  });
+
+  const reduced = EK_RISPETTA_RIDUCI_MOVIMENTO &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  hero.classList.add('ek-anim');
+  if (reduced) hero.classList.add('ek-reduced');
+
+  const play = () => {
+    hero.classList.remove('ek-on');
+    void hero.offsetWidth;
+    hero.classList.add('ek-on');
+  };
+
+  if (reduced || !('IntersectionObserver' in window)) {
+    hero.classList.add('ek-on');
+  } else {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) play();
+        else hero.classList.remove('ek-on');
+        deck.querySelectorAll('video').forEach(v =>
+          e.isIntersecting ? v.play().catch(()=>{}) : v.pause());
+      });
+    }, { threshold: 0.25 }).observe(hero);
+  }
+})();
+</script>
+
+</body>
+</html>

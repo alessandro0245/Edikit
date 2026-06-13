@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import {
   ArrowLeft,
   Upload,
@@ -16,10 +17,22 @@ import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
-import { getTemplateOrientation, orientationContainerClass } from "@/utils/templateOrientation";
+import {
+  getTemplateOrientation,
+  orientationContainerClass,
+} from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 
+const ASPECT_RATIOS = [
+  { label: "9:16", value: "9/16" },
+  { label: "2:3", value: "2/3" },
+  { label: "4:5", value: "4/5" },
+  { label: "1:1", value: "1/1" },
+  { label: "16:9", value: "16/9" },
+];
+
 const CustomizePage = () => {
+  const [previewRatio, setPreviewRatio] = useState("4/5");
   const {
     template,
     renderJob,
@@ -700,36 +713,55 @@ const CustomizePage = () => {
           <div className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
             <div className="p-6 rounded-lg border border-border bg-card">
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-foreground">
-                  Preview
-                </h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-foreground">
+                    Preview
+                  </h2>
+                  <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-0.5">
+                    {ASPECT_RATIOS.map(({ label, value }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setPreviewRatio(value)}
+                        className={`rounded-md px-2.5 cursor-pointer py-1 text-xs font-medium transition-colors ${
+                          previewRatio === value
+                            ? "bg-card text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                <div className="overflow-hidden rounded-lg border border-border bg-black relative">
+                <div
+                  className="overflow-hidden rounded-lg border border-border bg-black relative"
+                  style={{ aspectRatio: previewRatio }}
+                >
                   {showRenderedVideo && renderedVideoSrc ? (
-                    <div className={orientationContainerClass[templateOrientation]}>
-                      <VideoPlayer
-                        src={renderedVideoSrc}
-                        autoPlay
-                        loop
-                        muted
-                        controls
-                        variant="minimal"
-                        aspectRatio="none"
-                        showDownload={false}
-                        showFullscreen
-                        className="h-full w-full rounded-none"
-                      />
-                    </div>
+                    <VideoPlayer
+                      src={renderedVideoSrc}
+                      autoPlay
+                      loop
+                      muted
+                      controls
+                      variant="minimal"
+                      aspectRatio="none"
+                      showDownload={false}
+                      showFullscreen
+                      className="h-full w-full rounded-none"
+                    />
                   ) : (
                     <AnimationPreview
                       src={template.previewUrl}
                       poster={template.thumbnail}
                       orientation={templateOrientation}
-                      fit="native"
+                      fit="contain"
                       showFullscreen
                       playOverlay={false}
                       trigger="auto"
-                      className="w-full"
+                      className="h-full w-full"
                     />
                   )}
                 </div>

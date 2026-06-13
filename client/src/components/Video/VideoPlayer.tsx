@@ -145,7 +145,7 @@ export default function VideoPlayer({
 
         {controls && (
           <div
-            className={`absolute inset-0 flex flex-col justify-between opacity-0 transition-opacity duration-300  ${
+            className={`absolute inset-0 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
               isMinimal
                 ? "bg-linear-to-t from-black/80 via-transparent to-transparent"
                 : "bg-linear-to-t from-black/80 via-transparent to-black/20"

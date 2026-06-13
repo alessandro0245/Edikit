@@ -11,9 +11,15 @@ export default function Hero() {
     <div className="min-h-screen bg-[#191919]">
       <main>
         {/* <Prompt /> */}
-      <EdikitHero />
-        {/* Gradient divider */}
-        <div className="h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
+        <EdikitHero />
+
+        {/* Section transition: dark hero fades into templates bg */}
+        <div
+          className="h-16 w-full"
+          style={{
+            background: "linear-gradient(to bottom, #0D0D0D, #191919)",
+          }}
+        />
 
         {/* Templates Section */}
         <section
@@ -143,9 +149,9 @@ export default function Hero() {
 
                 <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
                   Every template is professionally crafted by motion designers.
-                  Customize text, colors, and logos, then export instantly. No
+                  Customize text, colors and logos, then export instantly. No
                   animation experience needed.
-                </p>         
+                </p>
               </div>
             </div>
 
