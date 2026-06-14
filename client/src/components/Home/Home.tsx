@@ -13,14 +13,6 @@ export default function Hero() {
         {/* <Prompt /> */}
         <EdikitHero />
 
-        {/* Section transition: dark hero fades into templates bg */}
-        <div
-          className="h-16 w-full"
-          style={{
-            background: "linear-gradient(to bottom, #0D0D0D, #191919)",
-          }}
-        />
-
         {/* Templates Section */}
         <section
           className="relative overflow-hidden bg-[#191919] py-16 md:py-24"

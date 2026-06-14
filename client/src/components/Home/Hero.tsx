@@ -201,20 +201,20 @@ export default function EdikitHero() {
 
       <section
         ref={heroRef}
-        className="relative font-sans text-foreground overflow-hidden text-center antialiased"
+        className="relative text-foreground overflow-hidden text-center antialiased"
         style={{
           padding: "clamp(56px,9vh,88px) 24px clamp(26px,4vh,40px)",
-          background: "#0D0D0D",
+          background: "#191919",
         }}
       >
         {/* Blue radial glow — brand spotlight at top center */}
         <div
           className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse 85% 55% at 50% -5%, rgba(26,115,232,0.18) 0%, transparent 100%)",
-          }}
+          // style={{
+          //   background:
+          //     "radial-gradient(ellipse 85% 55% at 50% -5%, rgba(26,115,232,0.18) 0%, transparent 100%)",
+          // }}
         />
         <div className="relative max-w-245 mx-auto">
           {/* ── Headline ── */}
@@ -341,7 +341,7 @@ export default function EdikitHero() {
 
           {/* ── CTA ── */}
           <div
-            className="ek-cta flex gap-[14px] justify-center items-center flex-wrap"
+            className="ek-cta flex gap-3.5 justify-center items-center flex-wrap"
             style={{ marginTop: "clamp(14px,2vh,20px)" }}
           >
             <Link
@@ -349,22 +349,14 @@ export default function EdikitHero() {
               className="font-semibold text-[.92rem] rounded-full px-[1.6em] py-[.8em] text-white cursor-pointer no-underline inline-block transition-[transform,box-shadow] duration-200 ease-in-out hover:-translate-y-0.5 focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC]"
               style={{
                 background: "linear-gradient(92deg, #1A73E8, #5EB5FC)",
-                boxShadow: "0 12px 26px -10px rgba(26,115,232,.55)",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 16px 30px -10px rgba(26,115,232,.6)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 12px 26px -10px rgba(26,115,232,.55)")
-              }
+            
             >
               See pricing
             </Link>
             <Link
               href="#templates"
-              className="font-semibold text-[.92rem] rounded-full px-[1.6em] py-[.8em] text-foreground bg-transparent cursor-pointer no-underline inline-block hover:underline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC]"
+              className="font-semibold text-[.92rem] rounded-full px-[1.6em] py-[.8em] text-foreground bg-transparent cursor-pointer no-underline inline-block  focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC] border border-primary/50 transition-[background-color,color,box-shadow] duration-200 ease-in-out hover:bg-primary/10"
             >
               Explore templates
             </Link>
