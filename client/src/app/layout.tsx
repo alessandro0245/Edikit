@@ -2,24 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
-
-// Google Sans Flex Variable Font
-// const googleSansFlex = localFont({
-//   src: [
-//     {
-//       path: "../../public/fonts/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.woff2",
-//       weight: "100 900", // Variable font supports full weight range
-//       style: "normal",
-//     },
-//     {
-//       path: "../../public/fonts/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.woff",
-//       weight: "100 900", // Variable font supports full weight range
-//       style: "normal",
-//     }
-//   ],
-//   variable: "--font-google-sans-flex",
-//   display: "swap",
-// });
+import Script from "next/script";
+import SimpleFooter from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
   title: "Edikit | Create Production-Level Motion Graphics in Seconds",
@@ -50,11 +34,16 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className={` antialiased dark`} suppressHydrationWarning>
+      <body className={`antialiased dark`} suppressHydrationWarning>
         <Providers>
           <Navbar />
           {children}
+
+        <SimpleFooter/>
         </Providers>
+
+        {/* iubenda Script */}
+        <Script src="https://cdn.iubenda.com/iubenda.js" strategy="lazyOnload" />
       </body>
     </html>
   );

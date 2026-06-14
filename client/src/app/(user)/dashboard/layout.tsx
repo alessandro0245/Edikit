@@ -5,16 +5,6 @@ import api from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Overlay/Loader";
 
-interface User {
-  id: string;
-  userId?: string;
-  email: string;
-  fullName: string;
-  role: string;
-  planType: string;
-  avatar: string;
-}
-
 export default function DashboardLayout({
   children,
 }: Readonly<{

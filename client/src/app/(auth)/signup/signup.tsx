@@ -232,11 +232,11 @@ export default function SignUpPage() {
               <div className="pt-1">
                 <p className="text-xs text-muted-foreground leading-normal">
                   By creating an account, you agree to our{" "}
-                  <Link href="#" className="text-primary hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="#" className="text-primary hover:underline">
+                  <Link 
+                    href="https://www.iubenda.com/privacy-policy/40029799" 
+                    target="_blank" 
+                    className="text-primary hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                 </p>

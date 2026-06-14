@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Folder,
   Loader2,
   MoreVertical,
@@ -143,6 +145,18 @@ export default function DashboardJobsPage() {
     deleteJob,
   } = useDashboardJobs();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(jobs.length / itemsPerPage);
+  const currentJobs = jobs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Reset to page 1 when jobs data changes (e.g. after refresh or delete)
+  useEffect(() => {
+    if (currentPage > 1 && currentPage > Math.ceil(jobs.length / itemsPerPage)) {
+      setCurrentPage(Math.max(Math.ceil(jobs.length / itemsPerPage), 1));
+    }
+  }, [jobs.length, currentPage]);
+
   const actionsRefs = useRef<
     Record<
       string,
@@ -247,7 +261,7 @@ export default function DashboardJobsPage() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map((job) => (
+                {currentJobs.map((job) => (
                   <tr
                     key={job.id}
                     className="border-b border-border transition-colors hover:bg-muted/50"
@@ -343,7 +357,7 @@ export default function DashboardJobsPage() {
           </div>
 
           <div className="space-y-3 md:hidden">
-            {jobs.map((job) => (
+            {currentJobs.map((job) => (
               <div
                 key={job.id}
                 className="space-y-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/30"
@@ -445,6 +459,70 @@ export default function DashboardJobsPage() {
               <p className="text-sm text-muted-foreground md:text-base">
                 No jobs found for your account yet.
               </p>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between pb-4 px-4 select-none gap-4">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
+                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, jobs.length)}</span> of <span className="font-medium">{jobs.length}</span> results
+              </p>
+
+              <div className="flex items-center gap-1 order-1 sm:order-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-1.5 mr-1 rounded-md border border-border hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {(() => {
+                  const pages: (number | "ellipsis")[] = [];
+                  if (totalPages <= 5) {
+                    for (let i = 1; i <= totalPages; i++) pages.push(i);
+                  } else {
+                    pages.push(1);
+                    const start = Math.max(2, currentPage - 1);
+                    const end = Math.min(totalPages - 1, currentPage + 1);
+                    if (start > 2) pages.push("ellipsis");
+                    for (let i = start; i <= end; i++) pages.push(i);
+                    if (end < totalPages - 1) pages.push("ellipsis");
+                    pages.push(totalPages);
+                  }
+                  return pages.map((page, idx) =>
+                    page === "ellipsis" ? (
+                      <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-sm text-muted-foreground">
+                        &hellip;
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-accent border border-transparent hover:border-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  );
+                })()}
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 ml-1 rounded-md border border-border hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </>

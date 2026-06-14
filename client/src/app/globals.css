@@ -377,3 +377,91 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     }
   }
 }
+
+@keyframes wave-slide {
+  from { transform: translateX(0%);   }
+  to   { transform: translateX(-50%); }
+}
+
+
+/* ── Primary button ─────────────────────────────────────────────────────────*/
+.glow-btn--primary {
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  /* Static fallback — visible before hover */
+  background: linear-gradient(90deg, #0A4FB5 0%, #1A73E8 40%, #5EB5FC 100%);
+  box-shadow: 0 10px 24px -8px rgba(26, 115, 232, 0.40);
+  transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+/* ── Wave layer (the conveyor-belt gradient) ────────────────────────────────
+   200% wide so it contains TWO identical copies of the 4-stop pattern.
+   Clipped by the parent's overflow:hidden. */
+.glow-btn--primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 200%;            /* 2× button width → holds two pattern copies  */
+  border-radius: inherit;
+  will-change: transform;
+  background: linear-gradient(
+    90deg,
+    /* ── copy 1 ── */
+    #0A4FB5  0%,    /* deep blue  */
+    #1A73E8  12.5%, /* brand blue */
+    #5EB5FC  25%,   /* light blue */
+    #93D0FF  37.5%, /* sky blue   */
+    /* ── copy 2 (identical) ── */
+    #0A4FB5  50%,
+    #1A73E8  62.5%,
+    #5EB5FC  75%,
+    #93D0FF  87.5%,
+    /* ── return to copy 1 (closes the loop) ── */
+    #0A4FB5  100%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+/* On hover: fade in the wave and start scrolling */
+.glow-btn--primary:hover::before {
+  opacity: 1;
+  animation: wave-slide 2.5s linear infinite;
+}
+
+.glow-btn--primary:hover {
+  animation: glow-breathe 2.5s ease-in-out infinite;
+  transform: translateY(-2px);
+}
+
+/* ── Secondary ──────────────────────────────────────────────────────────────*/
+.glow-btn--secondary {
+  color: #1A73E8;
+  background: #ffffff;
+  border: 1.5px solid #BDDAFB;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: background 0.3s ease, border-color 0.3s ease,
+              box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.glow-btn--secondary:hover {
+  background: #EBF3FE;
+  border-color: #5EB5FC;
+  box-shadow:
+    0 0 12px 2px rgba(94, 181, 252, 0.30),
+    0 4px 12px rgba(26, 115, 232, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ── Ghost ──────────────────────────────────────────────────────────────────*/
+.glow-btn--ghost {
+  color: #1A73E8;
+  background: transparent;
+  transition: color 0.2s ease;
+}
+
+.glow-btn--ghost:hover {
+  color: #0A4FB5;
+  text-decoration: underline;
+}
