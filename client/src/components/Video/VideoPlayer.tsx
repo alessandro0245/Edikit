@@ -145,104 +145,64 @@ export default function VideoPlayer({
 
         {controls && (
           <div
-            className={`absolute inset-0 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-              isMinimal
-                ? "bg-linear-to-t from-black/80 via-transparent to-transparent"
-                : "bg-linear-to-t from-black/80 via-transparent to-black/20"
-            }`}
+            className={`absolute bottom-4 left-0 right-0 flex items-center justify-between px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20`}
           >
+            <div className="flex items-center gap-2">
+              <button
+                onClick={togglePlay}
+                className="p-2 text-white hover:scale-110 transition-transform"
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <Pause className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]" />
+                ) : (
+                  <Play className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]]" />
+                )}
+              </button>
+
+              <button
+                onClick={toggleMute}
+                className="p-2 text-white hover:scale-110 transition-transform"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <VolumeX className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                ) : (
+                  <Volume2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                )}
+              </button>
+            </div>
+
             {!isMinimal && (
-              <div className="flex flex-1 items-center justify-center">
-                <button
-                  onClick={togglePlay}
-                  className="rounded-full bg-white/20 p-4 backdrop-blur-sm transition-colors hover:bg-white/30"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-8 w-8 fill-white text-white" />
-                  ) : (
-                    <Play className="h-8 w-8 fill-white text-white" />
-                  )}
-                </button>
+              <div className="flex-1 max-w-sm px-4">
+                <input
+                  type="range"
+                  min="0"
+                  max={duration || 0}
+                  value={currentTime}
+                  onChange={(e) => {
+                    if (!videoRef.current) return;
+                    videoRef.current.currentTime = parseFloat(e.target.value);
+                    setCurrentTime(parseFloat(e.target.value));
+                  }}
+                  className="w-full h-1 cursor-pointer appearance-none bg-white/20 rounded-full accent-white filter drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
+                />
               </div>
             )}
 
-            <div className={`space-y-2 p-4 ${isMinimal ? "mt-auto" : ""}`}>
-              {!isMinimal && (
-                <div className="space-y-1">
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration || 0}
-                    value={currentTime}
-                    onChange={(e) => {
-                      if (!videoRef.current) return;
-                      videoRef.current.currentTime = parseFloat(e.target.value);
-                      setCurrentTime(parseFloat(e.target.value));
-                    }}
-                    className="h-1 w-full cursor-pointer rounded-full bg-white/30 accent-primary"
-                  />
-                  <div className="flex justify-between text-xs text-white/70">
-                    <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration)}</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={togglePlay}
-                    className="rounded-lg p-2 transition-colors hover:bg-white/10"
-                    aria-label={isPlaying ? "Pause" : "Play"}
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-4 w-4 fill-white text-white" />
-                    ) : (
-                      <Play className="h-4 w-4 fill-white text-white" />
-                    )}
-                  </button>
-
-                  <button
-                    onClick={toggleMute}
-                    className="rounded-lg p-2 transition-colors hover:bg-white/10"
-                    aria-label={isMuted ? "Unmute" : "Mute"}
-                  >
-                    {isMuted ? (
-                      <VolumeX className="h-4 w-4 text-white" />
-                    ) : (
-                      <Volume2 className="h-4 w-4 text-white" />
-                    )}
-                  </button>
-
-                  {!isMinimal && (
-                    <button
-                      onClick={handleReset}
-                      className="rounded-lg p-2 transition-colors hover:bg-white/10"
-                      aria-label="Restart"
-                    >
-                      <RotateCcw className="h-4 w-4 text-white" />
-                    </button>
-                  )}
-                </div>
-
-                {showFullscreen && (
-                  <button
-                    onClick={toggleFullscreen}
-                    className="rounded-lg p-2 transition-colors hover:bg-white/10"
-                    aria-label={
-                      isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"
-                    }
-                  >
-                    {isFullscreen ? (
-                      <Minimize2 className="h-4 w-4 text-white" />
-                    ) : (
-                      <Maximize2 className="h-4 w-4 text-white" />
-                    )}
-                  </button>
+            {showFullscreen && (
+              <button
+                onClick={toggleFullscreen}
+                className="p-2 text-white hover:scale-110 transition-transform"
+                aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                ) : (
+                  <Maximize2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
                 )}
-              </div>
-            </div>
+              </button>
+            )}
           </div>
         )}
       </div>

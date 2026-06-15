@@ -12,23 +12,17 @@ import {
   Info,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
 import {
   getTemplateOrientation,
-  orientationContainerClass,
 } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 
 const ASPECT_RATIOS = [
-  { label: "9:16", value: "9/16" },
-  { label: "2:3", value: "2/3" },
-  { label: "4:5", value: "4/5" },
-  { label: "1:1", value: "1/1" },
-  { label: "16:9", value: "16/9" },
+  { label: "9:16", value: "4/5" },
 ];
 
 const CustomizePage = () => {

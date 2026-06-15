@@ -302,7 +302,7 @@ export default function AnimationPreview({
       {showPlayOverlay && !videoError && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90">
-            <Play className="ml-0.5 h-6 w-6 text-gray-900" fill="currentColor" />
+            <Play className="ml-0.5 h-5 w-6 text-gray-900" fill="currentColor" />
           </div>
         </div>
       )}
@@ -315,34 +315,34 @@ export default function AnimationPreview({
 
       {showControls && isLoaded && (
         <div
-          className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-linear-to-t from-black/80 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover/preview:opacity-100"
+          className="absolute bottom-2 left-0 right-0 flex items-center justify-between px-6 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
           data-preview-control
         >
           <div className="flex items-center gap-1">
-            <button
+            {/* <button
               type="button"
               data-preview-control
               onClick={togglePlay}
-              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              className="p-2 text-white hover:scale-110 transition-transform"
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
-                <Pause className="h-4 w-4 fill-white text-white" />
+                <Pause className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] drop-shadow-[0_0_3px_rgba(0,0,0,1)]" />
               ) : (
-                <Play className="h-4 w-4 fill-white text-white" />
+                <Play className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] drop-shadow-[0_0_3px_rgba(0,0,0,1)]" />
               )}
-            </button>
+            </button> */}
             <button
               type="button"
               data-preview-control
               onClick={toggleMute}
-              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              className="p-2 text-white hover:scale-110 transition-transform"
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                <VolumeX className="h-4 w-4 text-white" />
+                <VolumeX className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]" />
               ) : (
-                <Volume2 className="h-4 w-4 text-white" />
+                <Volume2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]" />
               )}
             </button>
           </div>
@@ -352,13 +352,13 @@ export default function AnimationPreview({
               type="button"
               data-preview-control
               onClick={toggleFullscreen}
-              className="rounded-lg p-2 transition-colors hover:bg-white/10"
+              className="p-2 text-white hover:scale-110 transition-transform"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
-                <Minimize2 className="h-4 w-4 text-white" />
+                <Minimize2 className="h-5 w-5 filter drop-shadow-[0_0_3px_rgba(0,0,0,1)]" />
               ) : (
-                <Maximize2 className="h-4 w-4 text-white" />
+                <Maximize2 className="h-5 w-5 filter drop-shadow-[0_0_3px_rgba(0,0,0,1)]" />
               )}
             </button>
           )}

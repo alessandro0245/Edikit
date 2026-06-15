@@ -63,33 +63,14 @@ export default function EdikitHero() {
     hero.classList.add("ek-anim");
     if (reduced) hero.classList.add("ek-reduced");
 
-    const play = () => {
-      hero.classList.remove("ek-on");
-      void hero.offsetWidth;
-      hero.classList.add("ek-on");
-    };
-
     const videos = deckRef.current?.querySelectorAll("video") ?? [];
 
     if (reduced || !("IntersectionObserver" in window)) {
       hero.classList.add("ek-on");
     } else {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              play();
-              videos.forEach((v) => v.play().catch(() => {}));
-            } else {
-              hero.classList.remove("ek-on");
-              videos.forEach((v) => v.pause());
-            }
-          });
-        },
-        { threshold: 0.25 },
-      );
-      observer.observe(hero);
-      return () => observer.disconnect();
+      // Trigger animation immediately on mount (reload/refresh)
+      hero.classList.add("ek-on");
+      videos.forEach((v) => v.play().catch(() => {}));
     }
   }, []);
 
@@ -358,7 +339,7 @@ export default function EdikitHero() {
             <ShimmerButton
               href="/pricing"
               variant="primary"
-              size="lg"
+              size="md"
               className="uppercase tracking-wider"
             >
               See pricing

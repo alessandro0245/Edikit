@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { getInitialsAvatar } from "@/utils/getInitialsAvatar";
 import CreditsDisplay from "./CreditsDisplay";
+import ShimmerButton from "../ShimmerButton/ShimmerButton";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -160,12 +161,13 @@ const Navbar = () => {
                   >
                     Log in
                   </Link>
-                  <Link
+                  <ShimmerButton  
                     href="/signup"
-                    className="px-4 py-2 text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground"
+                    // className="px-4 py-2 text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground"
+                    size="sm"
                   >
                     Try for free
-                  </Link>
+                  </ShimmerButton>
                 </div>
               )}
             </div>
