@@ -10,6 +10,7 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
+
 } from "lucide-react";
 import Link from "next/link";
 import useCustomizeLogic from "./useCustomizeLogic";
@@ -20,13 +21,11 @@ import {
   getTemplateOrientation,
 } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
-const ASPECT_RATIOS = [
-  { label: "9:16", value: "4/5" },
-];
 
 const CustomizePage = () => {
-  const [previewRatio, setPreviewRatio] = useState("4/5");
+  const [previewRatio, setPreviewRatio] = useState("9/16");
   const {
     template,
     renderJob,
@@ -99,21 +98,99 @@ const CustomizePage = () => {
         </div>
       )}
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4">
         <Link
           href="/templates"
-          style={{ border: "1px" }}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-accent transition-colors mb-6"
+          className="rounded-lg text-sm font-medium text-foreground hover:bg-accent transition-colors "
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Templates
+          <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[575px_1fr] gap-8 max-w-7xl mx-auto">
-          {/* Left Column - Dynamic Form */}
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 max-w-7xl mx-auto items-start">
+          {/* Left Column - Sticky Preview */}
+          <div className="lg:sticky lg:top-16 space-y-4 order-2 lg:order-1">
+            <div className="rounded-2xl overflow-hidden shadow-sm">
+              <div className="p-2">
+                <div className="flex items-center gap-1">
+                  <h2 className="font-semibold text-foreground">
+                    Live Preview
+                  </h2>
+                </div>
+              </div>
+
+              <div className="p-2">
+                <div
+                  className="overflow-hidden rounded-xl border border-border bg-black relative mx-auto w-full max-h-[79vh] shadow-2xl transition-all"
+                  style={{ aspectRatio: previewRatio }}
+                >
+                  {showRenderedVideo && renderedVideoSrc ? (
+                    <VideoPlayer
+                      src={renderedVideoSrc}
+                      autoPlay
+                      loop
+                      muted
+                      controls
+                      variant="minimal"
+                      aspectRatio="none"
+                      showDownload={false}
+                      showFullscreen
+                      className="h-full w-full rounded-none"
+                    />
+                  ) : (
+                    <AnimationPreview
+                      src={template.previewUrl}
+                      poster={template.thumbnail}
+                      orientation={templateOrientation}
+                      fit="contain"
+                      showFullscreen
+                      playOverlay={false}
+                      trigger="auto"
+                      className="h-full w-full"
+                    />
+                  )}
+                </div>
+                
+                <p className="mt-4 text-center text-xs text-muted-foreground">
+                  The preview shows how your customization will look.
+                </p>
+              </div>
+            </div>
+
+            {/* Upgrade CTA */}
+            <div className="p-6 rounded-lg bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-foreground">
+                  Unlock Premium Features
+                </h3>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    4K resolution exports
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    Remove watermark
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    Transparent backgrounds
+                  </li>
+                </ul>
+               
+                <EdikitButton
+                href="/pricing"
+                width="w-full"
+                >
+                  Upgrade to Pro
+                </EdikitButton>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Scrollable Form */}
+          <div className="space-y-6 order-1 lg:order-2">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-2xl font-bold text-foreground mb-1">
                 {template.name}
               </h1>
               <p className="text-muted-foreground">
@@ -121,12 +198,12 @@ const CustomizePage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-lg border border-border bg-card space-y-6">
+            <div className="p-6 rounded-lg space-y-5">
               {/* Dynamic Fields */}
               {Object.entries(template.fields)
                 .filter(([fieldKey]) => fieldKey !== "background")
                 .map(([fieldKey, field]) => (
-                  <div key={fieldKey} className="space-y-2">
+                  <div key={fieldKey} className="space-y-1">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       {field.label}
                       {field.required && (
@@ -152,7 +229,7 @@ const CustomizePage = () => {
                             handleTextChange(fieldKey, e.target.value)
                           }
                           maxLength={field.maxLength}
-                          className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                          className="w-full h-7 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder={`Enter ${field.label.toLowerCase()}`}
                         />
                         {field.maxLength && (
@@ -591,10 +668,11 @@ const CustomizePage = () => {
             ) : showRenderedVideo ? (
               // Show Download Button when video is ready
               <div className="space-y-3">
-                <button
+                <EdikitButton
                   onClick={handleDownload}
                   disabled={isDownloading}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary-gradient text-primary-foreground font-medium disabled:opacity-60 disabled:cursor-not-allowed shadow-lg hover:shadow-xl cursor-pointer"
+                  variant="primary"
+                  width="w-full"
                 >
                   {isDownloading ? (
                     <>
@@ -607,8 +685,8 @@ const CustomizePage = () => {
                       Download Video
                     </>
                   )}
-                </button>
-                <button
+                </EdikitButton>
+                <EdikitButton
                   onClick={handleGeneratePreview}
                   disabled={
                     isGenerating ||
@@ -618,7 +696,8 @@ const CustomizePage = () => {
                     renderJob?.status === "PENDING" ||
                     renderJob?.status === "PROCESSING"
                   }
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary-gradient text-primary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  variant="primary"
+                  width="w-full"
                 >
                   {uploadingAssets.size > 0 ? (
                     <>
@@ -642,7 +721,7 @@ const CustomizePage = () => {
                       Login to Render
                     </>
                   )}
-                </button>
+                </EdikitButton>
                 {isDownloading && downloadProgress > 0 && (
                   <div className="space-y-1">
                     <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -659,7 +738,7 @@ const CustomizePage = () => {
               </div>
             ) : (
               // Show Render Button
-              <button
+              <EdikitButton
                 onClick={handleGeneratePreview}
                 disabled={
                   isGenerating ||
@@ -670,7 +749,8 @@ const CustomizePage = () => {
                   renderJob?.status === "PENDING" ||
                   renderJob?.status === "PROCESSING"
                 }
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary-gradient text-primary-foreground font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                variant="primary"
+                width="w-full"
               >
                 {uploadingAssets.size > 0 ? (
                   <>
@@ -699,97 +779,8 @@ const CustomizePage = () => {
                     Login to Render
                   </>
                 )}
-              </button>
+              </EdikitButton>
             )}
-          </div>
-
-          {/* Right Column - Preview */}
-          <div className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
-            <div className="p-6 rounded-lg border border-border bg-card">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Preview
-                  </h2>
-                  <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-0.5">
-                    {ASPECT_RATIOS.map(({ label, value }) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setPreviewRatio(value)}
-                        className={`rounded-md px-2.5 cursor-pointer py-1 text-xs font-medium transition-colors ${
-                          previewRatio === value
-                            ? "bg-card text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div
-                  className="overflow-hidden rounded-lg border border-border bg-black relative"
-                  style={{ aspectRatio: previewRatio }}
-                >
-                  {showRenderedVideo && renderedVideoSrc ? (
-                    <VideoPlayer
-                      src={renderedVideoSrc}
-                      autoPlay
-                      loop
-                      muted
-                      controls
-                      variant="minimal"
-                      aspectRatio="none"
-                      showDownload={false}
-                      showFullscreen
-                      className="h-full w-full rounded-none"
-                    />
-                  ) : (
-                    <AnimationPreview
-                      src={template.previewUrl}
-                      poster={template.thumbnail}
-                      orientation={templateOrientation}
-                      fit="contain"
-                      showFullscreen
-                      playOverlay={false}
-                      trigger="auto"
-                      className="h-full w-full"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Upgrade CTA */}
-            <div className="p-6 rounded-lg bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
-              <div className="space-y-3">
-                <h3 className="font-semibold text-foreground">
-                  Unlock Premium Features
-                </h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    4K resolution exports
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    Remove watermark
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    Transparent backgrounds
-                  </li>
-                </ul>
-                <Link
-                  href="/pricing"
-                  className="block w-full text-center px-4 py-2 rounded-lg bg-primary-gradient text-primary-foreground font-medium"
-                >
-                  Upgrade to Pro
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </main>

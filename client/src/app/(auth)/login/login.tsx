@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { z } from "zod";
 import { handleGoogleLogin } from "@/lib/auth";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
 // Zod Schema for Login Form
 const loginSchema = z.object({
@@ -170,10 +171,12 @@ const Login = () => {
           </div>
 
           {/* Submit Button */}
-          <button
+          <EdikitButton
             type="submit"
             disabled={loading}
-            className="w-full h-10 px-4 rounded-lg bg-primary-gradient text-primary-foreground text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 transition-opacity mt-2"
+            variant="primary"
+            width="md:w-full sm:w-80 lg:w-96"
+            className="mt-2"
           >
             {loading ? (
               <div className="flex items-center justify-center gap-2">
@@ -183,7 +186,7 @@ const Login = () => {
             ) : (
               "Sign In"
             )}
-          </button>
+          </EdikitButton>
         </form>
 
         {/* Divider */}

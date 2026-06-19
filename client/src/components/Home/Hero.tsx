@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import ShimmerButton from "../ShimmerButton/ShimmerButton";
+import EdikitButton from "../ShimmerButton/ShimmerButton";
 
 const RESPECT_REDUCED_MOTION = false;
 
@@ -336,20 +337,23 @@ export default function EdikitHero() {
             >
               See pricing
             </Link> */}
-            <ShimmerButton
+            <EdikitButton
               href="/pricing"
               variant="primary"
               size="md"
               className="uppercase tracking-wider"
             >
               See pricing
-            </ShimmerButton>
-            <Link
-              href="#templates"
-              className="font-semibold text-[.92rem] rounded-full px-[1.6em] py-[.8em] text-foreground bg-transparent cursor-pointer no-underline inline-block  focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC] border border-primary/50 transition-[background-color,color,box-shadow] duration-200 ease-in-out hover:bg-primary/10"
+            </EdikitButton>
+
+            <EdikitButton
+            href="/templates"
+            variant="secondary"
+            size="md"
+            className="uppercase tracking-wider"
             >
               Explore templates
-            </Link>
+            </EdikitButton>
           </div>
         </div>
       </section>

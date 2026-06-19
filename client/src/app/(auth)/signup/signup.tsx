@@ -7,6 +7,7 @@ import { Mail, Lock, User, LoaderCircle, Check, X } from "lucide-react";
 import Image from "next/image";
 import { GoogleIcon } from "@/components/Overlay/Svg";
 import { signupUser, handleGoogleLogin } from "@/lib/auth";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "@/components/Toast/showToast";
 import { useDispatch } from "react-redux";
@@ -243,10 +244,11 @@ export default function SignUpPage() {
               </div>
 
               {/* Submit Button */}
-              <button
+              <EdikitButton
                 type="submit"
                 disabled={loading}
-                className="w-full h-10 px-4 rounded-lg bg-primary-gradient text-primary-foreground text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 transition-opacity"
+                variant="primary"
+                width="w-full"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -256,7 +258,7 @@ export default function SignUpPage() {
                 ) : (
                   "Create Account"
                 )}
-              </button>
+              </EdikitButton>
             </form>
 
             {/* Divider */}

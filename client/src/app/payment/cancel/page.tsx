@@ -1,10 +1,10 @@
-import Link from "next/link"
-import { XCircle } from "lucide-react"
+import { XCircle } from "lucide-react";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
 export const metadata = {
   title: "Payment Cancelled",
   description: "Your payment has been cancelled",
-}
+};
 
 export default function CancelPage() {
   return (
@@ -23,30 +23,27 @@ export default function CancelPage() {
 
             {/* Content */}
             <div className="text-center space-y-3 mb-8">
-              <h1 className="text-3xl font-bold text-foreground">Payment Cancelled</h1>
+              <h1 className="text-3xl font-bold text-foreground">
+                Payment Cancelled
+              </h1>
               <p className="text-muted-foreground text-base">
-                Your payment has been cancelled. No charges have been made to your account. You can try again or explore
-                other options.
+                Your payment has been cancelled. No charges have been made to
+                your account. You can try again or explore other options.
               </p>
             </div>
-            
+
             {/* Action Buttons */}
             <div className="space-y-3">
-              <Link href="/" className="w-full block">
-                <button className="w-full bg-primary-gradient text-primary-foreground py-2 px-4 rounded-lg font-medium cursor-pointer">
-                  Back to Home
-                </button>
-              </Link>
-              <Link href="/pricing" className="w-full block">
-                <button className="w-full bg-transparent border border-border text-foreground hover:bg-muted py-2 px-4 rounded-lg font-medium transition-colors duration-200 cursor-pointer">
-                  Try Again
-                </button>
-              </Link>
+              <EdikitButton href="/" variant="primary" width="w-full">
+                Back to Home
+              </EdikitButton>
+              <EdikitButton href="/pricing" width="w-full" variant="secondary">
+                Try Again
+              </EdikitButton>
             </div>
-
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import TemplateCard from "@/components/Overlay/TemplateCard";
 import SearchBar from "@/components/Templates/SearchBar";
 import { templates } from "@/utils/constant";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
 function filterTemplatesBySearch(
   items: typeof templates,
@@ -96,22 +97,23 @@ const Templates = () => {
           />
 
           {hasNoResults ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="flex flex-col items-center justify-center py-9 text-center">
               <Search
-                className="mb-4 h-10 w-10 text-muted-foreground"
+                className="mb-2 h-10 w-10 text-muted-foreground"
                 aria-hidden
               />
               <h2 className="text-lg font-semibold">No templates found</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 Try a different keyword or browse all templates
               </p>
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="mt-6 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted cursor-pointer hover:border-primary"
+          
+              <EdikitButton
+              onClick={() => setSearchQuery("")}
+              variant="secondary"
+              className="mt-2"
               >
-                Clear search
-              </button>
+                Clear search  
+              </EdikitButton>
             </div>
           ) : (
             <div className="grid gap-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">

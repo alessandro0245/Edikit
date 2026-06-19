@@ -4,6 +4,7 @@ import { handlePayment } from "@/lib/payment";
 import { plans } from "@/utils/constant";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
 const Pricing = () => {
   const user = useSelector((state: RootState) => state.user.user);
@@ -69,20 +70,17 @@ const Pricing = () => {
                         user && user.planType === plan.planType;
 
                       return (
-                        <button
+                        <EdikitButton
+                          variant={plan.popular ? "primary" : "secondary"}
+                          width="w-full"
                           disabled={isCurrentPlan ?? undefined}
                           onClick={() => {
                             if (isCurrentPlan) return;
                             handlePayment(plan.id, user?.userId || user?.id);
                           }}
-                          className={`w-full px-6 py-3 rounded-lg font-medium cursor-pointer focus:bg-primary/50 disabled:opacity-60 disabled:cursor-not-allowed ${
-                            plan.popular
-                              ? "bg-primary-gradient text-primary-foreground"
-                              : "bg-secondary text-secondary-foreground hover:bg-primary/80"
-                          }`}
                         >
                           {isCurrentPlan ? "Current Plan" : plan.cta}
-                        </button>
+                        </EdikitButton>
                       );
                     })()}
                     {/* Features List */}

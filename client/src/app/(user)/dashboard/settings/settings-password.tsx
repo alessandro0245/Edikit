@@ -2,6 +2,7 @@
 
 import { Eye, EyeOff } from 'lucide-react'
 import { usePasswordSettings } from '@/hooks/usePasswordSettings'
+import EdikitButton from '@/components/ShimmerButton/ShimmerButton'
 
 export default function PasswordSection() {
   const {
@@ -126,13 +127,14 @@ export default function PasswordSection() {
         )}
 
         {/* Save Button */}
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="px-6 py-2.5 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-        >
-          {isSaving ? 'Saving...' : 'Save'}
-        </button>
+         <EdikitButton 
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  size='md'
+                  variant='secondary'
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </EdikitButton>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ import { CreditCard,  Zap } from "lucide-react";
 import { plans } from "@/utils/constant";
 import { handlePayment, cancelSubscription } from "@/lib/payment";
 import { useState } from "react";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 import { showSuccessToast } from "@/components/Toast/showToast";
 
 export default function ManagePlansPage() {
@@ -138,22 +139,18 @@ export default function ManagePlansPage() {
                         <span className="text-xs text-muted-foreground ml-1">/mo</span>
                       </div>
                       
-                      <button
+                      <EdikitButton
                         disabled={isCurrentPlan}
                         onClick={() => {
                           if (isCurrentPlan) return;
                           handlePayment(plan.id, user?.userId || user?.id);
                         }}
-                        className={`w-full sm:w-32.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-primary/70 ${
-                          isCurrentPlan
-                            ? "bg-secondary text-secondary-foreground"
-                            : isUpgrade
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "bg-background border border-border text-foreground hover:bg-accent"
-                        }`}
+                        variant={isCurrentPlan ? "primary" : "secondary"}
+                        size="md"
+                        width="w-full sm:w-32.5"
                       >
                         {isCurrentPlan ? "Active" : isUpgrade ? "Upgrade" : "Downgrade"}
-                      </button>
+                      </EdikitButton>
                     </div>
                   </div>
                 );

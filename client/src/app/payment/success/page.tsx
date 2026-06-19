@@ -1,6 +1,5 @@
-'use client'
-import Link from "next/link"
-import { CheckCircle } from "lucide-react"
+"use client";
+import { CheckCircle } from "lucide-react";
 import Loader from "@/components/Overlay/Loader";
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -8,23 +7,24 @@ import { useDispatch } from "react-redux";
 import { refreshUser } from "@/lib/auth";
 import { refreshCreditsInStore } from "@/lib/credits";
 import type { AppDispatch } from "@/redux/store";
+import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
 // Component that uses useSearchParams
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  const plan = searchParams.get('plan');
+  const sessionId = searchParams.get("session_id");
+  const plan = searchParams.get("plan");
   const [loading, setLoading] = useState(true);
   const [sessionData, setSessionData] = useState<any>(null);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     // Handle free plan
-    if (plan === 'free') {
+    if (plan === "free") {
       setSessionData({
-        planName: 'Free Plan',
-        amount: '$0.00',
-        success: true
+        planName: "Free Plan",
+        amount: "$0.00",
+        success: true,
       });
       setLoading(false);
       return;
@@ -37,7 +37,7 @@ function SuccessContent() {
       setLoading(false);
     }
   }, [sessionId, plan]);
-  
+
   useEffect(() => {
     // Refresh user profile and credits so planType is up to date without a manual reload
     if (sessionData?.success) {
@@ -47,26 +47,25 @@ function SuccessContent() {
   }, [sessionData, dispatch]);
 
   const verifySession = async (sessionId: string) => {
-  
-  try {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/stripe/verify-session?session_id=${sessionId}`;
-    
-    const response = await fetch(url);
-      
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/stripe/verify-session?session_id=${sessionId}`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setSessionData(data);
+    } catch (error) {
+      console.error("Error verifying session:", error);
+    } finally {
+      setLoading(false);
     }
-    
-    const data = await response.json();
-   
-    setSessionData(data);
-  } catch (error) {
-    console.error('Error verifying session:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (loading) {
     return (
@@ -92,7 +91,9 @@ function SuccessContent() {
 
             {/* Content */}
             <div className="text-center space-y-3 mb-8">
-              <h1 className="text-3xl font-bold text-foreground">Payment Successful!</h1>
+              <h1 className="text-3xl font-bold text-foreground">
+                Payment Successful!
+              </h1>
               <p className="text-muted-foreground text-base">
                 Thank you for your purchase. Your order has been confirmed
               </p>
@@ -101,24 +102,28 @@ function SuccessContent() {
               {sessionData && (
                 <div className="bg-muted/50 rounded-lg p-4 mt-4 space-y-2">
                   <p className="text-sm text-muted-foreground">Your Plan</p>
-                  <p className="text-lg font-semibold text-foreground">{sessionData.planName}</p>
-                  <p className="text-2xl font-bold text-foreground">{sessionData.amount}</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {sessionData.planName}
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {sessionData.amount}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <Link href="/" className="w-full block">
-                <button className="w-full bg-primary-gradient text-primary-foreground py-2 px-4 rounded-lg font-medium cursor-pointer">
-                  Back to Home
-                </button>
-              </Link>
-              <Link href="/templates" className="w-full block">
-                <button className="w-full bg-transparent border border-border text-foreground hover:bg-muted py-2 px-4 rounded-lg font-medium transition-colors duration-200 cursor-pointer">
-                  Browse Templates
-                </button>
-              </Link>
+              <EdikitButton href="/" variant="primary" width="w-full">
+                Back to Home
+              </EdikitButton>
+              <EdikitButton
+                href="/templates"
+                width="w-full"
+                variant="secondary"
+              >
+                Browse Templates
+              </EdikitButton>
             </div>
           </div>
         </div>
@@ -130,11 +135,13 @@ function SuccessContent() {
 // Main component with Suspense
 export default function SuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="h-screen flex justify-center items-center">
-        <Loader />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="h-screen flex justify-center items-center">
+          <Loader />
+        </div>
+      }
+    >
       <SuccessContent />
     </Suspense>
   );

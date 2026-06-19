@@ -147,28 +147,28 @@ export default function VideoPlayer({
           <div
             className={`absolute bottom-4 left-0 right-0 flex items-center justify-between px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20`}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 onClick={togglePlay}
-                className="p-2 text-white hover:scale-110 transition-transform"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
-                  <Pause className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]" />
+                  <Pause className="h-5 w-5 fill-white text-white transition-transform group-hover/control:scale-110" />
                 ) : (
-                  <Play className="h-5 w-5 fill-white filter drop-shadow-[0_0_1px_rgba(0,0,0,1)]]" />
+                  <Play className="h-5 w-5 fill-white text-white transition-transform group-hover/control:scale-110" />
                 )}
               </button>
 
               <button
                 onClick={toggleMute}
-                className="p-2 text-white hover:scale-110 transition-transform"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted ? (
-                  <VolumeX className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                  <VolumeX className="h-5 w-5 text-white transition-transform group-hover/control:scale-110" />
                 ) : (
-                  <Volume2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                  <Volume2 className="h-5 w-5 text-white transition-transform group-hover/control:scale-110" />
                 )}
               </button>
             </div>
@@ -185,7 +185,7 @@ export default function VideoPlayer({
                     videoRef.current.currentTime = parseFloat(e.target.value);
                     setCurrentTime(parseFloat(e.target.value));
                   }}
-                  className="w-full h-1 cursor-pointer appearance-none bg-white/20 rounded-full accent-white filter drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]"
+                  className="w-full h-1 cursor-pointer appearance-none bg-white/20 rounded-full accent-white"
                 />
               </div>
             )}
@@ -193,13 +193,13 @@ export default function VideoPlayer({
             {showFullscreen && (
               <button
                 onClick={toggleFullscreen}
-                className="p-2 text-white hover:scale-110 transition-transform"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control"
                 aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
                 {isFullscreen ? (
-                  <Minimize2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                  <Minimize2 className="h-5 w-5 text-white transition-transform group-hover/control:scale-110" />
                 ) : (
-                  <Maximize2 className="h-5 w-5 filter drop-shadow-[0_0_1px_rgba(0,0,0,1)] " />
+                  <Maximize2 className="h-5 w-5 text-white transition-transform group-hover/control:scale-110" />
                 )}
               </button>
             )}

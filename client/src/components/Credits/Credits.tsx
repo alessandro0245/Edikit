@@ -6,6 +6,7 @@ import type { RootState } from "@/redux/store";
 import { creditsApi, type CreditTransaction } from "@/lib/credits";
 import { Coins, Clock, TrendingDown, TrendingUp, RefreshCw, Gift, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import EdikitButton from "../ShimmerButton/ShimmerButton";
 
 export default function Credits() {
   const credits = useSelector((state: RootState) => state.credits.credits);
@@ -128,18 +129,19 @@ export default function Credits() {
         <div className="bg-card border border-border rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-3">
-            <Link
-              href="/pricing"
-              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg bg-primary-gradient text-primary-foreground"
+            <EdikitButton 
+            href="/pricing"
+            width="w-full"
             >
               Upgrade Plan
-            </Link>
-            <Link
-              href="/templates"
-              className="block w-full px-4 py-2 text-center text-sm font-medium rounded-lg border border-border hover:bg-accent transition-colors"
+            </EdikitButton>
+            <EdikitButton 
+            href="/templates"
+            width="w-full"
+            variant="secondary"
             >
               Browse Templates
-            </Link>
+            </EdikitButton>
           </div>
         </div>
       </div>
