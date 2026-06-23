@@ -71,6 +71,7 @@ export interface Template {
     [key: string]: {
       type: "text" | "image" | "video" | "media";
       label: string;
+      value?: string;
       maxLength?: number;
       dimensions?: string;
       required: boolean;
@@ -86,8 +87,8 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 1.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 18, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 18, required: true },
+      text1: { type: "text", value: "text number 1" , label: "Text 1", maxLength: 18, required: false },
+      text2: { type: "text", value: "text number 2" , label: "Text 2", maxLength: 18, required: false },
       media1: {
         type: "media",
         label: "Media 1",
@@ -115,10 +116,10 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 2.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 14, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 14, required: false },
-      text3: { type: "text", label: "Text 3", maxLength: 14, required: false },
-      text4: { type: "text", label: "Text 4", maxLength: 14, required: false },
+      text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 14, required: false },
+      text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 14, required: false },
+      text3: { type: "text", value: "Text number 3", label: "Text 3", maxLength: 14, required: false },
+      text4: { type: "text", value: "Text number 4", label: "Text 4", maxLength: 14, required: false },
       media1: {
         type: "media",
         label: "Media 1",
@@ -158,10 +159,10 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 3.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 15, required: false },
-      text2: { type: "text", label: "Text 2", maxLength: 15, required: false },
-      text3: { type: "text", label: "Text 3", maxLength: 15, required: false },
-      text4: { type: "text", label: "Text 4", maxLength: 15, required: false },
+      text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 15, required: false },
+      text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 15, required: false },
+      text3: { type: "text", value: "Text number 3", label: "Text 3", maxLength: 15, required: false },
+      text4: { type: "text", value: "Text number 4", label: "Text 4", maxLength: 15, required: false },
       image1: {
         type: "image",
         label: "Image 1",
@@ -204,12 +205,14 @@ export const templates: Template[] = [
       text1: {
         type: "text",
         label: "Article Name",
+        value: "Article Name",
         maxLength: 15,
-        required: true,
+        required: false,
       },
       text2: {
         type: "text",
         label: "Article Price",
+        value: "$199.99",
         maxLength: 10,
         required: false,
       },
@@ -234,27 +237,31 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 5.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 35, required: true },
+      text1: { type: "text", value: "This is text number 1", label: "Text 1", maxLength: 35, required: false },
       text2: {
         type: "text",
+        value: "https://www.edikit.net/",
         label: "Website Link",
         maxLength: 50,
         required: false,
       },
       text3: {
         type: "text",
+        value: "Website title",
         label: "Website Title",
         maxLength: 26,
         required: false,
       },
       text4: {
         type: "text",
+        value: "Edikit - blue website title",
         label: "Blue Website Title",
         maxLength: 35,
         required: false,
       },
       text5: {
         type: "text",
+        value: "website description",
         label: "Website Description",
         maxLength: 55,
         required: false,
@@ -288,11 +295,12 @@ export const templates: Template[] = [
     fields: {
       text1: {
         type: "text",
+        value: "Comment Keyword for files",
         label: "Comment Keyword",
         maxLength: 45,
-        required: true,
+        required: false,
       },
-      text2: { type: "text", label: "Keyword", maxLength: 12, required: false },
+      text2: { type: "text", value: `"Edikit"`, label: "Keyword", maxLength: 12, required: false },
       image1: {
         type: "image",
         label: "Image 1",
@@ -326,7 +334,7 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 7.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text", maxLength: 20, required: true },
+      text1: { type: "text", value: "Text 1, type here", label: "Text", maxLength: 20, required: true },
       background: {
         type: "image",
         label: "Background",
@@ -342,9 +350,9 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 8.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 17, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 27, required: false },
-      text3: { type: "text", label: "Price", maxLength: 8, required: false },
+      text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 17, required: false },
+      text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 27, required: false },
+      text3: { type: "text", value: "$100.00", label: "Price", maxLength: 8, required: false },
       image1: {
         type: "image",
         label: "Image 1",
@@ -368,36 +376,42 @@ export const templates: Template[] = [
     fields: {
       text1: {
         type: "text",
+        value: "This is text number 1! Add text",
         label: "Message 1",
         maxLength: 36,
-        required: true,
+        required: false,
       },
       text2: {
         type: "text",
+        value: "This is text number 2! Add text",
         label: "Message 2",
         maxLength: 36,
         required: false,
       },
       text3: {
         type: "text",
+        value: "This is text number 3! Add text",
         label: "Message 3",
         maxLength: 36,
         required: false,
       },
       text4: {
         type: "text",
+        value: "This is text number 4! Add text",
         label: "Message 4",
         maxLength: 36,
         required: false,
       },
       text5: {
         type: "text",
+        value: "This is text number 5! Add text",
         label: "Message 5",
         maxLength: 36,
         required: false,
       },
       text6: {
         type: "text",
+        value: "Name Surname",
         label: "Sender's Name",
         maxLength: 22,
         required: false,
@@ -423,9 +437,9 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 10.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 18, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 18, required: false },
-      text3: { type: "text", label: "Text 3", maxLength: 18, required: false },
+      text1: { type: "text", value: "text number 1", label: "Text 1", maxLength: 18, required: false },
+      text2: { type: "text", value: "text number 2", label: "Text 2", maxLength: 18, required: false },
+      text3: { type: "text", value: "text number 3", label: "Text 3", maxLength: 18, required: false },
       media1: {
         type: "media",
         label: "Media 1",
@@ -471,11 +485,12 @@ export const templates: Template[] = [
         dimensions: "512x512",
         required: false,
       },
-      text1: { type: "text", label: "Text 1", maxLength: 40, required: true },
-      text2: { type: "text", label: "Text 2", maxLength: 40, required: false },
-      text3: { type: "text", label: "Likes", maxLength: 5, required: false },
+      text1: { type: "text", value: "text number 1", label: "Text 1", maxLength: 40, required: false },
+      text2: { type: "text", value: "text number 2, type something here", label: "Text 2", maxLength: 40, required: false },
+      text3: { type: "text", value: "5,376", label: "Likes", maxLength: 5, required: false },
       text4: {
         type: "text",
+        value: "follow_edikit",
         label: "Username",
         maxLength: 20,
         required: false,
@@ -497,13 +512,15 @@ export const templates: Template[] = [
     fields: {
       text1: {
         type: "text",
+        value: "Channel Name",
         label: "Channel Name",
         maxLength: 14,
-        required: true,
+        required: false,
       },
-      text2: { type: "text", label: "Username", maxLength: 22, required: true },
+      text2: { type: "text", value: "@txt_username", label: "Username", maxLength: 22, required: false },
       text3: {
         type: "text",
+        value: "1 Mln subscribers",
         label: "Subscribers Count",
         maxLength: 20,
         required: false,
@@ -529,10 +546,11 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 13.png",
     hasTransprentBackground: false,
     fields: {
-      text1: { type: "text", label: "Month", maxLength: 18, required: true },
-      text2: { type: "text", label: "Year", maxLength: 18, required: true },
+      text1: { type: "text", value: "Month here", label: "Month", maxLength: 18, required: false },
+      text2: { type: "text", value: "2026", label: "Year", maxLength: 18, required: false },
       text3: {
         type: "text",
+        value: "Text number 1",
         label: "Event Text",
         maxLength: 18,
         required: false,
@@ -558,7 +576,7 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 14.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", label: "Text", maxLength: 20, required: true },
+      text1: { type: "text", value: "Text number 1", label: "Text", maxLength: 20, required: false },
       background: {
         type: "image",
         label: "Background",
@@ -574,28 +592,32 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 15.png",
     hasTransprentBackground: false,
     fields: {
-      text1: { type: "text", label: "Text 1", maxLength: 47, required: true },
+      text1: { type: "text", value: "This is text number 1, type something here!", label: "Text 1", maxLength: 47, required: false },
       text2: {
         type: "text",
+        value: "YourName1",
         label: "Your Name 1",
         maxLength: 33,
-        required: true,
+        required: false,
       },
       text3: {
         type: "text",
+        value: "@username_1",
         label: "Username 1",
         maxLength: 33,
-        required: true,
+        required: false,
       },
-      text4: { type: "text", label: "Text 2", maxLength: 47, required: false },
+      text4: { type: "text", value: "This is text number 2, type something here!", label: "Text 2", maxLength: 47, required: false },
       text5: {
         type: "text",
+        value: "YourName2",
         label: "Your Name 2",
         maxLength: 33,
         required: false,
       },
       text6: {
         type: "text",
+        value: "@username_2",
         label: "Username 2",
         maxLength: 33,
         required: false,
@@ -633,10 +655,10 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 16.png",
     hasTransprentBackground: false,
     fields: {
-      text1: { type: "text", label: "Likes", maxLength: 6, required: false },
-      text2: { type: "text", label: "Username", maxLength: 27, required: true },
-      text3: { type: "text", label: "Views", maxLength: 10, required: false },
-      text4: { type: "text", label: "Title", maxLength: 39, required: true },
+      text1: { type: "text", value: "2k", label: "Likes", maxLength: 6, required: false },
+      text2: { type: "text", value: "@username", label: "Username", maxLength: 27, required: false },
+      text3: { type: "text", value: "250k views", label: "Views", maxLength: 10, required: false },
+      text4: { type: "text", value: "Type your title here", label: "Title", maxLength: 39, required: false },
       image1: {
         type: "image",
         label: "Profile Pic",

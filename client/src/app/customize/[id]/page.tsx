@@ -112,8 +112,8 @@ const CustomizePage = () => {
             <div className="rounded-2xl overflow-hidden shadow-sm">
               <div className="p-2">
                 <div className="flex items-center gap-1">
-                  <h2 className="font-semibold text-foreground">
-                    Live Preview
+                  <h2 className="font-semibold text-foreground text-xl">
+                    Preview
                   </h2>
                 </div>
               </div>
@@ -157,7 +157,7 @@ const CustomizePage = () => {
             </div>
 
             {/* Upgrade CTA */}
-            <div className="p-6 rounded-lg bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
+            {/* <div className="p-6 rounded-lg bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
               <div className="space-y-3">
                 <h3 className="font-semibold text-foreground">
                   Unlock Premium Features
@@ -184,7 +184,7 @@ const CustomizePage = () => {
                   Upgrade to Pro
                 </EdikitButton>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Column - Scrollable Form */}
@@ -198,7 +198,7 @@ const CustomizePage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-lg space-y-5">
+            <div className="p-6 rounded-lg space-y-5 bg-card border border-border">
               {/* Dynamic Fields */}
               {Object.entries(template.fields)
                 .filter(([fieldKey]) => fieldKey !== "background")
@@ -224,7 +224,7 @@ const CustomizePage = () => {
                       <div>
                         <input
                           type="text"
-                          value={(formData[fieldKey] as string) || ""}
+                          value={(formData[fieldKey] as string) ?? field.value ?? ""}
                           onChange={(e) =>
                             handleTextChange(fieldKey, e.target.value)
                           }
@@ -236,6 +236,12 @@ const CustomizePage = () => {
                           <p className="text-xs text-muted-foreground mt-1">
                             {((formData[fieldKey] as string) || "").length} /{" "}
                             {field.maxLength} characters
+                          </p>
+                        )}
+                        {formData[fieldKey] === " " && (
+                          <p className="text-xs text-blue-500/80 mt-1 flex items-center gap-1.5">
+                            <Info className="w-3 h-3" />
+                            Field cleared. A space will be used for rendering purpose.
                           </p>
                         )}
                       </div>

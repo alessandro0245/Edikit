@@ -12,7 +12,7 @@ import {
 import { resizeVideo } from "@/utils/videoResize";
 
 interface FormDataState {
-  [key: string]: string | File | null;
+  [key: string]: string | File | null | undefined;
 }
 
 interface RenderJob {
@@ -24,6 +24,7 @@ interface RenderJob {
 }
 
 interface CustomizePersistedState {
+  version?: number;
   formData: Record<string, string>;
   uploadedAssets: Record<string, string>;
   renderJob: RenderJob | null;
@@ -60,7 +61,7 @@ export const useCustomizeLogic = () => {
     [key: string]: boolean;
   }>({});
   const [isRestoringState, setIsRestoringState] = useState(true);
-  const hasHydratedStateRef = useRef(false);
+  const [hasHydratedState, setHasHydratedState] = useState(false);
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -97,12 +98,12 @@ export const useCustomizeLogic = () => {
   // Restore persisted state for this template, or initialize a clean form.
   useEffect(() => {
     if (template) {
-      hasHydratedStateRef.current = false;
+      setHasHydratedState(false);
       setIsRestoringState(true);
 
       const initialData: FormDataState = {};
       Object.entries(template.fields).forEach(([key, field]) => {
-        initialData[key] = field.type === "text" ? "" : "";
+        initialData[key] = undefined;
       });
 
       try {
@@ -115,12 +116,20 @@ export const useCustomizeLogic = () => {
             savedState,
           ) as Partial<CustomizePersistedState>;
 
+          const isLegacy = !parsedState.version || parsedState.version < 2;
+
           Object.entries(template.fields).forEach(([key, field]) => {
             if (field.type === "text") {
-              initialData[key] =
-                typeof parsedState.formData?.[key] === "string"
-                  ? parsedState.formData[key]
-                  : "";
+              const savedValue = parsedState.formData?.[key];
+              if (typeof savedValue === "string") {
+                // If it's legacy state, we only trust non-empty strings because 
+                // a previous bug saved empty strings for all fields by default.
+                if (savedValue !== "" || !isLegacy) {
+                  initialData[key] = savedValue === "" ? " " : savedValue;
+                  return;
+                }
+              }
+              initialData[key] = undefined;
             }
           });
 
@@ -146,14 +155,13 @@ export const useCustomizeLogic = () => {
       setUploadingAssets(new Set());
       setImagePreviewReady({});
       hasNotifiedRef.current = false;
-      hasHydratedStateRef.current = true;
+      setHasHydratedState(true);
       setIsRestoringState(false);
     }
   }, [template]);
 
-  // Persist the user-entered state so downloads or refreshes don't wipe it out.
   useEffect(() => {
-    if (!template || !hasHydratedStateRef.current) return;
+    if (!template || !hasHydratedState) return;
 
     try {
       const persistedFormData: Record<string, string> = {};
@@ -162,10 +170,15 @@ export const useCustomizeLogic = () => {
         if (field.type !== "text") return;
 
         const value = formData[key];
-        persistedFormData[key] = typeof value === "string" ? value : "";
+        // Only persist if it's explicitly a string (including empty string)
+        // undefined means we use the template default
+        if (typeof value === "string") {
+          persistedFormData[key] = value;
+        }
       });
 
       const stateToPersist: CustomizePersistedState = {
+        version: 2,
         formData: persistedFormData,
         uploadedAssets,
         renderJob,
@@ -236,7 +249,27 @@ export const useCustomizeLogic = () => {
   }, [renderJob]);
 
   const handleTextChange = (fieldKey: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [fieldKey]: value }));
+    setFormData((prev) => {
+      const prevValue = prev[fieldKey];
+      let newValue = value;
+
+      // If the field was just the forced space and the user typed a character,
+      // remove the space so they don't have to delete it manually.
+      if (prevValue === " " && value.length > 1) {
+        if (value.startsWith(" ")) {
+          newValue = value.slice(1);
+        } else if (value.endsWith(" ")) {
+          newValue = value.slice(0, -1);
+        }
+      }
+
+      // If the user clears the input, we leave a single space so it's not completely blank
+      if (newValue === "") {
+        newValue = " ";
+      }
+
+      return { ...prev, [fieldKey]: newValue };
+    });
   };
 
   // Validate image dimensions match the required dimensions
