@@ -82,7 +82,7 @@ const Login = () => {
         dispatch
       );
       console.log("Login successful:", response);
-      router.push("/");
+      router.push("/dashboard");
       showSuccessToast("Logged in successfully!");
     } catch (error: any) {
       showErrorToast("Login failed", error.response?.data?.message);

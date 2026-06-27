@@ -105,7 +105,7 @@ export default function SignUpPage() {
       );
       console.log(response);
       showSuccessToast("Signup successful", "Your account has been created.");
-      router.push("/");
+      router.push("/dashboard");
       console.log("Signup successful:", response);
     } catch (error: any) {
       setLoading(false);
@@ -234,8 +234,7 @@ export default function SignUpPage() {
                 <p className="text-xs text-muted-foreground leading-normal">
                   By creating an account, you agree to our{" "}
                   <Link 
-                    href="https://www.iubenda.com/privacy-policy/40029799" 
-                    target="_blank" 
+                    href="/privacy-policy" 
                     className="text-primary hover:underline"
                   >
                     Privacy Policy
