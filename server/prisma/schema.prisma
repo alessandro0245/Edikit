@@ -110,6 +110,9 @@ model User {
   renderJobs         RenderJob[]
   creditTransactions CreditTransaction[]
 
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+
   @@map("users")
 }
 

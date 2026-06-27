@@ -34,12 +34,13 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className={`antialiased dark`} suppressHydrationWarning>
+      <body className={`antialiased dark min-h-screen flex flex-col`} suppressHydrationWarning>
         <Providers>
           <Navbar />
-          {children}
-
-        <SimpleFooter/>
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <SimpleFooter/>
         </Providers>
 
         {/* iubenda Script */}

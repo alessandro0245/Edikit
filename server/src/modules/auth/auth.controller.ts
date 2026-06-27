@@ -159,4 +159,28 @@ export class AuthController {
   async getProfile(@CurrentUser() user: JwtUser) {
     return await this.authService.getCurrentUser(user.userId);
   }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request a password reset email' })
+  @ApiResponse({ status: 200, description: 'Reset email sent if account exists' })
+  async forgotPassword(@Body('email') email: string) {
+  await this.authService.forgotPassword(email);
+
+  return { message: 'If that email is registered, a reset link has been sent.'};
+}
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using token from email' })
+  @ApiResponse({ status: 200, description: 'Password updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async resetPassword(
+  @Body('token') token: string,
+  @Body('password') password: string,
+) {
+  await this.authService.resetPassword(token, password);
+  return { message: 'Password updated successfully.' };
+}
 }
