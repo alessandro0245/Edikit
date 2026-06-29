@@ -45,9 +45,9 @@ export default function RootLayout({
 
         {/* iubenda Script */}
         <Script src="https://www.iubenda.com/privacy-policy/82026734" strategy="lazyOnload" />
-        {/* <Script strategy="lazyOnload" src="https://www.iubenda.com/privacy-policy/40029799/cookie-policy" />
-        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/4150beb2-3cab-44a9-9fe6-fd5c93d6cbd6.js"></script> */}
-         <script type="text/javascript" src="https://www.iubenda.com/privacy-policy/82026734/cookie-policy"></script>
+        <Script strategy="lazyOnload" src="https://www.iubenda.com/privacy-policy/82026734/cookie-policy" />
+        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"></script>
+         
       </body>
     </html>
   );
