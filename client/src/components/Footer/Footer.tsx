@@ -47,7 +47,7 @@ export default function SimpleFooter() {
           </Link>
           <div className="h-2.5 w-px bg-border/50 hidden sm:block" />
         
-          <Link href="/privacy-policy" className="hover:text-foreground transition-colors font-normal">
+          <Link href="https://www.iubenda.com/privacy-policy/82026734" className="hover:text-foreground transition-colors font-normal">
             Privacy Policy
           </Link>
         </div>

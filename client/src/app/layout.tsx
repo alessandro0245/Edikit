@@ -44,10 +44,10 @@ export default function RootLayout({
         </Providers>
 
         {/* iubenda Script */}
-        <Script src="https://cdn.iubenda.com/iubenda.js" strategy="lazyOnload" />
+        <Script src="https://www.iubenda.com/privacy-policy/82026734" strategy="lazyOnload" />
         {/* <Script strategy="lazyOnload" src="https://www.iubenda.com/privacy-policy/40029799/cookie-policy" />
         <script type="text/javascript" src="https://embeds.iubenda.com/widgets/4150beb2-3cab-44a9-9fe6-fd5c93d6cbd6.js"></script> */}
-         <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/390ecbff1413870983f6e78b6331e66b/script.js"></script>
+         <script type="text/javascript" src="https://www.iubenda.com/privacy-policy/82026734/cookie-policy"></script>
       </body>
     </html>
   );
