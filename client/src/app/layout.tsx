@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
-import Script from "next/script";
 import SimpleFooter from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
@@ -23,6 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* iubenda unified script — MUST be first in <head> for autoblocking to work */}
+        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"></script>
+
+        {/* iubenda Consent Database */}
+        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: `var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "Ki9lMDUKaWtobf92UIKJbCdOZTIDFFFi"}]);` }} />
+        <script type="text/javascript" src="https://cdn.iubenda.com/cons/iubenda_cons.js" async></script>
+
         <link rel="preconnect" href="https://fonts.googleapis.com"></link>
         <link
           rel="preconnect"
@@ -43,10 +49,6 @@ export default function RootLayout({
           <SimpleFooter/>
         </Providers>
 
-        {/* iubenda Script */}
-        <Script src="https://www.iubenda.com/privacy-policy/82026734" strategy="lazyOnload" />
-        <Script strategy="lazyOnload" src="https://www.iubenda.com/privacy-policy/82026734/cookie-policy" />
-        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"></script>
          
       </body>
     </html>

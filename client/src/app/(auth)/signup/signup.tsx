@@ -96,6 +96,18 @@ export default function SignUpPage() {
       return;
     }
 
+    // Record consent in iubenda Consent Database
+    if (typeof window !== "undefined" && (window as any)._iub?.cons_instructions) {
+      (window as any)._iub.cons_instructions.push(["submit", {
+        writeOnLocalStorage: false,
+        form: { selector: document.getElementById("signup-form") },
+        consent: {
+          legal_notices: [{ identifier: "privacy_policy" }],
+          subject: { email: formData.email, full_name: formData.fullName },
+        },
+      }]);
+    }
+
     try {
       const response = await signupUser(
         formData.fullName,
@@ -133,7 +145,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Sign Up Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form id="signup-form" onSubmit={handleSubmit} className="space-y-3.5">
               {/* Full Name */}
               <div className="space-y-1.5">
                 <label htmlFor="name" className="text-xs font-medium text-foreground">
@@ -143,6 +155,7 @@ export default function SignUpPage() {
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     id="name"
+                    name="full_name"
                     type="text"
                     placeholder="John Doe"
                     value={formData.fullName}
@@ -166,6 +179,7 @@ export default function SignUpPage() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={formData.email}
@@ -233,11 +247,11 @@ export default function SignUpPage() {
               <div className="pt-1">
                 <p className="text-xs text-muted-foreground leading-normal">
                   By creating an account, you agree to our{" "}
-                  <Link 
-                    href="/privacy-policy" 
-                    className="text-primary hover:underline"
-                  >
+                  <Link href="https://www.iubenda.com/privacy-policy/82026734" className="text-primary hover:underline">
                     Privacy Policy
+                  </Link>{" "}and{" "}
+                  <Link href="https://www.iubenda.com/privacy-policy/82026734/cookie-policy" className="text-primary hover:underline">
+                    Cookie Policy
                   </Link>
                 </p>
               </div>
