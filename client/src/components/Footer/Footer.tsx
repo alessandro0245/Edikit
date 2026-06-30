@@ -30,28 +30,8 @@ export default function SimpleFooter() {
           </span>
         </div>
 
-        {/* Center: System Slogan / Context (Subtle text) */}
-        <div className="hidden lg:block text-muted-foreground/60 font-normal truncate max-w-md">
-          Bring your static designs to life with automated motion graphics
-          templates.
-        </div>
-
         {/* Right Side: Quick Action & Policy Navigation Anchors */}
-        <div className="flex items-center gap-5 sm:gap-6 shrink-0">
-          <Link
-            href="/templates"
-            className="hover:text-foreground transition-colors uppercase tracking-wider text-[10px]"
-          >
-            Templates
-          </Link>
-          <Link
-            href="/pricing"
-            className="hover:text-foreground transition-colors uppercase tracking-wider text-[10px]"
-          >
-            Pricing
-          </Link>
-          <div className="h-2.5 w-px bg-border/50 hidden sm:block" />
-
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:gap-x-6 shrink-0">
           <Link
             href="https://www.iubenda.com/privacy-policy/82026734"
             className="hover:text-foreground transition-colors font-normal"
@@ -64,6 +44,21 @@ export default function SimpleFooter() {
           >
             Cookie Policy
           </Link>
+          {/* iubenda binds this class to open the privacy/cookie preferences
+              panel — covers GDPR consent + US (CCPA/CPRA) sale/sharing opt-out */}
+          <button
+            type="button"
+            className="iubenda-cs-preferences-link hover:text-foreground transition-colors font-normal cursor-pointer"
+          >
+            Your Privacy Choices
+          </button>
+          {/* iubenda binds this class to open the US "Notice at Collection" */}
+          <button
+            type="button"
+            className="iubenda-cs-uspr-link hover:text-foreground transition-colors font-normal cursor-pointer"
+          >
+            Notice at Collection
+          </button>
           <Link
             href="/terms"
             className="hover:text-foreground transition-colors font-normal"
