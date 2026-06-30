@@ -1,0 +1,359 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - link "Logo" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "Logo" [ref=e6]
+      - navigation [ref=e7]:
+        - link "Templates" [ref=e8] [cursor=pointer]:
+          - /url: /templates
+        - link "Pricing" [ref=e9] [cursor=pointer]:
+          - /url: /pricing
+      - generic [ref=e10]:
+        - button "Dark mode enabled" [disabled] [ref=e11]
+        - generic [ref=e13]:
+          - link "Log in" [ref=e14] [cursor=pointer]:
+            - /url: /login
+          - link "Try for free" [ref=e15] [cursor=pointer]:
+            - /url: /signup
+            - generic [ref=e17]: Try for free
+  - main [ref=e18]:
+    - main [ref=e21]:
+      - generic [ref=e23]:
+        - heading "Pro motion graphics in 2 clicks." [level=1] [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: Pro
+            - generic [ref=e27]: motion
+            - generic [ref=e28]: graphics
+          - generic [ref=e29]:
+            - generic [ref=e30]: in
+            - emphasis [ref=e32]: 2 clicks.
+        - generic [ref=e33]:
+          - generic [ref=e35]: TEMPLATE 01
+          - generic [ref=e37]: TEMPLATE 02
+          - generic [ref=e39]: TEMPLATE 03
+          - generic [ref=e41]: TEMPLATE 04
+          - generic [ref=e43]: TEMPLATE 05
+        - paragraph [ref=e44]: Pick a template, customize text and colors in your browser and download the rendered video. That's it.
+        - generic [ref=e45]:
+          - link "See pricing" [ref=e46] [cursor=pointer]:
+            - /url: /pricing
+            - generic [ref=e48]: See pricing
+          - link "Explore templates" [ref=e49] [cursor=pointer]:
+            - /url: /templates
+            - generic [ref=e51]: Explore templates
+      - generic [ref=e53]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: 16 professionally crafted animations
+          - heading "Templates designed for creators" [level=2] [ref=e60]:
+            - text: Templates designed for
+            - generic [ref=e61]:
+              - text: creators
+              - img [ref=e62]
+          - paragraph [ref=e64]: Every template is professionally crafted by motion designers. Customize text, colors and logos, then export instantly. No animation experience needed.
+        - generic [ref=e66]:
+          - button "Previous templates" [ref=e67]:
+            - img [ref=e68]
+          - button "Next templates" [ref=e70]:
+            - img [ref=e71]
+          - generic [ref=e74]:
+            - link "Two Cards Linked Together Two Cards Linked Together" [ref=e77] [cursor=pointer]:
+              - /url: /customize/1
+              - generic [ref=e78]:
+                - img "Two Cards Linked Together" [ref=e80]
+                - paragraph [ref=e82]: Two Cards Linked Together
+            - link "Card Tree Branch Layout Card Tree Branch Layout" [ref=e85] [cursor=pointer]:
+              - /url: /customize/2
+              - generic [ref=e86]:
+                - img "Card Tree Branch Layout" [ref=e88]
+                - paragraph [ref=e90]: Card Tree Branch Layout
+            - link "Swipeable Stack of Cards Swipeable Stack of Cards" [ref=e93] [cursor=pointer]:
+              - /url: /customize/3
+              - generic [ref=e94]:
+                - img "Swipeable Stack of Cards" [ref=e96]
+                - paragraph [ref=e98]: Swipeable Stack of Cards
+            - link "Product Price Showcase Card Product Price Showcase Card" [ref=e101] [cursor=pointer]:
+              - /url: /customize/4
+              - generic [ref=e102]:
+                - img "Product Price Showcase Card" [ref=e104]
+                - paragraph [ref=e106]: Product Price Showcase Card
+            - link "Google Search Results Layout Google Search Results Layout" [ref=e109] [cursor=pointer]:
+              - /url: /customize/5
+              - generic [ref=e110]:
+                - img "Google Search Results Layout" [ref=e112]
+                - paragraph [ref=e114]: Google Search Results Layout
+            - link "Folder Opening Image Reveal Folder Opening Image Reveal" [ref=e117] [cursor=pointer]:
+              - /url: /customize/6
+              - generic [ref=e118]:
+                - img "Folder Opening Image Reveal" [ref=e120]
+                - paragraph [ref=e122]: Folder Opening Image Reveal
+            - link "Clock with Sliding Banner Clock with Sliding Banner" [ref=e125] [cursor=pointer]:
+              - /url: /customize/7
+              - generic [ref=e126]:
+                - img "Clock with Sliding Banner" [ref=e128]
+                - paragraph [ref=e130]: Clock with Sliding Banner
+            - link "Dark Product Showcase Card Dark Product Showcase Card" [ref=e133] [cursor=pointer]:
+              - /url: /customize/8
+              - generic [ref=e134]:
+                - img "Dark Product Showcase Card" [ref=e136]
+                - paragraph [ref=e138]: Dark Product Showcase Card
+            - link "Chat Message Notification Stack Chat Message Notification Stack" [ref=e141] [cursor=pointer]:
+              - /url: /customize/9
+              - generic [ref=e142]:
+                - img "Chat Message Notification Stack" [ref=e144]
+                - paragraph [ref=e146]: Chat Message Notification Stack
+            - link "Three Cards Linked Together Three Cards Linked Together" [ref=e149] [cursor=pointer]:
+              - /url: /customize/10
+              - generic [ref=e150]:
+                - img "Three Cards Linked Together" [ref=e152]
+                - paragraph [ref=e154]: Three Cards Linked Together
+            - link "Animated Social Media Post Animated Social Media Post" [ref=e157] [cursor=pointer]:
+              - /url: /customize/11
+              - generic [ref=e158]:
+                - img "Animated Social Media Post" [ref=e160]
+                - paragraph [ref=e162]: Animated Social Media Post
+            - link "Creator Channel Subscribe Header Creator Channel Subscribe Header" [ref=e165] [cursor=pointer]:
+              - /url: /customize/12
+              - generic [ref=e166]:
+                - img "Creator Channel Subscribe Header" [ref=e168]
+                - paragraph [ref=e170]: Creator Channel Subscribe Header
+            - link "Pinned Calendar Event Card Pinned Calendar Event Card" [ref=e173] [cursor=pointer]:
+              - /url: /customize/13
+              - generic [ref=e174]:
+                - img "Pinned Calendar Event Card" [ref=e176]
+                - paragraph [ref=e178]: Pinned Calendar Event Card
+            - link "Single Line Bouncing Text Single Line Bouncing Text" [ref=e181] [cursor=pointer]:
+              - /url: /customize/14
+              - generic [ref=e182]:
+                - img "Single Line Bouncing Text" [ref=e184]
+                - paragraph [ref=e186]: Single Line Bouncing Text
+            - link "Two-Post Social Thread Two-Post Social Thread" [ref=e189] [cursor=pointer]:
+              - /url: /customize/15
+              - generic [ref=e190]:
+                - img "Two-Post Social Thread" [ref=e192]
+                - paragraph [ref=e194]: Two-Post Social Thread
+            - link "Social Video Player Card" [ref=e197] [cursor=pointer]:
+              - /url: /customize/16
+              - paragraph [ref=e202]: Social Video Player Card
+            - link "Two Cards Linked Together" [ref=e205] [cursor=pointer]:
+              - /url: /customize/1
+              - paragraph [ref=e210]: Two Cards Linked Together
+            - link "Card Tree Branch Layout" [ref=e213] [cursor=pointer]:
+              - /url: /customize/2
+              - paragraph [ref=e218]: Card Tree Branch Layout
+            - link "Swipeable Stack of Cards Swipeable Stack of Cards" [ref=e221] [cursor=pointer]:
+              - /url: /customize/3
+              - generic [ref=e222]:
+                - img "Swipeable Stack of Cards" [ref=e224]
+                - paragraph [ref=e226]: Swipeable Stack of Cards
+            - link "Product Price Showcase Card Product Price Showcase Card" [ref=e229] [cursor=pointer]:
+              - /url: /customize/4
+              - generic [ref=e230]:
+                - img "Product Price Showcase Card" [ref=e232]
+                - paragraph [ref=e234]: Product Price Showcase Card
+            - link "Google Search Results Layout Google Search Results Layout" [ref=e237] [cursor=pointer]:
+              - /url: /customize/5
+              - generic [ref=e238]:
+                - img "Google Search Results Layout" [ref=e240]
+                - paragraph [ref=e242]: Google Search Results Layout
+            - link "Folder Opening Image Reveal Folder Opening Image Reveal" [ref=e245] [cursor=pointer]:
+              - /url: /customize/6
+              - generic [ref=e246]:
+                - img "Folder Opening Image Reveal" [ref=e248]
+                - paragraph [ref=e250]: Folder Opening Image Reveal
+            - link "Clock with Sliding Banner Clock with Sliding Banner" [ref=e253] [cursor=pointer]:
+              - /url: /customize/7
+              - generic [ref=e254]:
+                - img "Clock with Sliding Banner" [ref=e256]
+                - paragraph [ref=e258]: Clock with Sliding Banner
+            - link "Dark Product Showcase Card Dark Product Showcase Card" [ref=e261] [cursor=pointer]:
+              - /url: /customize/8
+              - generic [ref=e262]:
+                - img "Dark Product Showcase Card" [ref=e264]
+                - paragraph [ref=e266]: Dark Product Showcase Card
+            - link "Chat Message Notification Stack Chat Message Notification Stack" [ref=e269] [cursor=pointer]:
+              - /url: /customize/9
+              - generic [ref=e270]:
+                - img "Chat Message Notification Stack" [ref=e272]
+                - paragraph [ref=e274]: Chat Message Notification Stack
+            - link "Three Cards Linked Together Three Cards Linked Together" [ref=e277] [cursor=pointer]:
+              - /url: /customize/10
+              - generic [ref=e278]:
+                - img "Three Cards Linked Together" [ref=e280]
+                - paragraph [ref=e282]: Three Cards Linked Together
+            - link "Animated Social Media Post Animated Social Media Post" [ref=e285] [cursor=pointer]:
+              - /url: /customize/11
+              - generic [ref=e286]:
+                - img "Animated Social Media Post" [ref=e288]
+                - paragraph [ref=e290]: Animated Social Media Post
+            - link "Creator Channel Subscribe Header Creator Channel Subscribe Header" [ref=e293] [cursor=pointer]:
+              - /url: /customize/12
+              - generic [ref=e294]:
+                - img "Creator Channel Subscribe Header" [ref=e296]
+                - paragraph [ref=e298]: Creator Channel Subscribe Header
+            - link "Pinned Calendar Event Card Pinned Calendar Event Card" [ref=e301] [cursor=pointer]:
+              - /url: /customize/13
+              - generic [ref=e302]:
+                - img "Pinned Calendar Event Card" [ref=e304]
+                - paragraph [ref=e306]: Pinned Calendar Event Card
+            - link "Single Line Bouncing Text Single Line Bouncing Text" [ref=e309] [cursor=pointer]:
+              - /url: /customize/14
+              - generic [ref=e310]:
+                - img "Single Line Bouncing Text" [ref=e312]
+                - paragraph [ref=e314]: Single Line Bouncing Text
+            - link "Two-Post Social Thread Two-Post Social Thread" [ref=e317] [cursor=pointer]:
+              - /url: /customize/15
+              - generic [ref=e318]:
+                - img "Two-Post Social Thread" [ref=e320]
+                - paragraph [ref=e322]: Two-Post Social Thread
+            - link "Social Video Player Card Social Video Player Card" [ref=e325] [cursor=pointer]:
+              - /url: /customize/16
+              - generic [ref=e326]:
+                - img "Social Video Player Card" [ref=e328]
+                - paragraph [ref=e330]: Social Video Player Card
+            - link "Two Cards Linked Together Two Cards Linked Together" [ref=e333] [cursor=pointer]:
+              - /url: /customize/1
+              - generic [ref=e334]:
+                - img "Two Cards Linked Together" [ref=e336]
+                - paragraph [ref=e338]: Two Cards Linked Together
+            - link "Card Tree Branch Layout Card Tree Branch Layout" [ref=e341] [cursor=pointer]:
+              - /url: /customize/2
+              - generic [ref=e342]:
+                - img "Card Tree Branch Layout" [ref=e344]
+                - paragraph [ref=e346]: Card Tree Branch Layout
+            - link "Swipeable Stack of Cards Swipeable Stack of Cards" [ref=e349] [cursor=pointer]:
+              - /url: /customize/3
+              - generic [ref=e350]:
+                - img "Swipeable Stack of Cards" [ref=e352]
+                - paragraph [ref=e354]: Swipeable Stack of Cards
+            - link "Product Price Showcase Card Product Price Showcase Card" [ref=e357] [cursor=pointer]:
+              - /url: /customize/4
+              - generic [ref=e358]:
+                - img "Product Price Showcase Card" [ref=e360]
+                - paragraph [ref=e362]: Product Price Showcase Card
+            - link "Google Search Results Layout Google Search Results Layout" [ref=e365] [cursor=pointer]:
+              - /url: /customize/5
+              - generic [ref=e366]:
+                - img "Google Search Results Layout" [ref=e368]
+                - paragraph [ref=e370]: Google Search Results Layout
+            - link "Folder Opening Image Reveal Folder Opening Image Reveal" [ref=e373] [cursor=pointer]:
+              - /url: /customize/6
+              - generic [ref=e374]:
+                - img "Folder Opening Image Reveal" [ref=e376]
+                - paragraph [ref=e378]: Folder Opening Image Reveal
+            - link "Clock with Sliding Banner Clock with Sliding Banner" [ref=e381] [cursor=pointer]:
+              - /url: /customize/7
+              - generic [ref=e382]:
+                - img "Clock with Sliding Banner" [ref=e384]
+                - paragraph [ref=e386]: Clock with Sliding Banner
+            - link "Dark Product Showcase Card Dark Product Showcase Card" [ref=e389] [cursor=pointer]:
+              - /url: /customize/8
+              - generic [ref=e390]:
+                - img "Dark Product Showcase Card" [ref=e392]
+                - paragraph [ref=e394]: Dark Product Showcase Card
+            - link "Chat Message Notification Stack Chat Message Notification Stack" [ref=e397] [cursor=pointer]:
+              - /url: /customize/9
+              - generic [ref=e398]:
+                - img "Chat Message Notification Stack" [ref=e400]
+                - paragraph [ref=e402]: Chat Message Notification Stack
+            - link "Three Cards Linked Together Three Cards Linked Together" [ref=e405] [cursor=pointer]:
+              - /url: /customize/10
+              - generic [ref=e406]:
+                - img "Three Cards Linked Together" [ref=e408]
+                - paragraph [ref=e410]: Three Cards Linked Together
+            - link "Animated Social Media Post Animated Social Media Post" [ref=e413] [cursor=pointer]:
+              - /url: /customize/11
+              - generic [ref=e414]:
+                - img "Animated Social Media Post" [ref=e416]
+                - paragraph [ref=e418]: Animated Social Media Post
+            - link "Creator Channel Subscribe Header Creator Channel Subscribe Header" [ref=e421] [cursor=pointer]:
+              - /url: /customize/12
+              - generic [ref=e422]:
+                - img "Creator Channel Subscribe Header" [ref=e424]
+                - paragraph [ref=e426]: Creator Channel Subscribe Header
+            - link "Pinned Calendar Event Card Pinned Calendar Event Card" [ref=e429] [cursor=pointer]:
+              - /url: /customize/13
+              - generic [ref=e430]:
+                - img "Pinned Calendar Event Card" [ref=e432]
+                - paragraph [ref=e434]: Pinned Calendar Event Card
+            - link "Single Line Bouncing Text Single Line Bouncing Text" [ref=e437] [cursor=pointer]:
+              - /url: /customize/14
+              - generic [ref=e438]:
+                - img "Single Line Bouncing Text" [ref=e440]
+                - paragraph [ref=e442]: Single Line Bouncing Text
+            - link "Two-Post Social Thread Two-Post Social Thread" [ref=e445] [cursor=pointer]:
+              - /url: /customize/15
+              - generic [ref=e446]:
+                - img "Two-Post Social Thread" [ref=e448]
+                - paragraph [ref=e450]: Two-Post Social Thread
+            - link "Social Video Player Card Social Video Player Card" [ref=e453] [cursor=pointer]:
+              - /url: /customize/16
+              - generic [ref=e454]:
+                - img "Social Video Player Card" [ref=e456]
+                - paragraph [ref=e458]: Social Video Player Card
+          - generic [ref=e459]:
+            - button "Go to template Two Cards Linked Together" [ref=e460]
+            - button "Go to template Card Tree Branch Layout" [ref=e461]
+            - button "Go to template Swipeable Stack of Cards" [ref=e462]
+            - button "Go to template Product Price Showcase Card" [ref=e463]
+            - button "Go to template Google Search Results Layout" [ref=e464]
+            - button "Go to template Folder Opening Image Reveal" [ref=e465]
+            - button "Go to template Clock with Sliding Banner" [ref=e466]
+            - button "Go to template Dark Product Showcase Card" [ref=e467]
+            - button "Go to template Chat Message Notification Stack" [ref=e468]
+            - button "Go to template Three Cards Linked Together" [ref=e469]
+            - button "Go to template Animated Social Media Post" [ref=e470]
+            - button "Go to template Creator Channel Subscribe Header" [ref=e471]
+            - button "Go to template Pinned Calendar Event Card" [ref=e472]
+            - button "Go to template Single Line Bouncing Text" [ref=e473]
+            - button "Go to template Two-Post Social Thread" [ref=e474]
+            - button "Go to template Social Video Player Card" [ref=e475]
+        - link "Browse All Templates" [ref=e478] [cursor=pointer]:
+          - /url: /templates
+          - generic [ref=e480]:
+            - text: Browse All Templates
+            - img [ref=e481]
+  - contentinfo [ref=e483]:
+    - generic [ref=e484]:
+      - generic [ref=e485]:
+        - img "Edikit" [ref=e486] [cursor=pointer]
+        - generic [ref=e488]: © 2026 Edikit. All rights reserved.
+      - generic [ref=e489]: Bring your static designs to life with automated motion graphics templates.
+      - generic [ref=e490]:
+        - link "Templates" [ref=e491] [cursor=pointer]:
+          - /url: /templates
+        - link "Pricing" [ref=e492] [cursor=pointer]:
+          - /url: /pricing
+        - link "Privacy Policy" [ref=e494] [cursor=pointer]:
+          - /url: https://www.iubenda.com/privacy-policy/82026734
+        - link "Cookie Policy" [ref=e495] [cursor=pointer]:
+          - /url: https://www.iubenda.com/privacy-policy/82026734/cookie-policy
+        - link "Terms" [ref=e496] [cursor=pointer]:
+          - /url: /terms
+  - alert [ref=e497]
+  - dialog "Notice" [ref=e498]:
+    - generic [ref=e503]:
+      - img "logo" [ref=e508]
+      - generic [ref=e510]:
+        - button "Notice" [disabled] [ref=e513] [cursor=pointer]
+        - button "Preferences" [ref=e516] [cursor=pointer]
+    - generic [ref=e519]:
+      - document [ref=e520]:
+        - paragraph [ref=e521]: We use cookies and similar technologies for essential site functions and with your consent, to improve and personalize your experience. You can accept, reject or set your preferences anytime. See our Cookie Policy for details.
+      - generic [ref=e522]:
+        - generic [ref=e523]: We use them for
+        - generic [ref=e524]:
+          - generic [ref=e526]:
+            - img [ref=e529]
+            - generic [ref=e533]: Necessary
+          - generic [ref=e535]:
+            - img [ref=e538]
+            - generic [ref=e544]: Experience
+          - generic [ref=e547]: Sale of my personal information
+          - generic [ref=e550]: Sharing of my personal information
+          - generic [ref=e553]: Processing of my personal information for targeted advertising
+    - generic [ref=e557]:
+      - button "Reject" [ref=e559] [cursor=pointer]:
+        - generic [ref=e560]: Reject
+      - button "Accept all" [ref=e562] [cursor=pointer]:
+        - generic [ref=e563]: Accept all
