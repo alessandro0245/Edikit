@@ -256,7 +256,7 @@ export default function EdikitButton(props: EdikitButtonProps) {
   }
 
   // ── As button ──────────────────────────────────────────────────────────────
-  const { disabled, onClick, type = "button", ...rest } = props as AsButtonProps;
+  const { disabled, onClick, type = "button", className: _cls, ...rest } = props as AsButtonProps;
   return (
     <button
       ref={containerRef as React.RefObject<HTMLButtonElement>}

@@ -175,7 +175,7 @@ const Login = () => {
             type="submit"
             disabled={loading}
             variant="primary"
-            width="md:w-full sm:w-80 lg:w-96"
+            width="w-full"
             className="mt-2"
           >
             {loading ? (
