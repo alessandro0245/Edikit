@@ -122,21 +122,8 @@ export default function Hero() {
 
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance">
                   Templates designed for{" "}
-                  <span className="relative inline-block">
+                  <span className="inline-block bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent">
                     creators
-                    <svg
-                      className="absolute -bottom-1 left-0 w-full h-2.5 text-primary/50"
-                      viewBox="0 0 200 10"
-                      preserveAspectRatio="none"
-                      fill="none"
-                    >
-                      <path
-                        d="M2 7 Q50 1 100 6 T198 4"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
                   </span>
                 </h2>
 

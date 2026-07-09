@@ -96,69 +96,69 @@ export const useCustomizeLogic = () => {
   }, []);
 
   // Restore persisted state for this template, or initialize a clean form.
-  useEffect(() => {
-    if (template) {
-      setHasHydratedState(false);
-      setIsRestoringState(true);
+  // useEffect(() => {
+  //   if (template) {
+  //     setHasHydratedState(false);
+  //     setIsRestoringState(true);
 
-      const initialData: FormDataState = {};
-      Object.entries(template.fields).forEach(([key, field]) => {
-        initialData[key] = undefined;
-      });
+  //     const initialData: FormDataState = {};
+  //     Object.entries(template.fields).forEach(([key, field]) => {
+  //       initialData[key] = undefined;
+  //     });
 
-      try {
-        const savedState = window.localStorage.getItem(
-          getCustomizeStorageKey(templateId),
-        );
+  //     try {
+  //       const savedState = window.localStorage.getItem(
+  //         getCustomizeStorageKey(templateId),
+  //       );
 
-        if (savedState) {
-          const parsedState = JSON.parse(
-            savedState,
-          ) as Partial<CustomizePersistedState>;
+  //       if (savedState) {
+  //         const parsedState = JSON.parse(
+  //           savedState,
+  //         ) as Partial<CustomizePersistedState>;
 
-          const isLegacy = !parsedState.version || parsedState.version < 2;
+  //         const isLegacy = !parsedState.version || parsedState.version < 2;
 
-          Object.entries(template.fields).forEach(([key, field]) => {
-            if (field.type === "text") {
-              const savedValue = parsedState.formData?.[key];
-              if (typeof savedValue === "string") {
-                // If it's legacy state, we only trust non-empty strings because 
-                // a previous bug saved empty strings for all fields by default.
-                if (savedValue !== "" || !isLegacy) {
-                  initialData[key] = savedValue === "" ? " " : savedValue;
-                  return;
-                }
-              }
-              initialData[key] = undefined;
-            }
-          });
+  //         Object.entries(template.fields).forEach(([key, field]) => {
+  //           if (field.type === "text") {
+  //             const savedValue = parsedState.formData?.[key];
+  //             if (typeof savedValue === "string") {
+  //               // If it's legacy state, we only trust non-empty strings because 
+  //               // a previous bug saved empty strings for all fields by default.
+  //               if (savedValue !== "" || !isLegacy) {
+  //                 initialData[key] = savedValue === "" ? " " : savedValue;
+  //                 return;
+  //               }
+  //             }
+  //             initialData[key] = undefined;
+  //           }
+  //         });
 
-          setFormData(initialData);
-          setUploadedAssets(parsedState.uploadedAssets ?? {});
-          setRenderJob(parsedState.renderJob ?? null);
-          setUseBackgroundColor(parsedState.useBackgroundColor ?? true);
-        } else {
-          setFormData(initialData);
-          setUploadedAssets({});
-          setRenderJob(null);
-          setUseBackgroundColor(true);
-        }
-      } catch (error) {
-        console.error("Failed to restore customize state:", error);
-        setFormData(initialData);
-        setUploadedAssets({});
-        setRenderJob(null);
-        setUseBackgroundColor(true);
-      }
+  //         setFormData(initialData);
+  //         setUploadedAssets(parsedState.uploadedAssets ?? {});
+  //         setRenderJob(parsedState.renderJob ?? null);
+  //         setUseBackgroundColor(parsedState.useBackgroundColor ?? true);
+  //       } else {
+  //         setFormData(initialData);
+  //         setUploadedAssets({});
+  //         setRenderJob(null);
+  //         setUseBackgroundColor(true);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to restore customize state:", error);
+  //       setFormData(initialData);
+  //       setUploadedAssets({});
+  //       setRenderJob(null);
+  //       setUseBackgroundColor(true);
+  //     }
 
-      setFilePreviews({});
-      setUploadingAssets(new Set());
-      setImagePreviewReady({});
-      hasNotifiedRef.current = false;
-      setHasHydratedState(true);
-      setIsRestoringState(false);
-    }
-  }, [template]);
+  //     setFilePreviews({});
+  //     setUploadingAssets(new Set());
+  //     setImagePreviewReady({});
+  //     hasNotifiedRef.current = false;
+  //     setHasHydratedState(true);
+  //     setIsRestoringState(false);
+  //   }
+  // }, [template]);
 
   useEffect(() => {
     if (!template || !hasHydratedState) return;

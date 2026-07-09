@@ -46,8 +46,8 @@ function Slide({ template, role }: SlideProps) {
         href={`/customize/${template.id}`}
         className={`group block w-full ${
           isCenter
-            ? "max-w-[260px] sm:max-w-[300px] md:max-w-[340px] lg:max-w-[360px]"
-            : "max-w-[220px] sm:max-w-[250px] md:max-w-[280px] lg:max-w-[300px]"
+            ? "max-w-65 sm:max-w-75 md:max-w-85 lg:max-w-90"
+            : "max-w-55 sm:max-w-62.5 md:max-w-70 lg:max-w-75"
         }`}
       >
         <div
@@ -128,7 +128,7 @@ export default function TemplateSlider({ templates }: TemplateSliderProps) {
           <ChevronLeft className="h-5 w-5" />
         </button>
 
-        <p className="min-w-[72px] text-center text-sm tabular-nums text-muted-foreground">
+        <p className="min-w-18 text-center text-sm tabular-nums text-muted-foreground">
           <span className="font-semibold text-foreground">
             {String(activeIndex + 1).padStart(2, "0")}
           </span>

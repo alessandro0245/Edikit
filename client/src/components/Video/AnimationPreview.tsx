@@ -101,10 +101,34 @@ export default function AnimationPreview({
     pauseVideo();
   };
 
+  // Autoplay/preload viewport control for trigger === "auto"
   useEffect(() => {
-    if (trigger !== "auto") return;
-    setIsActive(true);
-    requestVideo();
+    if (trigger !== "auto" || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          setIsActive(true);
+          requestVideo();
+        } else {
+          setIsActive(false);
+          setVideoRequested(false);
+          setIsLoaded(false);
+          setIsPlaying(false);
+          setIsLoading(false);
+          const video = videoRef.current;
+          if (video) {
+            video.removeAttribute("src");
+            video.load();
+          }
+        }
+      },
+      { rootMargin: "150px" }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, [trigger, requestVideo]);
 
   const handleContainerClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -185,10 +209,14 @@ export default function AnimationPreview({
   };
 
   useEffect(() => {
-    if ((trigger === "hover" || trigger === "auto") && isActive && isLoaded) {
-      playVideo();
+    if (trigger === "hover" || trigger === "auto") {
+      if (isActive && isLoaded) {
+        playVideo();
+      } else if (!isActive) {
+        pauseVideo();
+      }
     }
-  }, [trigger, isActive, isLoaded, playVideo]);
+  }, [trigger, isActive, isLoaded, playVideo, pauseVideo]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -202,7 +230,7 @@ export default function AnimationPreview({
   }, []);
 
   useEffect(() => {
-    if (!prefetchOnVisible || videoRequested || !containerRef.current) return;
+    if (!prefetchOnVisible || videoRequested || !containerRef.current || trigger === "auto") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -216,7 +244,7 @@ export default function AnimationPreview({
 
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [prefetchOnVisible, requestVideo, videoRequested]);
+  }, [prefetchOnVisible, requestVideo, videoRequested, trigger]);
 
   const containerAspectClass =
     fit === "native" ? orientationContainerClass[orientation] : "h-full w-full";

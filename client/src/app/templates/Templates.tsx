@@ -36,6 +36,9 @@ const Templates = () => {
   );
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [visibleCount, setVisibleCount] = useState(8);
+  const scrollTriggerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -77,6 +80,35 @@ const Templates = () => {
     return filterTemplatesBySearch(templates, debouncedSearchQuery);
   }, [debouncedSearchQuery]);
 
+  // Reset visible count on search query change to keep initial view minimal
+  useEffect(() => {
+    setVisibleCount(8);
+  }, [debouncedSearchQuery]);
+
+  // Infinite scroll intersection observer logic
+  useEffect(() => {
+    const trigger = scrollTriggerRef.current;
+    if (!trigger) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 8, filteredTemplates.length));
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(trigger);
+    return () => {
+      observer.unobserve(trigger);
+    };
+  }, [filteredTemplates.length, visibleCount]);
+
+  const visibleTemplates = useMemo(() => {
+    return filteredTemplates.slice(0, visibleCount);
+  }, [filteredTemplates, visibleCount]);
+
   const isSearchActive = debouncedSearchQuery.trim().length > 0;
   const hasNoResults = isSearchActive && filteredTemplates.length === 0;
 
@@ -116,11 +148,17 @@ const Templates = () => {
               </EdikitButton>
             </div>
           ) : (
-            <div className="grid gap-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredTemplates.map((template) => (
-                <TemplateCard key={template.id} template={template} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-4">
+                {visibleTemplates.map((template) => (
+                  <TemplateCard key={template.id} template={template} />
+                ))}
+              </div>
+
+              {visibleCount < filteredTemplates.length && (
+                <div ref={scrollTriggerRef} className="h-10 w-full flex items-center justify-center py-4" />
+              )}
+            </>
           )}
         </div>
       </div>

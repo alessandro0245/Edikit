@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import ShimmerButton from "../ShimmerButton/ShimmerButton";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
+import { wrap } from "module";
 
 const RESPECT_REDUCED_MOTION = false;
 
@@ -203,7 +204,7 @@ export default function EdikitHero() {
           {/* ── Headline ── */}
           <h1
             className="font-semibold leading-[1.1] tracking-[-0.01em] mx-auto max-w-[20ch]"
-            style={{ fontSize: "clamp(2rem,5vw,3.8rem)" }}
+            style={{ fontSize: "clamp(2rem,5vw,3.4rem)" , textWrap: "wrap" }}
           >
             <span className="block">
               {["Pro", "motion", "graphics"].map((word, i) => (
