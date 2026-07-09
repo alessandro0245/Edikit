@@ -122,7 +122,7 @@ export default function Hero() {
 
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance">
                   Templates designed for{" "}
-                  <span className="inline-block bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+                  <span className="inline-block bg-linear-to-r from-[#1A73E8] to-[#5EB5FC] bg-clip-text text-transparent">
                     creators
                   </span>
                 </h2>

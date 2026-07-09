@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
-import ShimmerButton from "../ShimmerButton/ShimmerButton";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
-import { wrap } from "module";
 
 const RESPECT_REDUCED_MOTION = false;
 
@@ -202,54 +199,41 @@ export default function EdikitHero() {
         />
         <div className="relative max-w-245 mx-auto">
           {/* ── Headline ── */}
+
           <h1
-            className="font-semibold leading-[1.1] tracking-[-0.01em] mx-auto max-w-[20ch]"
-            style={{ fontSize: "clamp(2rem,5vw,3.4rem)" , textWrap: "wrap" }}
+            className="font-semibold leading-[1.15] tracking-[-0.02em] mx-auto max-w-[30ch]"
+            style={{ fontSize: "clamp(2rem, 5.5vw, 2.5rem)", textWrap: "balance" }}
           >
-            <span className="block">
-              {["Pro", "motion", "graphics"].map((word, i) => (
-                <span
-                  key={word}
-                  className="ek-word inline-block"
-                  style={{
-                    ["--w" as string]: i,
-                    willChange: "opacity, filter, transform",
-                  }}
-                >
-                  {word}
-                  {i < 2 ? " " : ""}
-                </span>
-              ))}
-            </span>
-            <span className="block">
+            {["Pro", "motion", "graphics", "in"].map((word, i) => (
               <span
+                key={word}
                 className="ek-word inline-block"
                 style={{
-                  ["--w" as string]: 3,
+                  ["--w" as string]: i,
                   willChange: "opacity, filter, transform",
                 }}
               >
-                in&nbsp;
+                {word}&nbsp;
               </span>
-              <span
-                className="ek-word inline-block"
+            ))}
+            <span
+              className="ek-word inline-block"
+              style={{
+                ["--w" as string]: 4,
+                willChange: "opacity, filter, transform",
+              }}
+            >
+              <em
+                className="not-italic"
                 style={{
-                  ["--w" as string]: 4,
-                  willChange: "opacity, filter, transform",
+                  background: "linear-gradient(92deg, #1A73E8, #5EB5FC)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
                 }}
               >
-                <em
-                  className="not-italic"
-                  style={{
-                    background: "linear-gradient(92deg, #1A73E8, #5EB5FC)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  2 clicks.
-                </em>
-              </span>
+                2 clicks.
+              </em>
             </span>
           </h1>
 
