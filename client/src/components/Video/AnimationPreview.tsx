@@ -100,17 +100,24 @@ export default function AnimationPreview({
     setIsActive(false);
     pauseVideo();
   };
+  // Keep a stable ref to requestVideo so the IntersectionObserver effect
+  // doesn't re-run (and tear-down/re-create the observer) when videoRequested toggles.
+  const requestVideoRef = useRef(requestVideo);
+  useEffect(() => {
+    requestVideoRef.current = requestVideo;
+  }, [requestVideo]);
 
   // Autoplay/preload viewport control for trigger === "auto"
   useEffect(() => {
     if (trigger !== "auto" || !containerRef.current) return;
 
+    const el = containerRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
           setIsActive(true);
-          requestVideo();
+          requestVideoRef.current();
         } else {
           setIsActive(false);
           setVideoRequested(false);
@@ -127,9 +134,9 @@ export default function AnimationPreview({
       { rootMargin: "150px" }
     );
 
-    observer.observe(containerRef.current);
+    observer.observe(el);
     return () => observer.disconnect();
-  }, [trigger, requestVideo]);
+  }, [trigger, src]);
 
   const handleContainerClick = (event: MouseEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest("[data-preview-control]")) {

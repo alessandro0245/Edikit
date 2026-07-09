@@ -50,6 +50,7 @@ const CustomizePage = () => {
     setUseBackgroundColor,
     setImagePreviewReady,
     videoResizeProgress,
+    deletingAssets,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -257,7 +258,7 @@ const CustomizePage = () => {
                             onFileSelect={(file, input) =>
                               handleFileUpload(fieldKey, file, input)
                             }
-                            className="overflow-hidden rounded-xl border border-border"
+                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
                           >
                             <div className="bg-checker aspect-square flex items-center justify-center p-3">
                               <img
@@ -278,7 +279,7 @@ const CustomizePage = () => {
                                     [fieldKey]: true,
                                   }))
                                 }
-                                className="max-h-full max-w-full object-contain pointer-events-none"
+                                className="max-h-72 max-w-72 object-contain pointer-events-none"
                               />
                             </div>
                             <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
@@ -293,10 +294,23 @@ const CustomizePage = () => {
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
                                 }}
-                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                disabled={deletingAssets.has(fieldKey)}
+                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                  deletingAssets.has(fieldKey)
+                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                }`}
                                 type="button"
                               >
-                                <X className="w-3 h-3" /> Remove
+                                {deletingAssets.has(fieldKey) ? (
+                                  <>
+                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-3 h-3" /> Remove
+                                  </>
+                                )}
                               </button>
                             </div>
                           </FileDropZone>
@@ -356,7 +370,7 @@ const CustomizePage = () => {
                             onFileSelect={(file, input) =>
                               handleFileUpload(fieldKey, file, input)
                             }
-                            className="overflow-hidden rounded-xl border border-border"
+                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
                           >
                             <div className="bg-checker aspect-square flex items-center justify-center">
                               <video
@@ -364,7 +378,7 @@ const CustomizePage = () => {
                                   filePreviews[fieldKey] ||
                                   uploadedAssets[fieldKey]
                                 }
-                                className="h-full w-full object-contain"
+                                className="max-h-72 max-w-72 object-contain"
                                 controls
                                 onClick={(event) => event.stopPropagation()}
                               />
@@ -381,10 +395,23 @@ const CustomizePage = () => {
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
                                 }}
-                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                disabled={deletingAssets.has(fieldKey)}
+                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                  deletingAssets.has(fieldKey)
+                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                }`}
                                 type="button"
                               >
-                                <X className="w-3 h-3" /> Remove
+                                {deletingAssets.has(fieldKey) ? (
+                                  <>
+                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-3 h-3" /> Remove
+                                  </>
+                                )}
                               </button>
                             </div>
                           </FileDropZone>
@@ -444,7 +471,7 @@ const CustomizePage = () => {
                             onFileSelect={(file, input) =>
                               handleFileUpload(fieldKey, file, input)
                             }
-                            className="overflow-hidden rounded-xl border border-border"
+                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
                           >
                             <div className="bg-checker aspect-square flex items-center justify-center p-3">
                               {(formData[fieldKey] as File)?.type?.startsWith(
@@ -456,7 +483,7 @@ const CustomizePage = () => {
                                     filePreviews[fieldKey] ||
                                     uploadedAssets[fieldKey]
                                   }
-                                  className="max-h-full max-w-full object-contain"
+                                  className="max-h-72 max-w-72 object-contain"
                                   controls
                                   onClick={(event) => event.stopPropagation()}
                                 />
@@ -479,7 +506,7 @@ const CustomizePage = () => {
                                       [fieldKey]: true,
                                     }))
                                   }
-                                  className="max-h-full max-w-full object-contain pointer-events-none"
+                                  className="max-h-72 max-w-72 object-contain pointer-events-none"
                                 />
                               )}
                             </div>
@@ -495,10 +522,23 @@ const CustomizePage = () => {
                                     ? await deleteAsset(fieldKey)
                                     : removeFile(fieldKey);
                                 }}
-                                className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+                                disabled={deletingAssets.has(fieldKey)}
+                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                  deletingAssets.has(fieldKey)
+                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                }`}
                                 type="button"
                               >
-                                <X className="w-3 h-3" /> Remove
+                                {deletingAssets.has(fieldKey) ? (
+                                  <>
+                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-3 h-3" /> Remove
+                                  </>
+                                )}
                               </button>
                             </div>
                           </FileDropZone>

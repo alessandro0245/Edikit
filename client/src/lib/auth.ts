@@ -1,5 +1,5 @@
 import { baseUrl } from "@/utils/constant";
-import axios from "axios";
+import api from "./api";
 import { clearUser, setUser } from "@/redux/slices/authSlice";
 import { setCredits, clearCredits } from "@/redux/slices/creditsSlice";
 import { AppDispatch } from "@/redux/store";
@@ -25,29 +25,6 @@ declare global {
     };
   }
 }
-
-const api = axios.create({
-  baseURL: baseUrl,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Request interceptor: Add Bearer token if cookie not available (mobile browser fallback)
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("user_token");
-    if (token && !config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
-      console.log("🔑 Token added to request header");
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
 export default api;
 

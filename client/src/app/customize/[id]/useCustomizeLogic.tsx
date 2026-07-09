@@ -57,6 +57,7 @@ export const useCustomizeLogic = () => {
   const [uploadingAssets, setUploadingAssets] = useState<Set<string>>(
     new Set(),
   );
+  const [deletingAssets, setDeletingAssets] = useState<Set<string>>(new Set());
   const [imagePreviewReady, setImagePreviewReady] = useState<{
     [key: string]: boolean;
   }>({});
@@ -697,8 +698,9 @@ export const useCustomizeLogic = () => {
   };
 
   const deleteAsset = async (fieldKey: string) => {
-    if (!uploadedAssets[fieldKey]) return;
+    if (!uploadedAssets[fieldKey] || deletingAssets.has(fieldKey)) return;
 
+    setDeletingAssets((prev) => new Set(prev).add(fieldKey));
     try {
       const assetUrl = uploadedAssets[fieldKey];
 
@@ -750,6 +752,12 @@ export const useCustomizeLogic = () => {
     } catch (error) {
       console.error("Failed to delete asset:", error);
       showErrorToast(`Failed to delete ${fieldKey}`);
+    } finally {
+      setDeletingAssets((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fieldKey);
+        return newSet;
+      });
     }
   };
 
@@ -904,6 +912,7 @@ export const useCustomizeLogic = () => {
     setFormData,
     setUploadingAssets,
     videoResizeProgress,
+    deletingAssets,
   } as const;
 };
 

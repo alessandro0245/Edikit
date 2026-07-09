@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
 import SimpleFooter from "@/components/Footer/Footer";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Edikit | Create Production-Level Motion Graphics in Seconds",
@@ -22,13 +23,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* iubenda unified script — MUST be first in <head> for autoblocking to work */}
-        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"></script>
-
-        {/* iubenda Consent Database */}
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: `var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "Ki9lMDUKaWtobf92UIKJbCdOZTIDFFFi"}]);` }} />
-        <script type="text/javascript" src="https://cdn.iubenda.com/cons/iubenda_cons.js" async></script>
-
         <link rel="preconnect" href="https://fonts.googleapis.com"></link>
         <link
           rel="preconnect"
@@ -41,6 +35,17 @@ export default function RootLayout({
         ></link>
       </head>
       <body className={`antialiased dark min-h-screen flex flex-col`} suppressHydrationWarning>
+        <Script
+          src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"
+          strategy="afterInteractive"
+        />
+        <Script id="iubenda-cons-init" strategy="afterInteractive">
+          {`var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "Ki9lMDUKaWtobf92UIKJbCdOZTIDFFFi"}]);`}
+        </Script>
+        <Script
+          src="https://cdn.iubenda.com/cons/iubenda_cons.js"
+          strategy="afterInteractive"
+        />
         <Providers>
           <Navbar />
           <main className="flex-1 flex flex-col">

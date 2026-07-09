@@ -1,4 +1,4 @@
-import { baseUrl } from "@/utils/constant";
+import api from "./api";
 
 export type RenderJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 export type RenderJobType = "TEMPLATE" | "AI_PROMPT";
@@ -16,11 +16,6 @@ export interface RenderJobRecord {
   updatedAt: string;
 }
 
-const api = axios.create({
-  baseURL: baseUrl,
-  withCredentials: true,
-});
-
 export const jobsApi = {
   getMyJobs: async (): Promise<RenderJobRecord[]> => {
     const { data } = await api.get("/render/jobs");
@@ -29,5 +24,5 @@ export const jobsApi = {
   deleteJob: async (jobId: string): Promise<void> => {
     await api.delete(`/render/job/${jobId}`);
   },
-};import axios from "axios";
+};
 

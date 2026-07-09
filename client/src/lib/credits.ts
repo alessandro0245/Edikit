@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { baseUrl } from '@/utils/constant';
+import api from "./api";
 
 export interface CreditsData {
   credits: number;
@@ -15,11 +14,6 @@ export interface CreditTransaction {
   description: string;
   createdAt: string;
 }
-
-const api = axios.create({
-  baseURL: baseUrl,
-  withCredentials: true,
-});
 
 export const creditsApi = {
   getCreditsData: async (): Promise<CreditsData> => {
