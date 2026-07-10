@@ -16,7 +16,7 @@ export default function Hero() {
 
         {/* Templates Section */}
         <section
-          className="relative overflow-hidden bg-[#191919] py-16 md:py-24"
+          className="relative overflow-hidden bg-[#191919] py-10 md:py-16"
           id="templates"
         >
           {/* ── Background decorations ── */}

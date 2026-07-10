@@ -200,10 +200,7 @@ export default function EdikitHero() {
         <div className="relative max-w-245 mx-auto">
           {/* ── Headline ── */}
 
-          <h1
-            className="font-semibold leading-[1.15] tracking-[-0.02em] mx-auto max-w-[30ch]"
-            style={{ fontSize: "clamp(2rem, 5.5vw, 2.5rem)", textWrap: "balance" }}
-          >
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance mx-auto max-w-[30ch]">
             {["Pro", "motion", "graphics", "in"].map((word, i) => (
               <span
                 key={word}
@@ -223,15 +220,7 @@ export default function EdikitHero() {
                 willChange: "opacity, filter, transform",
               }}
             >
-              <em
-                className="not-italic"
-                style={{
-                  background: "linear-gradient(92deg, #1A73E8, #5EB5FC)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
-              >
+              <em className="not-italic inline-block bg-linear-to-r from-[#1A73E8] to-[#5EB5FC] bg-clip-text text-transparent">
                 2 clicks.
               </em>
             </span>
@@ -243,7 +232,7 @@ export default function EdikitHero() {
             className="ek-deck relative mx-auto max-w-230"
             style={{
               height: "clamp(150px,20.5vw,250px)",
-              margin: "clamp(8px,1.2vh,14px) auto clamp(48px,7vh,58px)",
+              margin: "clamp(8px,1.2vh,14px) auto clamp(34px,4vh,40px)",
             }}
           >
             {TEMPLATES.map((tpl, i) => {
@@ -299,10 +288,7 @@ export default function EdikitHero() {
           </div>
 
           {/* ── Subtitle ── */}
-          <p
-            className="ek-sub max-w-[46ch] mx-auto leading-[1.55] text-[#CFCFCF]"
-            style={{ fontSize: "clamp(.88rem,1.5vw,1rem)" }}
-          >
+          <p className="ek-sub text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
             Pick a template, customize text and colors in your browser and
             download the rendered video. That&apos;s it.
           </p>
@@ -310,18 +296,8 @@ export default function EdikitHero() {
           {/* ── CTA ── */}
           <div
             className="ek-cta flex gap-3.5 justify-center items-center flex-wrap"
-            style={{ marginTop: "clamp(14px,2vh,20px)" }}
+            style={{ marginTop: "clamp(28px,4vh,40px)" }}
           >
-            {/* <Link
-              href="/pricing"
-              className="font-semibold text-[.92rem] rounded-full px-[1.6em] py-[.8em] text-white cursor-pointer no-underline inline-block transition-[transform,box-shadow] duration-200 ease-in-out hover:-translate-y-0.5 focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC]"
-              style={{
-                background: "linear-gradient(92deg, #1A73E8, #5EB5FC)",
-              }}
-            
-            >
-              See pricing
-            </Link> */}
             <EdikitButton
               href="/pricing"
               variant="primary"
