@@ -12,11 +12,11 @@ interface Template {
 }
 
 const TEMPLATES: Template[] = [
-  { src: "", poster: "", label: "TEMPLATE 01" },
-  { src: "", poster: "", label: "TEMPLATE 02" },
-  { src: "", poster: "", label: "TEMPLATE 03" },
-  { src: "", poster: "", label: "TEMPLATE 04" },
-  { src: "", poster: "", label: "TEMPLATE 05" },
+  { src: "/previews/square-1.mp4", poster: "/preview/square-1.mp4", label: "TEMPLATE 01" },
+  { src: "/previews/square-2.mp4", poster: "/preview/square-2.mp4", label: "TEMPLATE 02" },
+  { src: "/previews/square-3.mp4", poster: "/preview/square-3.mp4", label: "TEMPLATE 03" },
+  { src: "/previews/square-4.mp4", poster: "/preview/square-4.mp4", label: "TEMPLATE 04" },
+  { src: "/previews/square-5.mp4", poster: "/preview/square-5.mp4", label: "TEMPLATE 05" },
 ];
 
 interface CardSlot {

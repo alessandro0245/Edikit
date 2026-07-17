@@ -690,7 +690,7 @@ export const categoriesTemplate = [
     iconName: "intro" as const,
     examples: ["Channel Welcome", "Series Title", "Breaking News"],
     imageUrl:
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+      "",
   },
   {
     id: "content",
@@ -700,7 +700,7 @@ export const categoriesTemplate = [
     iconName: "content" as const,
     examples: ["Top 5 Tips", "Explainer Text", "Quote or Stat"],
     imageUrl:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
+      "",
   },
   {
     id: "cta",
@@ -710,6 +710,6 @@ export const categoriesTemplate = [
     iconName: "cta" as const,
     examples: ["Subscribe Now", "Visit Website", "Follow Us"],
     imageUrl:
-      "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=800&q=80",
+      "",
   },
 ];

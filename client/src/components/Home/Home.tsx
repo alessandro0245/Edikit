@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { templates } from "@/utils/constant";
 import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
