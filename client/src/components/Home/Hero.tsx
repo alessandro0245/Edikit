@@ -93,11 +93,17 @@ export default function EdikitHero() {
           width: var(--ek-cardw);
           aspect-ratio: 1 / 1;
           border-radius: clamp(12px, 1.6vw, 18px);
+          border: 2px solid #4B4B4B;
           overflow: hidden;
-          background: #232323;
+          background: #000;
+          transition: border-color .3s ease, filter .3s ease, transform .3s ease;
           transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r));
           z-index: var(--z);
           will-change: transform, opacity;
+        }
+
+        .ek-card:hover {
+          border-color: var(--primary);
         }
 
         /* ── Pre-animation: JS adds .ek-anim, then .ek-on to trigger ── */
@@ -156,7 +162,6 @@ export default function EdikitHero() {
 
         /* ── Subtle brightness on hover (pointer devices only) ── */
         @media (hover: hover) {
-          .ek-card { transition: filter .3s ease; }
           .ek-card:hover { filter: brightness(1.04); }
         }
 
