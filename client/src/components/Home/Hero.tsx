@@ -102,10 +102,6 @@ export default function EdikitHero() {
           will-change: transform, opacity;
         }
 
-        .ek-card:hover {
-          border-color: var(--primary);
-        }
-
         /* ── Pre-animation: JS adds .ek-anim, then .ek-on to trigger ── */
         .ek-anim .ek-word { opacity: 0; }
         .ek-anim .ek-sub  { opacity: 0; }
