@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
       await forgotPassword(email);
       setSubmitted(true);
     } catch {
-      setError("Something went wrong. Please try again.");
+      // setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -27,29 +27,44 @@ export default function ForgotPasswordPage() {
 
   // ── Success state ────────────────────────────────────────────────────────
   if (submitted) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-background px-4">
-        <div className="w-full max-w-md text-center space-y-5">
-          <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-            <Mail className="w-8 h-8 text-green-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">Check your inbox</h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            If <strong className="text-foreground">{email}</strong> is registered,
-            you'll receive a reset link shortly.
-            Check your spam folder if you don't see it within a few minutes.
-          </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to login
-          </Link>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md text-center space-y-5">
+        <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
+          <Mail className="w-8 h-8 text-green-500" />
         </div>
+        <h1 className="text-2xl font-bold text-foreground">Check your inbox</h1>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          If <strong className="text-foreground">{email}</strong> is registered,
+          you'll receive a reset link shortly.
+        </p>
+
+        {/* ── Helpful hints ── */}
+        <div className="rounded-lg border border-border bg-muted/40 p-4 text-left space-y-2">
+          <p className="text-sm font-medium text-foreground">Didn't get an email?</p>
+          <ul className="text-sm text-muted-foreground space-y-1.5">
+            <li>• Check your spam or junk folder</li>
+            <li>• Make sure you typed the right email</li>
+            <li>• You may have signed up with Google — try the button below</li>
+            <li>• You may not have an account yet —{" "}
+              <Link href="/signup" className="text-primary hover:underline">
+                create one here
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <Link
+          href="/login"
+          className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to login
+        </Link>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // ── Form state ───────────────────────────────────────────────────────────
   return (
@@ -97,7 +112,7 @@ export default function ForgotPasswordPage() {
             disabled={loading || !email}
             className="w-full h-11 rounded-lg font-semibold text-white
                        bg-primary hover:bg-primary/90 transition-colors
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+                       disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? "Sending..." : "Send reset link"}
           </button>

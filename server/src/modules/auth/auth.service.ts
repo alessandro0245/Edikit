@@ -336,7 +336,7 @@ export class AuthService {
     });
   }
   async forgotPassword(email: string){
-    
+    try{
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { email },
     });
@@ -344,7 +344,18 @@ export class AuthService {
    if (!user) return;
 
   //user who signed via google or apple login
-   if (user.provider !== 'email') return;
+   if (user.provider !== 'email') {
+      const providerName =
+      user.provider === 'google' ? 'Google' : 'Apple';
+
+       await this.resend.emails.send({
+      from: 'Edikit <no-reply@mail.edikit.net>',
+      to: user.email,
+      subject: 'About your Edikit account',
+      html: this.buildOAuthEmailHtml(user.email, providerName),
+    });
+    return;
+   }
     
    const plainToken = crypto.randomBytes(32).toString('hex');
   
@@ -371,7 +382,11 @@ export class AuthService {
       to: user.email,
       subject: 'Reset your Edikit password',
       html: this.buildResetEmailHtml(user.email, resetUrl),
+      
     });
+    } catch (error) {
+    console.error('ForgotPassword error (silent):', error);
+  }
   }
 
  async resetPassword(token: string, newPassword: string): Promise<void> {
@@ -427,12 +442,9 @@ private buildResetEmailHtml(email: string, resetUrl: string): string {
           <tr><td align="center">
             <table width="520" cellpadding="0" cellspacing="0"
               style="background:#fff;border-radius:12px;padding:40px;border:1px solid #e4e4e7;">
-
               <tr><td align="center" style="padding-bottom:32px;">
                 <span style="font-size:22px;font-weight:700;color:#1A73E8;">Edikit</span>
-                <img src="/logo.png" alt="Edikit Logo" width="40" height="40" style="display:block;margin-top:8px;">
               </td></tr>
-
               <tr><td style="padding-bottom:12px;">
                 <h1 style="margin:0;font-size:22px;font-weight:700;color:#0B1220;">
                   Reset your password
@@ -457,6 +469,59 @@ private buildResetEmailHtml(email: string, resetUrl: string): string {
               <tr><td style="padding-bottom:28px;color:#5A6475;font-size:13px;line-height:1.6;">
                 If the button doesn't work, paste this into your browser:<br/>
                 <a href="${resetUrl}" style="color:#1A73E8;word-break:break-all;">${resetUrl}</a>
+              </td></tr>
+
+              <tr><td style="color:#a1a1aa;font-size:13px;border-top:1px solid #f4f4f5;padding-top:20px;">
+                If you didn't request this, you can safely ignore this email.
+              </td></tr>
+
+            </table>
+          </td></tr>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
+private buildOAuthEmailHtml(email: string, provider: string): string {
+  const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+  return `
+    <!DOCTYPE html>
+    <html>
+      <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Inter',system-ui,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+          <tr><td align="center">
+            <table width="520" cellpadding="0" cellspacing="0"
+              style="background:#fff;border-radius:12px;padding:40px;border:1px solid #e4e4e7;">
+
+              <tr><td align="center" style="padding-bottom:32px;">
+                <span style="font-size:22px;font-weight:700;color:#1A73E8;">Edikit</span>
+              </td></tr>
+
+              <tr><td style="padding-bottom:12px;">
+                <h1 style="margin:0;font-size:22px;font-weight:700;color:#0B1220;">
+                  You signed in with ${provider}
+                </h1>
+              </td></tr>
+
+              <tr><td style="padding-bottom:28px;color:#5A6475;font-size:15px;line-height:1.6;">
+                We received a password reset request for 
+                <strong>${email}</strong>, but this account 
+                was created using <strong>${provider} Sign In</strong> 
+                — it doesn't have a password.
+                <br/><br/>
+                To access your account, just click the button below and 
+                sign in with ${provider} as usual.
+              </td></tr>
+
+              <tr><td align="center" style="padding-bottom:28px;">
+                <a href="${frontendUrl}/login"
+                  style="display:inline-block;padding:14px 32px;
+                         background:linear-gradient(105deg,#1A73E8,#5EB5FC);
+                         color:#fff;text-decoration:none;border-radius:999px;
+                         font-weight:600;font-size:15px;">
+                  Go to Login
+                </a>
               </td></tr>
 
               <tr><td style="color:#a1a1aa;font-size:13px;border-top:1px solid #f4f4f5;padding-top:20px;">
