@@ -432,107 +432,269 @@ export class AuthService {
     },
   });
 }
- 
 private buildResetEmailHtml(email: string, resetUrl: string): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Inter',system-ui,sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
-          <tr><td align="center">
-            <table width="520" cellpadding="0" cellspacing="0"
-              style="background:#fff;border-radius:12px;padding:40px;border:1px solid #e4e4e7;">
-              <tr><td align="center" style="padding-bottom:32px;">
-                <span style="font-size:22px;font-weight:700;color:#1A73E8;">Edikit</span>
-              </td></tr>
-              <tr><td style="padding-bottom:12px;">
-                <h1 style="margin:0;font-size:22px;font-weight:700;color:#0B1220;">
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Reset your password</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f6f7;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
+             'Helvetica Neue',Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:48px 24px;">
+
+    <table width="520" cellpadding="0" cellspacing="0"
+           style="max-width:520px;width:100%;">
+
+      <!-- Logo -->
+      <tr>
+        <td align="center" style="padding-bottom:32px;">
+          <img
+            src="https://edikit.net/_next/image?url=%2Flogo.png&w=256&q=75"
+            alt="Edikit"
+            width="120"
+            height="auto"
+            style="display:block;border:0;outline:none;
+                   text-decoration:none;max-width:120px;"
+          />
+        </td>
+      </tr>
+
+      <!-- Card -->
+      <tr>
+        <td style="background:#ffffff;border-radius:12px;
+                   border:1px solid #e4e4e7;overflow:hidden;">
+
+          <!-- Top accent line -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td height="3"
+                  style="background:linear-gradient(90deg,#1A73E8,#5EB5FC);
+                         font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+          </table>
+
+          <!-- Content -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:40px 48px;">
+
+                <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;
+                           color:#09090b;letter-spacing:-0.3px;line-height:1.3;">
                   Reset your password
                 </h1>
-              </td></tr>
 
-              <tr><td style="padding-bottom:28px;color:#5A6475;font-size:15px;line-height:1.6;">
-                We received a request to reset the password for <strong>${email}</strong>.
-                This link expires in <strong>1 hour</strong>.
-              </td></tr>
+                <p style="margin:0 0 12px;font-size:15px;color:#52525b;line-height:1.65;">
+                  We received a request to reset the password for
+                  <span style="color:#09090b;font-weight:500;">${email}</span>.
+                </p>
 
-              <tr><td align="center" style="padding-bottom:28px;">
-                <a href="${resetUrl}"
-                  style="display:inline-block;padding:14px 32px;
-                         background:linear-gradient(105deg,#1A73E8,#5EB5FC);
-                         color:#fff;text-decoration:none;border-radius:999px;
-                         font-weight:600;font-size:15px;">
-                  Reset Password
-                </a>
-              </td></tr>
+                <p style="margin:0 0 32px;font-size:15px;color:#52525b;line-height:1.65;">
+                  This link is valid for one hour. If you did not make this
+                  request, no action is needed.
+                </p>
 
-              <tr><td style="padding-bottom:28px;color:#5A6475;font-size:13px;line-height:1.6;">
-                If the button doesn't work, paste this into your browser:<br/>
-                <a href="${resetUrl}" style="color:#1A73E8;word-break:break-all;">${resetUrl}</a>
-              </td></tr>
+                <!-- Button -->
+                <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="border-radius:999px;
+                               background:linear-gradient(105deg,#1A73E8,#5EB5FC);">
+                      <a href="${resetUrl}"
+                         style="display:inline-block;padding:13px 32px;
+                                color:#ffffff;text-decoration:none;
+                                font-size:14px;font-weight:600;
+                                letter-spacing:0.1px;border-radius:999px;">
+                        Reset password
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-              <tr><td style="color:#a1a1aa;font-size:13px;border-top:1px solid #f4f4f5;padding-top:20px;">
-                If you didn't request this, you can safely ignore this email.
-              </td></tr>
+                <!-- Divider -->
+                <table width="100%" cellpadding="0" cellspacing="0"
+                       style="margin:36px 0;">
+                  <tr>
+                    <td height="1"
+                        style="background:#f4f4f5;font-size:0;line-height:0;">
+                    </td>
+                  </tr>
+                </table>
 
-            </table>
-          </td></tr>
-        </table>
-      </body>
-    </html>
-  `;
+                <!-- Fallback link -->
+                <p style="margin:0;font-size:12px;color:#a1a1aa;line-height:1.7;">
+                  If the button above does not work, copy and paste the
+                  following link into your browser:
+                </p>
+                <p style="margin:6px 0 0;font-size:11px;line-height:1.6;
+                          word-break:break-all;">
+                  <a href="${resetUrl}"
+                     style="color:#1A73E8;text-decoration:none;">
+                    ${resetUrl}
+                  </a>
+                </p>
+
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="padding:24px 0 0;" align="center">
+          <p style="margin:0 0 6px;font-size:12px;color:#a1a1aa;line-height:1.6;">
+            Sent by Edikit &middot; edikit.net
+          </p>
+          <p style="margin:0;font-size:11px;color:#c4c4c7;">
+            <a href="https://edikit.net/privacy-policy"
+               style="color:#a1a1aa;text-decoration:none;">Privacy Policy</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://edikit.net/cookie-policy"
+               style="color:#a1a1aa;text-decoration:none;">Cookie Policy</a>
+          </p>
+        </td>
+      </tr>
+
+    </table>
+
+  </td></tr>
+  </table>
+
+</body>
+</html>`;
 }
 
 private buildOAuthEmailHtml(email: string, provider: string): string {
   const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-  return `
-    <!DOCTYPE html>
-    <html>
-      <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Inter',system-ui,sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
-          <tr><td align="center">
-            <table width="520" cellpadding="0" cellspacing="0"
-              style="background:#fff;border-radius:12px;padding:40px;border:1px solid #e4e4e7;">
 
-              <tr><td align="center" style="padding-bottom:32px;">
-                <span style="font-size:22px;font-weight:700;color:#1A73E8;">Edikit</span>
-              </td></tr>
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>About your Edikit account</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f6f7;
+             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
+             'Helvetica Neue',Arial,sans-serif;">
 
-              <tr><td style="padding-bottom:12px;">
-                <h1 style="margin:0;font-size:22px;font-weight:700;color:#0B1220;">
-                  You signed in with ${provider}
+  <table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:48px 24px;">
+
+    <table width="520" cellpadding="0" cellspacing="0"
+           style="max-width:520px;width:100%;">
+
+      <!-- Logo -->
+      <tr>
+        <td align="center" style="padding-bottom:32px;">
+          <img
+            src="https://edikit.net/_next/image?url=%2Flogo.png&w=256&q=75"
+            alt="Edikit"
+            width="120"
+            height="auto"
+            style="display:block;border:0;outline:none;
+                   text-decoration:none;max-width:120px;"
+          />
+        </td>
+      </tr>
+
+      <!-- Card -->
+      <tr>
+        <td style="background:#ffffff;border-radius:12px;
+                   border:1px solid #e4e4e7;overflow:hidden;">
+
+          <!-- Top accent line -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td height="3"
+                  style="background:linear-gradient(90deg,#1A73E8,#5EB5FC);
+                         font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+          </table>
+
+          <!-- Content -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:40px 48px;">
+
+                <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;
+                           color:#09090b;letter-spacing:-0.3px;line-height:1.3;">
+                  This account uses ${provider} Sign In
                 </h1>
-              </td></tr>
 
-              <tr><td style="padding-bottom:28px;color:#5A6475;font-size:15px;line-height:1.6;">
-                We received a password reset request for 
-                <strong>${email}</strong>, but this account 
-                was created using <strong>${provider} Sign In</strong> 
-                — it doesn't have a password.
-                <br/><br/>
-                To access your account, just click the button below and 
-                sign in with ${provider} as usual.
-              </td></tr>
+                <p style="margin:0 0 12px;font-size:15px;color:#52525b;line-height:1.65;">
+                  We received a password reset request for
+                  <span style="color:#09090b;font-weight:500;">${email}</span>,
+                  but this account was created with ${provider} and does not
+                  have a password.
+                </p>
 
-              <tr><td align="center" style="padding-bottom:28px;">
-                <a href="${frontendUrl}/login"
-                  style="display:inline-block;padding:14px 32px;
-                         background:linear-gradient(105deg,#1A73E8,#5EB5FC);
-                         color:#fff;text-decoration:none;border-radius:999px;
-                         font-weight:600;font-size:15px;">
-                  Go to Login
-                </a>
-              </td></tr>
+                <p style="margin:0 0 32px;font-size:15px;color:#52525b;line-height:1.65;">
+                  To access your account, use the Continue with ${provider}
+                  option on the login page.
+                </p>
 
-              <tr><td style="color:#a1a1aa;font-size:13px;border-top:1px solid #f4f4f5;padding-top:20px;">
-                If you didn't request this, you can safely ignore this email.
-              </td></tr>
+                <!-- Button -->
+                <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="border-radius:999px;
+                               background:linear-gradient(105deg,#1A73E8,#5EB5FC);">
+                      <a href="${frontendUrl}/login"
+                         style="display:inline-block;padding:13px 32px;
+                                color:#ffffff;text-decoration:none;
+                                font-size:14px;font-weight:600;
+                                letter-spacing:0.1px;border-radius:999px;">
+                        Go to login
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-            </table>
-          </td></tr>
-        </table>
-      </body>
-    </html>
-  `;
+                <!-- Divider -->
+                <table width="100%" cellpadding="0" cellspacing="0"
+                       style="margin:36px 0 0;">
+                  <tr>
+                    <td height="1"
+                        style="background:#f4f4f5;font-size:0;line-height:0;">
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="padding:24px 0 0;" align="center">
+          <p style="margin:0 0 6px;font-size:12px;color:#a1a1aa;line-height:1.6;">
+            Sent by Edikit &middot; edikit.net
+          </p>
+          <p style="margin:0;font-size:11px;color:#c4c4c7;">
+            <a href="https://edikit.net/privacy-policy"
+               style="color:#a1a1aa;text-decoration:none;">Privacy Policy</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://edikit.net/cookie-policy"
+               style="color:#a1a1aa;text-decoration:none;">Cookie Policy</a>
+          </p>
+        </td>
+      </tr>
+
+    </table>
+
+  </td></tr>
+  </table>
+
+</body>
+</html>`;
 }
+
 }
