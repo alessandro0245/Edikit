@@ -817,7 +817,7 @@ const CustomizePage = () => {
                 ) : isLoggedIn ? (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    Render Video (8 credits)
+                    Render Video (5 credits)
                   </>
                 ) : (
                   <>

@@ -10,7 +10,7 @@ export const plans = [
     description:
       "Perfect for exploring Edikit and creating your first AI videos",
     features: [
-      "30 video generation credits per month",
+      "60 video generation credits per month",
       "Export in 720p resolution",
       "MP4 video export",
     ],

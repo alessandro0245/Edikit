@@ -11,7 +11,7 @@ export class CreditsService {
   private getCreditLimitForSubscription(planType: PlanType): number {
     const limits: Record<PlanType, number> = {
       FREE: 24,
-      STARTER: 80,
+      STARTER: 60,
       CREATOR: 300,
       STUDIO: 600,
     };

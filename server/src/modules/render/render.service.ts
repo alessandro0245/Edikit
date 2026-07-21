@@ -55,7 +55,7 @@ export interface NexrenderFont {
 @Injectable()
 export class RenderService {
   private readonly logger = new Logger(RenderService.name);
-  private static readonly TEMPLATE_CREDIT_COST = 8;
+  private static readonly TEMPLATE_CREDIT_COST = 5;
   private readonly nexrenderApiUrl: string;
   private readonly nexrenderApiKey: string;
   private readonly animationsPath: string;

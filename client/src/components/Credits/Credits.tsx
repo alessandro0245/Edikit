@@ -286,7 +286,7 @@ export default function Credits() {
         <h3 className="text-lg font-semibold mb-2">About Credits</h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li>• Credits are used when you render videos from templates</li>
-          <li>• Each template video render costs 8 credit</li>
+          <li>• Each template video render costs 5 credits</li>
           <li>• Upgrade your plan to get more credits per month</li>
           <li>• Failed renders will automatically refund your credits</li>
         </ul>
