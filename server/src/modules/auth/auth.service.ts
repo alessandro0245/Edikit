@@ -79,6 +79,7 @@ export class AuthService {
         role,
         planType: PlanType.FREE,
         provider: 'email',
+        credits: 24,
       },
     });
 
@@ -235,6 +236,7 @@ export class AuthService {
             role,
             planType: PlanType.FREE,
             avatar: profile.avatar || '',
+            credits: 24,
           },
         });
       }
@@ -298,6 +300,7 @@ export class AuthService {
               provider: 'apple',
               role,
               planType: PlanType.FREE,
+              credits: 24,
             },
           });
         }

@@ -150,7 +150,7 @@ export default function VideoPlayer({
             <div className="flex items-center gap-3">
               <button
                 onClick={togglePlay}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control ml-1"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
@@ -193,7 +193,7 @@ export default function VideoPlayer({
             {showFullscreen && (
               <button
                 onClick={toggleFullscreen}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control mr-1"
                 aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
                 {isFullscreen ? (

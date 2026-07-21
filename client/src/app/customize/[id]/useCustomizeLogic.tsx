@@ -795,6 +795,7 @@ export const useCustomizeLogic = () => {
     }
 
     setIsGenerating(true);
+    showInfoToast("8 credits will be deducted. Rendering your video...");
 
     try {
       const renderDto: any = {};

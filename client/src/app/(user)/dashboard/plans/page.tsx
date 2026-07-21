@@ -71,7 +71,7 @@ export default function ManagePlansPage() {
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     {currentPlanType.toUpperCase() === "FREE" 
-                      ? "You are currently on the Free plan. Upgrade to unlock more credits and features." 
+                      ? "You are currently on the Free plan. It includes 24 credits, before you upgrade." 
                       : `You are billed ${activePlanDetails?.price} ${activePlanDetails?.period}.`}
                   </p>
                 </div>

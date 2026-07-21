@@ -88,7 +88,7 @@ const Navbar = () => {
             <ToogleTheme />
 
             {/* Credits Display - Visible on all devices */}
-            {!isLoading && !minLoadingTime && user && isFreePlan && (
+            {!isLoading && !minLoadingTime && user  && (
               <CreditsDisplay />
             )}
 
