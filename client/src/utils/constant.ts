@@ -11,8 +11,8 @@ export const plans = [
       "Perfect for exploring Edikit and creating your first AI videos",
     features: [
       "60 video generation credits per month",
-      "Export in 720p resolution",
-      "MP4 video export",
+      "MP4 and MOV export formats",
+      "Transparent background support",
     ],
     cta: "Get Started",
     popular: false,
@@ -26,7 +26,6 @@ export const plans = [
     description: "Ideal for creators producing content regularly",
     features: [
       "300 video generation credits per month",
-      "Full HD 1080p exports",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -42,7 +41,6 @@ export const plans = [
     description: "Built for teams, agencies, and power creators",
     features: [
       "600 video generation credits per month",
-      "Ultra HD 4K exports",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
