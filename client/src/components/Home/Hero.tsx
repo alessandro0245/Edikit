@@ -326,7 +326,7 @@ export default function EdikitHero() {
                       loop
                       autoPlay
                       playsInline
-                      preload="metadata"
+                      preload="none"
                       poster={tpl.poster}
                       src={tpl.src}
                       onLoadedData={(e) => {

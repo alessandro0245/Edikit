@@ -54,7 +54,7 @@ export default function RootLayout({
         </noscript>
 
         {/* Step 5 — preload logo so it's ready before browser finds the img tag */}
-        <link rel="preload" href="/logo.png" as="image" type="image/png" />
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       </head>
 
       <body
