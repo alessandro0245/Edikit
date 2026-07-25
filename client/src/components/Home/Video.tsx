@@ -54,7 +54,7 @@ const Video = () => {
         {/* Poster Image */}
         {!isPlaying && (
           <Image
-            src="/previews/cyan-hero-img.png"
+            src=""
             alt="Hero Image"
             fill
             className="object-contain"

@@ -126,7 +126,7 @@ export default function EdikitHero() {
           left: 12px;
           right: 12px;
           bottom: 12px;
-          display: grid;
+          display: none;
           place-items: center;
           padding: 8px 10px;
           border-radius: 999px;

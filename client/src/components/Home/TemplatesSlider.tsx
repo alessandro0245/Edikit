@@ -15,6 +15,7 @@ import {
   getTemplateOrientation,
   orientationContainerClass,
 } from "@/utils/templateOrientation";
+import Image from "next/image";
 
 interface TemplatesSliderProps {
   templates: Template[];
@@ -118,9 +119,10 @@ function SliderCard({
               className={`relative overflow-hidden bg-black ${orientationContainerClass[orientation]}`}
             >
               {template.thumbnail && (
-                <img
+                <Image
                   src={template.thumbnail}
                   alt={template.name}
+                  fill
                   className="absolute inset-0 h-full w-full object-cover"
                   draggable={false}
                 />

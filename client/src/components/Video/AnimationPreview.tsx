@@ -279,7 +279,7 @@ export default function AnimationPreview({
         typeof poster === "object" && poster ? (
           <Image
             src={poster}
-            alt=""
+            alt="template preview"
             fill
             className={`object-cover transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
