@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
 
 const RESPECT_REDUCED_MOTION = false;
@@ -12,11 +12,11 @@ interface Template {
 }
 
 const TEMPLATES: Template[] = [
-  { src: "/previews/square-1.mp4", poster: "/preview/square-1.mp4", label: "TEMPLATE 01" },
-  { src: "/previews/square-2.mp4", poster: "/preview/square-2.mp4", label: "TEMPLATE 02" },
-  { src: "/previews/square-3.mp4", poster: "/preview/square-3.mp4", label: "TEMPLATE 03" },
-  { src: "/previews/square-4.mp4", poster: "/preview/square-4.mp4", label: "TEMPLATE 04" },
-  { src: "/previews/square-5.mp4", poster: "/preview/square-5.mp4", label: "TEMPLATE 05" },
+  { src: "/previews/square-1.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 01" },
+  { src: "/previews/square-2.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 02" },
+  { src: "/previews/square-3.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 03" },
+  { src: "/previews/square-4.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 04" },
+  { src: "/previews/square-5.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 05" },
 ];
 
 interface CardSlot {
@@ -50,6 +50,11 @@ const CARD_SLOTS: CardSlot[] = [
 export default function EdikitHero() {
   const heroRef = useRef<HTMLElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
+  const [readyCards, setReadyCards] = useState<Record<number, boolean>>({});
+
+  const markCardReady = (index: number) => {
+    setReadyCards((current) => (current[index] ? current : { ...current, [index]: true }));
+  };
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -93,13 +98,64 @@ export default function EdikitHero() {
           width: var(--ek-cardw);
           aspect-ratio: 1 / 1;
           border-radius: clamp(12px, 1.6vw, 18px);
-          border: 2px solid #4B4B4B;
+          border: 2px solid rgba(255, 255, 255, 0.08);
           overflow: hidden;
-          background: #000;
+          background: linear-gradient(135deg, #080808 0%, #111111 55%, #050505 100%);
           transition: border-color .3s ease, filter .3s ease, transform .3s ease;
           transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r));
           z-index: var(--z);
           will-change: transform, opacity;
+        }
+
+        .ek-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(110deg, rgba(255,255,255,0.02) 8%, rgba(255,255,255,0.08) 18%, rgba(255,255,255,0.02) 33%),
+            linear-gradient(135deg, rgba(0,0,0,0.88), rgba(26,115,232,0.1));
+          background-size: 220% 100%, 100% 100%;
+          animation: ek-shimmer 1.25s ease-in-out infinite;
+          opacity: 1;
+          transition: opacity .25s ease;
+        }
+
+        .ek-card::after {
+          content: attr(data-label);
+          position: absolute;
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+          display: grid;
+          place-items: center;
+          padding: 8px 10px;
+          border-radius: 999px;
+          background: rgba(4, 4, 4, 0.68);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          color: rgba(255,255,255,0.72);
+          font-size: 0.62rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          opacity: 1;
+          transition: opacity .25s ease;
+        }
+
+        .ek-card.is-ready::before,
+        .ek-card.is-ready::after {
+          opacity: 0;
+        }
+
+        .ek-card video {
+          opacity: 0;
+          transition: opacity .3s ease;
+        }
+
+        .ek-card.is-ready video {
+          opacity: 1;
+        }
+
+        .ek-card[data-loading="true"] {
+          border-color: rgba(255, 255, 255, 0.11);
         }
 
         /* ── Pre-animation: JS adds .ek-anim, then .ek-on to trigger ── */
@@ -156,6 +212,11 @@ export default function EdikitHero() {
           50%      { background-position: 100% 50%; }
         }
 
+        @keyframes ek-shimmer {
+          0% { background-position: 0% 50%, 0% 0%; }
+          100% { background-position: 160% 50%, 0% 0%; }
+        }
+
         /* ── Subtle brightness on hover (pointer devices only) ── */
         @media (hover: hover) {
           .ek-card:hover { filter: brightness(1.04); }
@@ -195,7 +256,7 @@ export default function EdikitHero() {
           aria-hidden="true"
           // style={{
           //   background:
-          //     "radial-gradient(ellipse 85% 55% at 50% -5%, rgba(26,115,232,0.18) 0%, transparent 100%)",
+          //     "radial-gradient(ellipse 85% 55% at 50% -5%, rgba(255,255,255,0.05) 0%, transparent 60%)",
           // }}
         />
         <div className="relative max-w-245 mx-auto">
@@ -252,8 +313,10 @@ export default function EdikitHero() {
               return (
                 <div
                   key={i}
-                  className={`ek-card${slot.isHero ? " ek-card--hero" : ""}`}
+                  className={`ek-card${slot.isHero ? " ek-card--hero" : ""}${readyCards[i] ? " is-ready" : ""}`}
                   data-i={i}
+                  data-label={tpl.label}
+                  data-loading={readyCards[i] ? "false" : "true"}
                   style={cssVars as React.CSSProperties}
                 >
                   {tpl.src ? (
@@ -266,7 +329,14 @@ export default function EdikitHero() {
                       preload="metadata"
                       poster={tpl.poster}
                       src={tpl.src}
-                      onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
+                      onLoadedData={(e) => {
+                        markCardReady(i);
+                        e.currentTarget.play().catch(() => {});
+                      }}
+                      onCanPlay={(e) => {
+                        markCardReady(i);
+                        e.currentTarget.play().catch(() => {});
+                      }}
                     />
                   ) : (
                     <div
@@ -274,8 +344,8 @@ export default function EdikitHero() {
                       style={{
                         background:
                           i % 2 === 1
-                            ? "linear-gradient(315deg, #1A73E8, #5EB5FC)"
-                            : "linear-gradient(135deg, #1A73E8, #5EB5FC)",
+                            ? "linear-gradient(315deg, #050505, #1a1a1a)"
+                            : "linear-gradient(135deg, #090909, #151515)",
                         backgroundSize: "220% 220%",
                         animation: "ek-drift 7s ease-in-out infinite",
                       }}

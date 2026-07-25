@@ -288,12 +288,14 @@ export default function AnimationPreview({
             onError={() => setPosterError(true)}
           />
         ) : (
-          <img
+          <Image
             src={posterSrc}
-            alt=""
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+            alt="template preview"
+            fill
+            className={`object-cover transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
             }`}
+            sizes="(max-width: 768px) 100vw, 33vw"
             onError={() => setPosterError(true)}
           />
         )

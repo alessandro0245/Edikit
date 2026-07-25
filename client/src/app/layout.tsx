@@ -23,18 +23,45 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com"></link>
+        {/* Step 1 — establish connections early */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        <link rel="preconnect" href="https://edikit-api-mc9p.onrender.com" />
+        {/* Step 2 — tell browser to fetch font file early */}
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        ></link>
+          rel="preload"
+          as="style"
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        />
+
+        {/* Step 3 — load font without blocking render */}
+        {/* media="print" = non-blocking, onLoad switches it to "all" once downloaded */}
         <link
           href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
-        ></link>
+          media="print"
+          // @ts-expect-error - onLoad with string value is valid HTML but TS complains
+          onLoad="this.media='all'"
+        />
+
+        {/* Step 4 — fallback for users with JavaScript disabled */}
+        <noscript>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+            rel="stylesheet"
+          />
+        </noscript>
+
+        {/* Step 5 — preload logo so it's ready before browser finds the img tag */}
+        <link rel="preload" href="/logo.png" as="image" type="image/png" />
       </head>
-      <body className={`antialiased dark min-h-screen flex flex-col`} suppressHydrationWarning>
+
+      <body
+        className="antialiased dark min-h-screen flex flex-col"
+        suppressHydrationWarning
+      >
+        {/* Iubenda — afterInteractive is correct, loads after page is ready */}
         <Script
           src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"
           strategy="afterInteractive"
@@ -51,10 +78,8 @@ export default function RootLayout({
           <main className="flex-1 flex flex-col">
             {children}
           </main>
-          <SimpleFooter/>
+          <SimpleFooter />
         </Providers>
-
-         
       </body>
     </html>
   );
