@@ -194,10 +194,13 @@ const Navbar = () => {
             <NavLink href="/pricing" onClick={() => setIsOpen(false)}>
               Pricing
             </NavLink>
-            <NavLink href="/dashboard/credits" onClick={() => setIsOpen(false)}>
+            {
+              user && (
+                <NavLink href="/dashboard/credits" onClick={() => setIsOpen(false)}>
               Credits
             </NavLink>
-
+              )
+            }
             <div className="flex flex-col gap-2 pt-2">
               {isLoading || minLoadingTime ? (
                 // Loading skeleton for mobile
