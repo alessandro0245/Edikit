@@ -12,11 +12,11 @@ interface Template {
 }
 
 const TEMPLATES: Template[] = [
-  { src: "/previews/square-1.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 01" },
-  { src: "/previews/square-2.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 02" },
-  { src: "/previews/square-3.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 03" },
-  { src: "/previews/square-4.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 04" },
-  { src: "/previews/square-5.mp4", poster: "/previews/cyan-hero-img.png", label: "TEMPLATE 05" },
+  { src: "/previews/square-1.mp4", poster: "", label: "TEMPLATE 01" },
+  { src: "/previews/square-2.mp4", poster: "", label: "TEMPLATE 02" },
+  { src: "/previews/square-3.mp4", poster: "", label: "TEMPLATE 03" },
+  { src: "/previews/square-4.mp4", poster: "", label: "TEMPLATE 04" },
+  { src: "/previews/square-5.mp4", poster: "", label: "TEMPLATE 05" },
 ];
 
 interface CardSlot {
@@ -72,7 +72,6 @@ export default function EdikitHero() {
     if (reduced || !("IntersectionObserver" in window)) {
       hero.classList.add("ek-on");
     } else {
-      // Trigger animation immediately on mount (reload/refresh)
       hero.classList.add("ek-on");
       videos.forEach((v) => v.play().catch(() => {}));
     }
