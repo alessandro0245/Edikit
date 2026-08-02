@@ -47,7 +47,7 @@ const CARD_SLOTS: CardSlot[] = [
   },
 ];
 
-export default function EdikitHero() {
+export default function EdikitHero({ isReady = true }: { isReady?: boolean }) {
   const heroRef = useRef<HTMLElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
   const [readyCards, setReadyCards] = useState<Record<number, boolean>>({});
@@ -56,6 +56,7 @@ export default function EdikitHero() {
     setReadyCards((current) => (current[index] ? current : { ...current, [index]: true }));
   };
 
+  // Add ek-anim on mount to prepare initial hidden animation state (opacity 0)
   useEffect(() => {
     const hero = heroRef.current;
     if (!hero) return;
@@ -66,16 +67,18 @@ export default function EdikitHero() {
 
     hero.classList.add("ek-anim");
     if (reduced) hero.classList.add("ek-reduced");
-
-    const videos = deckRef.current?.querySelectorAll("video") ?? [];
-
-    if (reduced || !("IntersectionObserver" in window)) {
-      hero.classList.add("ek-on");
-    } else {
-      hero.classList.add("ek-on");
-      videos.forEach((v) => v.play().catch(() => {}));
-    }
   }, []);
+
+  // Gate entrance animation behind isReady (triggers when preloader fully exits)
+  useEffect(() => {
+    if (!isReady) return;
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    hero.classList.add("ek-on");
+    const videos = deckRef.current?.querySelectorAll("video") ?? [];
+    videos.forEach((v) => v.play().catch(() => {}));
+  }, [isReady]);
 
   return (
     <>
@@ -249,18 +252,8 @@ export default function EdikitHero() {
           background: "#191919",
         }}
       >
-        {/* Blue radial glow — brand spotlight at top center */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden="true"
-          // style={{
-          //   background:
-          //     "radial-gradient(ellipse 85% 55% at 50% -5%, rgba(255,255,255,0.05) 0%, transparent 60%)",
-          // }}
-        />
         <div className="relative max-w-245 mx-auto">
           {/* ── Headline ── */}
-
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance mx-auto max-w-[30ch]">
             {["Pro", "motion", "graphics", "in"].map((word, i) => (
               <span
@@ -378,10 +371,10 @@ export default function EdikitHero() {
             </EdikitButton>
 
             <EdikitButton
-            href="/templates"
-            variant="secondary"
-            size="md"
-            className="uppercase tracking-wider"
+              href="/templates"
+              variant="secondary"
+              size="md"
+              className="uppercase tracking-wider"
             >
               Explore templates
             </EdikitButton>

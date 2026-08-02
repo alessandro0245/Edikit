@@ -25,6 +25,7 @@ export default function EdikitPreloader({
     try {
       if (sessionStorage.getItem(SESSION_KEY)) {
         document.documentElement.classList.add('preloader-done');
+        document.documentElement.classList.remove('preloader-active');
         setVisible(false);
         onExitComplete?.();
         return;
@@ -32,6 +33,9 @@ export default function EdikitPreloader({
     } catch {
       /* private browsing fallback */
     }
+
+    // Lock scroll and suppress cookie banner while preloader is active
+    document.documentElement.classList.add('preloader-active');
 
     // Step 1: Hold preloader for minDisplayMs
     const displayTimer = setTimeout(() => {
@@ -45,6 +49,7 @@ export default function EdikitPreloader({
         } catch {
           /* fallback */
         }
+        document.documentElement.classList.remove('preloader-active');
         setVisible(false);
         onExitComplete?.();
       }, 700);
@@ -52,7 +57,10 @@ export default function EdikitPreloader({
       return () => clearTimeout(fadeTimer);
     }, minDisplayMs);
 
-    return () => clearTimeout(displayTimer);
+    return () => {
+      clearTimeout(displayTimer);
+      document.documentElement.classList.remove('preloader-active');
+    };
   }, [minDisplayMs, onExitComplete]);
 
   // Lock scrollbar while preloader is visible
@@ -71,9 +79,23 @@ export default function EdikitPreloader({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `if(typeof window!=='undefined'&&sessionStorage.getItem('${SESSION_KEY}')){document.documentElement.classList.add('preloader-done');}`,
+          __html: `if(typeof window!=='undefined'&&sessionStorage.getItem('${SESSION_KEY}')){document.documentElement.classList.add('preloader-done');}else{document.documentElement.classList.add('preloader-active');}`,
         }}
       />
+      <style>{`
+        html.preloader-active,
+        html.preloader-active body {
+          overflow: hidden !important;
+        }
+        html.preloader-active [id*="iub"],
+        html.preloader-active [class*="iub"],
+        html.preloader-active iframe[src*="iubenda"] {
+          display: none !important;
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+        }
+      `}</style>
       <div
         className={`fixed inset-0 z-[100] flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#090909] transition-opacity duration-700 ease-out [.preloader-done_&]:hidden ${
           fading ? 'pointer-events-none opacity-0' : 'opacity-100'
