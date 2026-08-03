@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { templates } from "@/utils/constant";
 import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
@@ -9,29 +8,11 @@ import EdikitButton from "../ShimmerButton/ShimmerButton";
 import EdikitPreloader from "../PreLoaderScreen/Edikitpreloader";
 
 export default function Hero() {
-  const [heroReady, setHeroReady] = useState(false);
-
-  const handlePreloaderExitComplete = useCallback(() => {
-    // Wait one frame so hero transition starts after preloader unmount.
-    requestAnimationFrame(() => setHeroReady(true));
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#191919]">
-      <EdikitPreloader
-        minDisplayMs={4500}
-        onExitComplete={handlePreloaderExitComplete}
-      />
+      <EdikitPreloader minDisplayMs={4500} />
       <main>
-        <div
-          className={`transition-all duration-700 ease-out will-change-[opacity,transform,filter] ${
-            heroReady
-              ? "translate-y-0 opacity-100 blur-0"
-              : "translate-y-3 opacity-0 blur-[6px]"
-          }`}
-        >
-          <EdikitHero isReady={heroReady} />
-        </div>
+        <EdikitHero />
 
         {/* Templates Section */}
         <section

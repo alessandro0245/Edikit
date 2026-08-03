@@ -3,7 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
 import SimpleFooter from "@/components/Footer/Footer";
-import IubendaCookieBanner from "@/components/PreLoaderScreen/IubendaCookieBanner";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Edikit | Create Production-Level Motion Graphics in Seconds",
@@ -36,6 +36,7 @@ export default function RootLayout({
         />
 
         {/* Step 3 — load font without blocking render */}
+        {/* media="print" = non-blocking, onLoad switches it to "all" once downloaded */}
         <link
           href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
@@ -60,7 +61,18 @@ export default function RootLayout({
         className="antialiased dark min-h-screen flex flex-col"
         suppressHydrationWarning
       >
-        <IubendaCookieBanner />
+        {/* Iubenda — afterInteractive is correct, loads after page is ready */}
+        <Script
+          src="https://embeds.iubenda.com/widgets/97df219b-28e7-4dab-aced-9888cfb87cda.js"
+          strategy="afterInteractive"
+        />
+        <Script id="iubenda-cons-init" strategy="afterInteractive">
+          {`var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "Ki9lMDUKaWtobf92UIKJbCdOZTIDFFFi"}]);`}
+        </Script>
+        <Script
+          src="https://cdn.iubenda.com/cons/iubenda_cons.js"
+          strategy="afterInteractive"
+        />
         <Providers>
           <Navbar />
           <main className="flex-1 flex flex-col">
