@@ -400,15 +400,11 @@ export const useCustomizeLogic = () => {
             return;
           }
 
-          // ── Step 1: Fill entire canvas with black ──
-          ctx.fillStyle = "#000000";
-          ctx.fillRect(0, 0, targetWidth, targetHeight);
-
-          // ── Step 2: Scale image to fit inside (contain), centered ──
-          const zoomFactor = 1.2;
+          // Scale to cover the full canvas so we never introduce empty edges.
+          const zoomFactor = 1.03;
 
           const scale =
-            Math.min(targetWidth / img.width, targetHeight / img.height) *
+            Math.max(targetWidth / img.width, targetHeight / img.height) *
             zoomFactor;
 
           const drawW = img.width * scale;
@@ -611,11 +607,9 @@ export const useCustomizeLogic = () => {
                 );
               } catch (resizeErr) {
                 console.error("Video auto-resize failed", resizeErr);
-                showErrorToast("Failed to resize video automatically");
-                if (inputElement) {
-                  inputElement.value = "";
-                }
-                return;
+                showInfoToast(
+                  "Video resize failed, uploading original file instead.",
+                );
               } finally {
                 setVideoResizeProgress((prev) => {
                   const next = { ...prev };
@@ -626,12 +620,9 @@ export const useCustomizeLogic = () => {
             }
           } catch (error) {
             console.error("Video validation failed", error);
-            showErrorToast("Failed to validate video");
-            // Clear the file input
-            if (inputElement) {
-              inputElement.value = "";
-            }
-            return;
+            showInfoToast(
+              "Video validation failed, uploading original file instead.",
+            );
           }
         }
       }
@@ -667,7 +658,15 @@ export const useCustomizeLogic = () => {
       showSuccessToast(`${fieldKey} uploaded successfully`);
     } catch (error) {
       console.error("Upload failed:", error);
-      showErrorToast(`Failed to upload ${fieldKey}`);
+      const responseMessage = (error as any)?.response?.data?.message;
+      const details = Array.isArray(responseMessage)
+        ? responseMessage.join(", ")
+        : responseMessage;
+      showErrorToast(
+        details
+          ? `Failed to upload ${fieldKey}: ${details}`
+          : `Failed to upload ${fieldKey}`,
+      );
     } finally {
       // Remove from uploading set
       setUploadingAssets((prev) => {
