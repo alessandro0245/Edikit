@@ -67,6 +67,7 @@ export const useCustomizeLogic = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
+  const [muteAudio, setMuteAudio] = useState(true);
   const [videoResizeProgress, setVideoResizeProgress] = useState<{
     [key: string]: number;
   }>({});
@@ -829,6 +830,7 @@ export const useCustomizeLogic = () => {
         {
           ...renderDto,
           useBackgroundColor,
+          muteAudio,
         },
         {
           withCredentials: true,
@@ -904,6 +906,8 @@ export const useCustomizeLogic = () => {
     handleDownload,
     useBackgroundColor,
     setUseBackgroundColor,
+    muteAudio,
+    setMuteAudio,
     imagePreviewReady,
     setImagePreviewReady,
     isRestoringState,

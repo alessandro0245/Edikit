@@ -1448,9 +1448,30 @@ export class RenderService {
       const layerName = layerMapping[key];
       if (layerName) assets.push({ type: 'image', src: url, layerName });
     };
+    // Whether to strip audio from uploaded video assets
+    const shouldMuteAudio = dto.muteAudio !== false;
+
+    /**
+     * Strip audio from a Cloudinary video URL by injecting the `ac_none`
+     * transformation (audio-codec = none).
+     * Pattern: .../video/upload/v123/... → .../video/upload/ac_none/v123/...
+     * Non-Cloudinary URLs are returned unchanged.
+     */
+    const stripAudioFromUrl = (url: string): string => {
+      return url.replace(
+        /\/video\/upload\/(v\d+\/)/,
+        '/video/upload/ac_none/$1',
+      );
+    };
+
+    const resolveVideoUrl = (url: string): string =>
+      shouldMuteAudio ? stripAudioFromUrl(url) : url;
+
     const pushVideo = (key: string, url: string) => {
       const layerName = layerMapping[key];
-      if (layerName) assets.push({ type: 'video', src: url, layerName });
+      if (layerName) {
+        assets.push({ type: 'video', src: resolveVideoUrl(url), layerName });
+      }
     };
     const hideLayer = (layerName: string) =>
       assets.push({ type: 'data', layerName, property: 'Opacity', value: 0 });
@@ -1494,7 +1515,7 @@ export class RenderService {
       isDual[n] = true;
       if (vidUrl) {
         if (vidLayer)
-          assets.push({ type: 'video', src: vidUrl, layerName: vidLayer });
+          assets.push({ type: 'video', src: resolveVideoUrl(vidUrl), layerName: vidLayer });
         if (imgLayer) hideLayer(imgLayer);
       } else if (imgUrl) {
         if (imgLayer)

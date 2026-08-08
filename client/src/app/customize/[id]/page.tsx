@@ -10,7 +10,8 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
-
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import Link from "next/link";
 import useCustomizeLogic from "./useCustomizeLogic";
@@ -48,6 +49,8 @@ const CustomizePage = () => {
     handleDownload,
     useBackgroundColor,
     setUseBackgroundColor,
+    muteAudio,
+    setMuteAudio,
     setImagePreviewReady,
     videoResizeProgress,
     deletingAssets,
@@ -380,6 +383,7 @@ const CustomizePage = () => {
                                 }
                                 className="max-h-72 max-w-72 object-contain"
                                 controls
+                                muted
                                 onClick={(event) => event.stopPropagation()}
                               />
                             </div>
@@ -485,6 +489,7 @@ const CustomizePage = () => {
                                   }
                                   className="max-h-72 max-w-72 object-contain"
                                   controls
+                                  muted
                                   onClick={(event) => event.stopPropagation()}
                                 />
                               ) : (
@@ -633,6 +638,54 @@ const CustomizePage = () => {
                     {useBackgroundColor
                       ? "Export target: MP4"
                       : "Export target: QuickTime MOV (Animation + Alpha)"}
+                  </p>
+                </div>
+              )}
+
+              {/* Video Audio toggle - only show when a video has been uploaded */}
+              {Object.values(uploadedAssets).some(
+                (url) => url?.includes("/video/")
+              ) && (
+                <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      Video Audio
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Control whether uploaded video assets retain their audio
+                      in the rendered output.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMuteAudio(true)}
+                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                        muteAudio
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <VolumeX className="w-4 h-4" />
+                      Off
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMuteAudio(false)}
+                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                        !muteAudio
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Volume2 className="w-4 h-4" />
+                      On
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {muteAudio
+                      ? "Audio from uploaded videos will be removed."
+                      : "Audio from uploaded videos will be included in the render."}
                   </p>
                 </div>
               )}

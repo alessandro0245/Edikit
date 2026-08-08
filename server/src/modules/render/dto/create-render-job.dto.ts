@@ -158,4 +158,8 @@ export class CreateRenderJobDto {
   @IsOptional()
   @IsBoolean()
   useBackgroundColor?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  muteAudio?: boolean;
 }
