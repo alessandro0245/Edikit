@@ -574,7 +574,10 @@ export const templates: Template[] = [
     thumbnail: "/previews/animation 14.png",
     hasTransprentBackground: true,
     fields: {
-      text1: { type: "text", value: "Text number 1", label: "Text", maxLength: 20, required: false },
+      text1: { type: "text", value: "Text number 1", label: "Line 1", maxLength: 20, required: false },
+      text2: {
+        type: "text", value: "Text number 2", label: "Line 2", maxLength: 20, required: false
+      },
       background: {
         type: "image",
         label: "Background",

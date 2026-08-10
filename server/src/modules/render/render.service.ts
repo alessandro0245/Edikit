@@ -1133,6 +1133,7 @@ export class RenderService {
       // Animation 14 — single text + gradient color via colors
       14: {
         text1: 'txt_1',
+        text2: "txt_2",
         background: 'background',
       },
 
