@@ -27,6 +27,41 @@ class ColorCustomization {
   @IsOptional()
   @IsString()
   @IsHexColor()
+  accentColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  bannerColorStart?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  bannerColorEnd?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  keywordColorStart?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  keywordColorEnd?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  particlesColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
+  decorationColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
   background?: string;
 
   @IsOptional()
@@ -147,6 +182,37 @@ export class CreateRenderJobDto {
   @IsOptional()
   @IsString()
   background?: string;
+
+  // Accent Color (direct or inside colors)
+  @IsOptional()
+  @IsString()
+  accentColor?: string;
+
+  // Banner Colors (direct or inside colors)
+  @IsOptional()
+  @IsString()
+  bannerColorStart?: string;
+
+  @IsOptional()
+  @IsString()
+  bannerColorEnd?: string;
+
+  // Template 6 Colors (direct or inside colors)
+  @IsOptional()
+  @IsString()
+  keywordColorStart?: string;
+
+  @IsOptional()
+  @IsString()
+  keywordColorEnd?: string;
+
+  @IsOptional()
+  @IsString()
+  particlesColor?: string;
+
+  @IsOptional()
+  @IsString()
+  decorationColor?: string;
 
   // Color customizations
   @IsOptional()

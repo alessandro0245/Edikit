@@ -693,13 +693,15 @@ Animation_14:
 
 main_comp
 ├── txt_1
+├── txt_2
 ├── background (2160x3840)
 ├── sfx_1
 └── sfx_1
 
 Fields the user can change and what they do:
-txt_1: name it: "text" - The user can change the text (maximum length: 20 characters)
-txt_1: name it: "text color" - The user selects 2 colors. Apply them respectively to the "Start Color" and "End Color" fields of the Gradient Ramp effect (IT: Scala sfumatura / EN: Gradient Ramp) on txt_1.
+txt_1: name it: "Line 1" - The user can change the text (maximum length: 20 characters)
+txt_2: name it: "Line 2" - The user can change the text (maximum length: 20 characters)
+accent color: name it: "accent color" - In this animation, the text appears in blue for the first second, the user can change that color with a field named "accent color". The setting is found in both text_1 and text_2 > Animator 2 > Expression Selector > fill color (The user selects one color that applies to both text_1 and text_2).
 background: name it: "background" - The user can decide to remove the background (if the background gets removed, the export settings are as written in General Rules).
 
 Animation_15:

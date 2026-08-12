@@ -169,7 +169,7 @@ export const useCustomizeLogic = () => {
       const persistedFormData: Record<string, string> = {};
 
       Object.entries(template.fields).forEach(([key, field]) => {
-        if (field.type !== "text") return;
+        if (field.type !== "text" && field.type !== "color") return;
 
         const value = formData[key];
         // Only persist if it's explicitly a string (including empty string)
@@ -809,6 +809,16 @@ export const useCustomizeLogic = () => {
           const value = formData[key] as string;
           if (value) {
             renderDto[key] = value;
+          }
+        } else if (field.type === "color") {
+          const value = (formData[key] as string) || field.value;
+          if (value) {
+            renderDto[key] = value;
+            renderDto.colors = {
+              ...(renderDto.colors || {}),
+              [key]: value,
+              ...(key === "accentColor" ? { accent: value } : {}),
+            };
           }
         } else if (field.type === "image" || field.type === "video") {
           if (uploadedAssets[key]) {

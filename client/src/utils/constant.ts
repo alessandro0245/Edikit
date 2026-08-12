@@ -67,7 +67,7 @@ export interface Template {
   hasTransprentBackground?: boolean;
   fields: {
     [key: string]: {
-      type: "text" | "image" | "video" | "media";
+      type: "text" | "image" | "video" | "media" | "color";
       label: string;
       value?: string;
       maxLength?: number;
@@ -317,6 +317,30 @@ export const templates: Template[] = [
         dimensions: "1080x1080",
         required: false,
       },
+      keywordColorStart: {
+        type: "color",
+        value: "#3B82F6",
+        label: "Keyword Start Color",
+        required: false,
+      },
+      keywordColorEnd: {
+        type: "color",
+        value: "#3B82F6",
+        label: "Keyword End Color",
+        required: false,
+      },
+      particlesColor: {
+        type: "color",
+        value: "#FFFFFF",
+        label: "Particles Color",
+        required: false,
+      },
+      decorationColor: {
+        type: "color",
+        value: "#3B82F6",
+        label: "Decoration Color",
+        required: false,
+      },
       background: {
         type: "image",
         label: "Background",
@@ -333,6 +357,18 @@ export const templates: Template[] = [
     hasTransprentBackground: true,
     fields: {
       text1: { type: "text", value: "Text 1, type here", label: "Text", maxLength: 20, required: true },
+      bannerColorStart: {
+        type: "color",
+        value: "#3B82F6",
+        label: "Banner End Color",
+        required: false,
+      },
+      bannerColorEnd: {
+        type: "color",
+        value: "#8abdff",
+        label: "Banner Start Color",
+        required: false,
+      },
       background: {
         type: "image",
         label: "Background",
@@ -577,6 +613,12 @@ export const templates: Template[] = [
       text1: { type: "text", value: "Text number 1", label: "Line 1", maxLength: 20, required: false },
       text2: {
         type: "text", value: "Text number 2", label: "Line 2", maxLength: 20, required: false
+      },
+      accentColor: {
+        type: "color",
+        value: "#3B82F6",
+        label: "Accent Color",
+        required: false,
       },
       background: {
         type: "image",

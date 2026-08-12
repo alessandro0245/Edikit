@@ -251,6 +251,56 @@ const CustomizePage = () => {
                       </div>
                     )}
 
+                    {/* Color Input */}
+                    {field.type === "color" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <div className="relative flex items-center justify-center h-10 w-12 rounded-lg border border-border bg-background overflow-hidden hover:border-primary/50 transition-colors">
+                            <input
+                              type="color"
+                              id={`color-${fieldKey}`}
+                              value={
+                                ((formData[fieldKey] as string) ||
+                                field.value ||
+                                "#3B82F6").startsWith("#")
+                                  ? ((formData[fieldKey] as string) ||
+                                      field.value ||
+                                      "#3B82F6")
+                                  : "#3B82F6"
+                              }
+                              onChange={(e) =>
+                                handleTextChange(fieldKey, e.target.value)
+                              }
+                              className="h-14 w-14 cursor-pointer border-0 bg-transparent p-0 -m-2"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={
+                                (formData[fieldKey] as string) ??
+                                field.value ??
+                                "#3B82F6"
+                              }
+                              onChange={(e) => {
+                                let val = e.target.value;
+                                if (val && !val.startsWith("#") && !val.startsWith(" ")) {
+                                  val = `#${val}`;
+                                }
+                                handleTextChange(fieldKey, val);
+                              }}
+                              maxLength={7}
+                              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground font-mono text-sm uppercase placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              placeholder="#3B82F6"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Select color for {field.label.toLowerCase()}.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Image Upload */}
                     {field.type === "image" && (
                       <div>

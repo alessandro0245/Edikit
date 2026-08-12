@@ -1566,9 +1566,128 @@ export class RenderService {
         assets.push({ type: 'image', src: dto.background, layerName });
     }
 
-    // ── Colors ───────────────────────────────────────────────────────────────
-    if (dto.colors) {
-      if (dto.colors.primary) {
+    // ── Template 14: Accent Color (Animator 2 -> Expression Selector -> Fill Color on txt_1 & txt_2)
+    const accentColorHex =
+      dto.colors?.accent || dto.colors?.accentColor || dto.accentColor;
+
+    if (templateId === 14 && accentColorHex) {
+      const rgb = this.hexToRgb(accentColorHex);
+      assets.push({
+        type: 'data',
+        layerName: 'txt_1',
+        property:
+          'ADBE Text Properties.ADBE Text Animators.Animatore 2.ADBE Text Animator Properties.ADBE Text Fill Color',
+        value: rgb,
+      });
+      assets.push({
+        type: 'data',
+        layerName: 'txt_2',
+        property:
+          'ADBE Text Properties.ADBE Text Animators.Animatore 2.ADBE Text Animator Properties.ADBE Text Fill Color',
+        value: rgb,
+      });
+    }
+    // ── Template 6: Keyword Color, Particles Color, Decoration Color ───────────
+    const keywordStartHex =
+      dto.keywordColorStart ||
+      dto.colors?.keywordColorStart ||
+      dto.colors?.primary;
+    const keywordEndHex =
+      dto.keywordColorEnd ||
+      dto.colors?.keywordColorEnd ||
+      dto.colors?.secondary;
+    const particlesColorHex =
+      dto.particlesColor ||
+      dto.colors?.particlesColor;
+    const decorationColorHex =
+      dto.decorationColor ||
+      dto.colors?.decorationColor;
+
+    if (templateId === 6) {
+      if (keywordStartHex) {
+        const rgbStart = this.hexToRgb(keywordStartHex);
+        assets.push({
+          type: 'data',
+          layerName: 'txt_2',
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0002',
+          value: rgbStart,
+        });
+      }
+      if (keywordEndHex) {
+        const rgbEnd = this.hexToRgb(keywordEndHex);
+        assets.push({
+          type: 'data',
+          layerName: 'txt_2',
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0004',
+          value: rgbEnd,
+        });
+      }
+      if (particlesColorHex) {
+        const rgbParticles = this.hexToRgb(particlesColorHex);
+        assets.push({
+          type: 'data',
+          layerName: 'img_1',
+          property: 'ADBE Effect Parade.ADBE Tint.ADBE Tint-0001',
+          value: rgbParticles,
+        });
+        assets.push({
+          type: 'data',
+          layerName: 'img_1',
+          property: 'ADBE Effect Parade.ADBE Tint.ADBE Tint-0002',
+          value: rgbParticles,
+        });
+      }
+      if (decorationColorHex) {
+        const rgbDecoration = this.hexToRgb(decorationColorHex);
+        assets.push({
+          type: 'data',
+          layerName: 'img_5',
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0002',
+          value: rgbDecoration,
+        });
+        assets.push({
+          type: 'data',
+          layerName: 'img_5',
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0004',
+          value: rgbDecoration,
+        });
+      }
+    }
+
+    // ── Template 7: Banner Gradient Color on img_1 (Gradient Ramp: Start Color & End Color)
+    const bannerStartHex =
+      dto.bannerColorStart ||
+      dto.colors?.bannerColorStart ||
+      dto.colors?.primary;
+    const bannerEndHex =
+      dto.bannerColorEnd ||
+      dto.colors?.bannerColorEnd ||
+      dto.colors?.secondary;
+
+    if (templateId === 7) {
+      const bannerLayer = 'img_1';
+      if (bannerStartHex) {
+        const rgbStart = this.hexToRgb(bannerStartHex);
+        assets.push({
+          type: 'data',
+          layerName: bannerLayer,
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0002',
+          value: rgbStart,
+        });
+      }
+      if (bannerEndHex) {
+        const rgbEnd = this.hexToRgb(bannerEndHex);
+        assets.push({
+          type: 'data',
+          layerName: bannerLayer,
+          property: 'ADBE Effect Parade.ADBE Ramp.ADBE Ramp-0004',
+          value: rgbEnd,
+        });
+      }
+    }
+
+    if (dto.colors || accentColorHex) {
+      if (dto.colors?.primary) {
         const layerName = layerMapping.colorPrimary;
         if (layerName)
           assets.push({
@@ -1578,7 +1697,7 @@ export class RenderService {
             value: this.hexToRgb(dto.colors.primary),
           });
       }
-      if (dto.colors.secondary) {
+      if (dto.colors?.secondary) {
         const layerName = layerMapping.colorSecondary;
         if (layerName)
           assets.push({
@@ -1588,17 +1707,17 @@ export class RenderService {
             value: this.hexToRgb(dto.colors.secondary),
           });
       }
-      if (dto.colors.accent) {
+      if (accentColorHex && templateId !== 14) {
         const layerName = layerMapping.colorAccent;
         if (layerName)
           assets.push({
             type: 'data',
             layerName,
             property: 'Color',
-            value: this.hexToRgb(dto.colors.accent),
+            value: this.hexToRgb(accentColorHex),
           });
       }
-      if (dto.colors.background) {
+      if (dto.colors?.background) {
         const layerName = layerMapping.colorBackground;
         if (layerName)
           assets.push({
@@ -1608,7 +1727,7 @@ export class RenderService {
             value: this.hexToRgb(dto.colors.background),
           });
       }
-      if (dto.colors.text) {
+      if (dto.colors?.text) {
         const layerName = layerMapping.colorText;
         if (layerName)
           assets.push({
