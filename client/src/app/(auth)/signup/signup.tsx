@@ -15,6 +15,8 @@ import { AppDispatch } from "@/redux/store";
 import { z } from "zod";
 
 // Zod Schema for Signup Form
+const GMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+
 const signupSchema = z.object({
   fullName: z
     .string()
@@ -25,7 +27,10 @@ const signupSchema = z.object({
   email: z
     .string()
     .min(1, "Email is required")
-    .email("Please enter a valid email address"),
+    .email("Please enter a valid email address")
+    .refine((val) => GMAIL_REGEX.test(val.trim()), {
+      message: "Only Gmail addresses (@gmail.com) are allowed",
+    }),
   password: z
     .string()
     .min(1, "Password is required")
@@ -80,8 +85,14 @@ export default function SignUpPage() {
     // Mark all fields as touched
     setTouched({ fullName: true, email: true, password: true });
 
+    const sanitizedData = {
+      fullName: formData.fullName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+    };
+
     // Validate with Zod
-    const validation = signupSchema.safeParse(formData);
+    const validation = signupSchema.safeParse(sanitizedData);
 
     if (!validation.success) {
       // Extract errors from Zod
@@ -103,16 +114,16 @@ export default function SignUpPage() {
         form: { selector: document.getElementById("signup-form") },
         consent: {
           legal_notices: [{ identifier: "privacy_policy" }],
-          subject: { email: formData.email, full_name: formData.fullName },
+          subject: { email: sanitizedData.email, full_name: sanitizedData.fullName },
         },
       }]);
     }
 
     try {
       const response = await signupUser(
-        formData.fullName,
-        formData.email,
-        formData.password,
+        sanitizedData.fullName,
+        sanitizedData.email,
+        sanitizedData.password,
         dispatch
       );
       console.log(response);
@@ -181,7 +192,7 @@ export default function SignUpPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="you@gmail.com"
                     value={formData.email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
                     className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.email ? "border-red-500" : "border-border"

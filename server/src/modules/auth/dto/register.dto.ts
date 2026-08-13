@@ -1,5 +1,6 @@
-import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class RegisterDto {
   @ApiProperty({
@@ -12,10 +13,14 @@ export class RegisterDto {
   fullName: string;
 
   @ApiProperty({
-    description: 'User email address',
-    example: 'john.doe@example.com',
+    description: 'User email address (Gmail only)',
+    example: 'john.doe@gmail.com',
   })
-  @IsEmail()
+  @IsEmail({}, { message: 'Please enter a valid email address' })
+  @Matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/i, {
+    message: 'Only Gmail addresses (@gmail.com) are allowed',
+  })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
   email: string;
 
   @ApiProperty({

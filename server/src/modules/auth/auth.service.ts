@@ -55,8 +55,14 @@ export class AuthService {
     role: string;
     planType: string;
   }> {
+    const email = registerDto.email?.trim().toLowerCase();
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    if (!email || !gmailRegex.test(email)) {
+      throw new BadRequestException('Only Gmail addresses (@gmail.com) are allowed');
+    }
+
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: registerDto.email },
+      where: { email },
     });
 
     if (existingUser) {
@@ -74,7 +80,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         fullName: registerDto.fullName,
-        email: registerDto.email,
+        email,
         password: hashedPassword,
         role,
         planType: PlanType.FREE,
