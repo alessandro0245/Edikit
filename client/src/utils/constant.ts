@@ -331,14 +331,14 @@ export const templates: Template[] = [
       },
       particlesColor: {
         type: "color",
-        value: "#FFFFFF",
+        value: "#5EB5FC",
         label: "Particles Color",
         required: false,
       },
       decorationColor: {
         type: "color",
         value: "#3B82F6",
-        label: "Decoration Color",
+        label: "Folder Color",
         required: false,
       },
       background: {
