@@ -255,6 +255,16 @@ export const useCustomizeLogic = () => {
       const prevValue = prev[fieldKey];
       let newValue = value;
 
+      // For template 6 keyword (text2), automatically convert straight double quotes to typographic curly quotes
+      if (templateId === 6 && fieldKey === "text2" && newValue.includes('"')) {
+        let isOpening = true;
+        newValue = newValue.replace(/"/g, () => {
+          const q = isOpening ? "“" : "”";
+          isOpening = !isOpening;
+          return q;
+        });
+      }
+
       // If the field was just the forced space and the user typed a character,
       // remove the space so they don't have to delete it manually.
       if (prevValue === " " && value.length > 1) {

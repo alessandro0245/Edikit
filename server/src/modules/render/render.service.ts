@@ -1431,9 +1431,18 @@ export class RenderService {
     );
 
     const text1 = dto.text1 || dto.headline;
-    const text2 = dto.text2 || dto.subheadline;
+    let text2 = dto.text2 || dto.subheadline;
     const text3 = dto.text3 || dto.description;
     const image1 = dto.image1 || dto.logo;
+
+    if (templateId === 6 && text2) {
+      let isOpening = true;
+      text2 = text2.replace(/"/g, () => {
+        const q = isOpening ? '“' : '”';
+        isOpening = !isOpening;
+        return q;
+      });
+    }
 
     const pushText = (key: string, value: string) => {
       const layerName = layerMapping[key];

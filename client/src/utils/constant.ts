@@ -298,7 +298,7 @@ export const templates: Template[] = [
         maxLength: 45,
         required: false,
       },
-      text2: { type: "text", value: `"Edikit"`, label: "Keyword", maxLength: 12, required: false },
+      text2: { type: "text", value: "“Edikit”", label: "Keyword", maxLength: 12, required: false },
       image1: {
         type: "image",
         label: "Image 1",
