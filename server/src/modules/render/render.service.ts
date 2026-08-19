@@ -890,6 +890,7 @@ export class RenderService {
       src?: string;
       name?: string;
       params?: Record<string, any>;
+      keyword?: string;
     }>,
     webhookUrl: string | null,
     fonts: string[] = [],
@@ -1405,6 +1406,7 @@ export class RenderService {
       src?: string;
       name?: string;
       params?: Record<string, any>;
+      keyword?: string;
     }>
   > {
     type Asset = {
@@ -1415,6 +1417,7 @@ export class RenderService {
       src?: string;
       name?: string;
       params?: Record<string, any>;
+      keyword?: string;
     };
     const assets: Asset[] = [];
     const layerMapping = await this.getLayerMapping(templateId);
@@ -1444,15 +1447,30 @@ export class RenderService {
       });
     }
 
+    const fontPostScriptName = this.getFontPostScriptName(dto.fontFamily);
+
     const pushText = (key: string, value: string) => {
       const layerName = layerMapping[key];
-      if (layerName)
+      if (!layerName) return;
+
+      if (fontPostScriptName) {
+        assets.push({
+          type: 'function',
+          name: 'nx:text-params-set',
+          params: {
+            layerName,
+            textValue: value,
+            font: fontPostScriptName,
+          },
+        });
+      } else {
         assets.push({
           type: 'data',
           layerName,
           property: 'Source Text',
           value,
         });
+      }
     };
     const pushImage = (key: string, url: string) => {
       const layerName = layerMapping[key];
@@ -1497,12 +1515,47 @@ export class RenderService {
       // Template 9: sender's name propagates to all sibling text layers
       if (templateId === 9) {
         for (const ln of ['txt_5', 'txt_8', 'txt_11', 'txt_14']) {
+          if (fontPostScriptName) {
+            assets.push({
+              type: 'function',
+              name: 'nx:text-params-set',
+              params: {
+                layerName: ln,
+                textValue: dto.text6,
+                font: fontPostScriptName,
+              },
+            });
+          } else {
+            assets.push({
+              type: 'data',
+              layerName: ln,
+              property: 'Source Text',
+              value: dto.text6,
+            });
+          }
+        }
+      }
+    }
+
+    // If a custom font is selected, apply it to any text layers that were not overridden with custom text
+    if (fontPostScriptName) {
+      const updatedLayers = new Set(
+        assets
+          .filter((a) => a.name === 'nx:text-params-set' && a.params?.layerName)
+          .map((a) => a.params!.layerName),
+      );
+
+      for (const [key, layerName] of Object.entries(layerMapping)) {
+        if (key.startsWith('text') && layerName && !updatedLayers.has(layerName)) {
           assets.push({
-            type: 'data',
-            layerName: ln,
-            property: 'Source Text',
-            value: dto.text6,
+            type: 'function',
+            name: 'nx:text-params-set',
+            params: {
+              layerName,
+              font: fontPostScriptName,
+            },
           });
+          updatedLayers.add(layerName);
         }
       }
     }
@@ -1760,6 +1813,106 @@ export class RenderService {
     }
 
     return assets;
+  }
+
+  /**
+   * Map font family / identifier to After Effects PostScript font name
+   */
+  private getFontPostScriptName(fontFamily?: string): string | null {
+    if (!fontFamily) return null;
+    const normalized = fontFamily.toLowerCase().trim();
+
+    const fontMap: Record<string, string> = {
+      // Google Sans (Default)
+      'google-sans': 'GoogleSansFlex120pt-Regular',
+      googlesans: 'GoogleSansFlex120pt-Regular',
+      'googlesansflex120pt-regular': 'GoogleSansFlex120pt-Regular',
+      'googlesansflex120pt-medium': 'GoogleSansFlex120pt-Medium',
+      'googlesansflex-regular': 'GoogleSansFlex120pt-Regular',
+
+      // Roboto
+      roboto: 'Roboto-Regular',
+      'roboto-regular': 'Roboto-Regular',
+      'roboto-medium': 'Roboto-Medium',
+      'roboto-semibold': 'Roboto-SemiBold',
+      'roboto-bold': 'Roboto-SemiBold',
+      'roboto-light': 'Roboto-Light',
+
+      // Montserrat
+      montserrat: 'Montserrat-Regular',
+      'montserrat-regular': 'Montserrat-Regular',
+      'montserrat-medium': 'Montserrat-Medium',
+      'montserrat-semibold': 'Montserrat-SemiBold',
+      'montserrat-light': 'Montserrat-Light',
+
+      // Poppins
+      poppins: 'Poppins-Regular',
+      'poppins-regular': 'Poppins-Regular',
+      'poppins-medium': 'Poppins-Medium',
+      'poppins-semibold': 'Poppins-SemiBold',
+      'poppins-light': 'Poppins-Light',
+
+      // DM Sans
+      'dm-sans': 'DMSans-Regular',
+      dmsans: 'DMSans-Regular',
+      'dmsans-regular': 'DMSans-Regular',
+      'dmsans-medium': 'DMSans-Medium',
+      'dmsans-semibold': 'DMSans-SemiBold',
+      'dmsans-light': 'DMSans-Light',
+
+      // Manrope
+      manrope: 'Manrope-Regular',
+      'manrope-regular': 'Manrope-Regular',
+      'manrope-medium': 'Manrope-Medium',
+      'manrope-semibold': 'Manrope-SemiBold',
+      'manrope-light': 'Manrope-Light',
+
+      // Figtree
+      figtree: 'Figtree-Regular',
+      'figtree-regular': 'Figtree-Regular',
+      'figtree-medium': 'Figtree-Medium',
+      'figtree-semibold': 'Figtree-SemiBold',
+      'figtree-light': 'Figtree-Light',
+
+      // Rubik
+      rubik: 'Rubik-Regular',
+      'rubik-regular': 'Rubik-Regular',
+      'rubik-medium': 'Rubik-Medium',
+      'rubik-semibold': 'Rubik-SemiBold',
+      'rubik-light': 'Rubik-Light',
+
+      // Assistant
+      assistant: 'Assistant-Regular',
+      'assistant-regular': 'Assistant-Regular',
+      'assistant-medium': 'Assistant-Medium',
+      'assistant-semibold': 'Assistant-SemiBold',
+      'assistant-light': 'Assistant-Light',
+
+      // Hanken Grotesk
+      'hanken-grotesk': 'HankenGrotesk-Regular',
+      hankengrotesk: 'HankenGrotesk-Regular',
+      'hankengrotesk-regular': 'HankenGrotesk-Regular',
+      'hankengrotesk-medium': 'HankenGrotesk-Medium',
+      'hankengrotesk-semibold': 'HankenGrotesk-SemiBold',
+      'hankengrotesk-light': 'HankenGrotesk-Light',
+
+      // Noto Sans
+      'noto-sans': 'NotoSans-Regular',
+      notosans: 'NotoSans-Regular',
+      'notosans-regular': 'NotoSans-Regular',
+      'notosans-medium': 'NotoSans-Medium',
+      'notosans-semibold': 'NotoSans-SemiBold',
+      'notosans-light': 'NotoSans-Light',
+
+      // Onest
+      onest: 'Onest-Regular',
+      'onest-regular': 'Onest-Regular',
+      'onest-medium': 'Onest-Medium',
+      'onest-semibold': 'Onest-SemiBold',
+      'onest-light': 'Onest-Light',
+    };
+
+    return fontMap[normalized] || fontFamily;
   }
 
   /**

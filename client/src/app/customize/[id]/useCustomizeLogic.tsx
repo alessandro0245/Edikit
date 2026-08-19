@@ -10,6 +10,7 @@ import {
   showSuccessToast,
 } from "@/components/Toast/showToast";
 import { resizeVideo } from "@/utils/videoResize";
+import { type FontId } from "@/components/FontPicker/FontPicker";
 
 interface FormDataState {
   [key: string]: string | File | null | undefined;
@@ -68,6 +69,7 @@ export const useCustomizeLogic = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
   const [muteAudio, setMuteAudio] = useState(true);
+  const [selectedFont, setSelectedFont] = useState<FontId>("google-sans");
   const [videoResizeProgress, setVideoResizeProgress] = useState<{
     [key: string]: number;
   }>({});
@@ -849,6 +851,7 @@ export const useCustomizeLogic = () => {
         `/render/create-job/${templateId}`,
         {
           ...renderDto,
+          fontFamily: selectedFont,
           useBackgroundColor,
           muteAudio,
         },
@@ -928,6 +931,8 @@ export const useCustomizeLogic = () => {
     setUseBackgroundColor,
     muteAudio,
     setMuteAudio,
+    selectedFont,
+    setSelectedFont,
     imagePreviewReady,
     setImagePreviewReady,
     isRestoringState,

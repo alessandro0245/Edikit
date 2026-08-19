@@ -228,4 +228,8 @@ export class CreateRenderJobDto {
   @IsOptional()
   @IsBoolean()
   muteAudio?: boolean;
+
+  @IsOptional()
+  @IsString()
+  fontFamily?: string;
 }

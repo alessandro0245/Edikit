@@ -23,6 +23,7 @@ import {
 } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
+import FontPicker, { type FontId } from "@/components/FontPicker/FontPicker";
 
 
 const CustomizePage = () => {
@@ -51,6 +52,8 @@ const CustomizePage = () => {
     setUseBackgroundColor,
     muteAudio,
     setMuteAudio,
+    selectedFont,
+    setSelectedFont,
     setImagePreviewReady,
     videoResizeProgress,
     deletingAssets,
@@ -631,6 +634,12 @@ const CustomizePage = () => {
                     )}
                   </div>
                 ))}
+
+              {/* ── Font Picker ────────────────────────────────── */}
+              <FontPicker
+                value={selectedFont}
+                onChange={(fontId) => setSelectedFont(fontId)}
+              />
 
               {/* Dimension Disclaimer */}
               <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
