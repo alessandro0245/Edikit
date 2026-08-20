@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -12,22 +13,24 @@ import {
   Info,
   Volume2,
   VolumeX,
+  Type,
+  Image as ImageIcon,
+  Palette,
+  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
-import {
-  getTemplateOrientation,
-} from "@/utils/templateOrientation";
+import { getTemplateOrientation } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
-import FontPicker, { type FontId } from "@/components/FontPicker/FontPicker";
-
+import FontPicker from "@/components/FontPicker/FontPicker";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const CustomizePage = () => {
-  const [previewRatio, setPreviewRatio] = useState("9/16");
+  const [previewRatio] = useState("9/16");
   const {
     template,
     renderJob,
@@ -73,6 +76,30 @@ const CustomizePage = () => {
     ? (toMp4PreviewUrl(renderJob.outputUrl!) ?? renderJob.outputUrl!)
     : null;
 
+  // Group fields into categories
+  const textFields = Object.entries(template.fields).filter(
+    ([fieldKey, field]) => fieldKey !== "background" && field.type === "text"
+  );
+  const mediaFields = Object.entries(template.fields).filter(
+    ([fieldKey, field]) =>
+      fieldKey !== "background" &&
+      (field.type === "image" ||
+        field.type === "video" ||
+        field.type === "media")
+  );
+  const colorFields = Object.entries(template.fields).filter(
+    ([fieldKey, field]) => fieldKey !== "background" && field.type === "color"
+  );
+
+  const defaultTab =
+    textFields.length > 0
+      ? "text"
+      : mediaFields.length > 0
+      ? "media"
+      : colorFields.length > 0
+      ? "colors"
+      : "settings";
+
   return (
     <div className="min-h-screen bg-background relative">
       {isDownloading && (
@@ -81,9 +108,7 @@ const CustomizePage = () => {
             <div className="flex items-center gap-3">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
               <div>
-                <p className="font-medium text-foreground">
-                  Preparing download
-                </p>
+                <p className="font-medium text-foreground">Preparing download</p>
                 <p className="text-sm text-muted-foreground">
                   Keep this tab open while the file is being prepared.
                 </p>
@@ -108,7 +133,7 @@ const CustomizePage = () => {
       <main className="container mx-auto px-4 py-4">
         <Link
           href="/templates"
-          className="rounded-lg text-sm font-medium text-foreground hover:bg-accent transition-colors "
+          className="rounded-lg text-sm font-medium text-foreground hover:bg-accent transition-colors inline-block p-1.5"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -156,45 +181,14 @@ const CustomizePage = () => {
                     />
                   )}
                 </div>
-                
                 <p className="mt-4 text-center text-xs text-muted-foreground">
                   The preview shows how your customization will look.
                 </p>
               </div>
             </div>
-
-            {/* Upgrade CTA */}
-            {/* <div className="p-6 rounded-lg bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
-              <div className="space-y-3">
-                <h3 className="font-semibold text-foreground">
-                  Unlock Premium Features
-                </h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    4K resolution exports
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    Remove watermark
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    Transparent backgrounds
-                  </li>
-                </ul>
-               
-                <EdikitButton
-                href="/pricing"
-                width="w-full"
-                >
-                  Upgrade to Pro
-                </EdikitButton>
-              </div>
-            </div> */}
           </div>
 
-          {/* Right Column - Scrollable Form */}
+          {/* Right Column - Scrollable Form with Shadcn Line Tabs */}
           <div className="space-y-6 order-1 lg:order-2">
             <div>
               <h1 className="text-2xl font-bold text-foreground mb-1">
@@ -205,58 +199,477 @@ const CustomizePage = () => {
               </p>
             </div>
 
-            <div className="p-6 rounded-lg space-y-5 bg-card border border-border">
-              {/* Dynamic Fields */}
-              {Object.entries(template.fields)
-                .filter(([fieldKey]) => fieldKey !== "background")
-                .map(([fieldKey, field]) => (
-                  <div key={fieldKey} className="space-y-1">
-                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                      {field.label}
-                      {field.required && (
-                        <span className="text-red-500 text-xs">*</span>
-                      )}
-                      {field.dimensions && (
-                        <span className="text-xs text-muted-foreground font-normal">
-                          ({field.dimensions})
-                        </span>
-                      )}
-                      {uploadedAssets[fieldKey] && (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                      )}
-                    </label>
+            <div className="p-6 rounded-2xl space-y-6 bg-card border border-border shadow-xs">
+              <Tabs defaultValue={defaultTab} className="w-full">
+                <TabsList variant="line" className="mb-2">
+                  <TabsTrigger value="text" className="gap-2">
+                    <Type className="w-4 h-4" />
+                    <span>Text & Fonts</span>
+                    {textFields.length > 0 && (
+                      <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">
+                        {/* {textFields.length} */}
+                      </span>
+                    )}
+                  </TabsTrigger>
 
-                    {/* Text Input */}
-                    {field.type === "text" && (
-                      <div>
-                        <input
-                          type="text"
-                          value={(formData[fieldKey] as string) ?? field.value ?? ""}
-                          onChange={(e) =>
-                            handleTextChange(fieldKey, e.target.value)
-                          }
-                          maxLength={field.maxLength}
-                          className="w-full h-7 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                          placeholder={`Enter ${field.label.toLowerCase()}`}
-                        />
-                        {field.maxLength && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {((formData[fieldKey] as string) || "").length} /{" "}
-                            {field.maxLength} characters
-                          </p>
+                  {mediaFields.length > 0 && (
+                    <TabsTrigger value="media" className="gap-2">
+                      <ImageIcon className="w-4 h-4" />
+                      <span>Media Assets</span>
+                      {/* <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">
+                        {mediaFields.length}
+                      </span> */}
+                    </TabsTrigger>
+                  )}
+
+                  {colorFields.length > 0 && (
+                    <TabsTrigger value="colors" className="gap-2">
+                      <Palette className="w-4 h-4" />
+                      <span>Colors</span>
+                      {/* <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">
+                        {colorFields.length}
+                      </span> */}
+                    </TabsTrigger>
+                  )}
+
+                  <TabsTrigger value="settings" className="gap-2">
+                    <SlidersHorizontal className="w-4 h-4" />
+                    <span>Settings</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* ─── TAB 1: TEXT & FONTS ─── */}
+                <TabsContent value="text" className="space-y-5 pt-2">
+                  {textFields.length > 0 ? (
+                    textFields.map(([fieldKey, field]) => (
+                      <div key={fieldKey} className="space-y-1.5">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          {field.label}
+                          {field.required && (
+                            <span className="text-red-500 text-xs">*</span>
+                          )}
+                          {field.dimensions && (
+                            <span className="text-xs text-muted-foreground font-normal">
+                              ({field.dimensions})
+                            </span>
+                          )}
+                          {formData[fieldKey] && (
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          )}
+                        </label>
+
+                        <div>
+                          <input
+                            type="text"
+                            value={
+                              (formData[fieldKey] as string) ??
+                              field.value ??
+                              ""
+                            }
+                            onChange={(e) =>
+                              handleTextChange(fieldKey, e.target.value)
+                            }
+                            maxLength={field.maxLength}
+                            className="w-full h-9 px-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm transition-colors"
+                            placeholder={`Enter ${field.label.toLowerCase()}`}
+                          />
+                          {field.maxLength && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {((formData[fieldKey] as string) || "").length} /{" "}
+                              {field.maxLength} characters
+                            </p>
+                          )}
+                          {formData[fieldKey] === " " && (
+                            <p className="text-xs text-blue-500/80 mt-1 flex items-center gap-1.5">
+                              <Info className="w-3 h-3" />
+                              Field cleared. A space will be used for rendering purpose.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic py-2">
+                      This template does not have customizable text fields.
+                    </p>
+                  )}
+
+                  {/* Font Picker */}
+                  <div className="pt-2 border-t border-border/60">
+                    <FontPicker
+                      value={selectedFont}
+                      onChange={(fontId) => setSelectedFont(fontId)}
+                    />
+                  </div>
+                </TabsContent>
+
+                {/* ─── TAB 2: MEDIA ASSETS ─── */}
+                {mediaFields.length > 0 && (
+                  <TabsContent value="media" className="space-y-6 pt-2">
+                    {mediaFields.map(([fieldKey, field]) => (
+                      <div key={fieldKey} className="space-y-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          {field.label}
+                          {field.required && (
+                            <span className="text-red-500 text-xs">*</span>
+                          )}
+                          {field.dimensions && (
+                            <span className="text-xs text-muted-foreground font-normal">
+                              ({field.dimensions})
+                            </span>
+                          )}
+                          {uploadedAssets[fieldKey] && (
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                          )}
+                        </label>
+
+                        {/* Image Upload */}
+                        {field.type === "image" && (
+                          <div>
+                            {filePreviews[fieldKey] ||
+                            uploadedAssets[fieldKey] ? (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="image/png,image/jpeg,image/jpg,image/webp"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
+                              >
+                                <div className="bg-checker aspect-square flex items-center justify-center p-3">
+                                  <img
+                                    src={
+                                      filePreviews[fieldKey] ||
+                                      uploadedAssets[fieldKey]
+                                    }
+                                    alt={`${field.label} preview`}
+                                    onLoad={() =>
+                                      setImagePreviewReady((prev) => ({
+                                        ...prev,
+                                        [fieldKey]: true,
+                                      }))
+                                    }
+                                    onError={() =>
+                                      setImagePreviewReady((prev) => ({
+                                        ...prev,
+                                        [fieldKey]: true,
+                                      }))
+                                    }
+                                    className="max-h-72 max-w-72 object-contain pointer-events-none"
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <Upload className="w-3 h-3" /> Click or drag to
+                                    replace
+                                  </span>
+                                  <button
+                                    onClick={async (event) => {
+                                      event.stopPropagation();
+                                      uploadedAssets[fieldKey]
+                                        ? await deleteAsset(fieldKey)
+                                        : removeFile(fieldKey);
+                                    }}
+                                    disabled={deletingAssets.has(fieldKey)}
+                                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                      deletingAssets.has(fieldKey)
+                                        ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                        : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                    }`}
+                                    type="button"
+                                  >
+                                    {deletingAssets.has(fieldKey) ? (
+                                      <>
+                                        <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                      </>
+                                    ) : (
+                                      <>
+                                        <X className="w-3 h-3" /> Remove
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </FileDropZone>
+                            ) : (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="image/png,image/jpeg,image/jpg,image/webp"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                  <Upload className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <p className="text-sm font-medium text-foreground">
+                                  Upload {field.label}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Click or drag to upload • PNG, JPG (max. 5MB)
+                                  {field.dimensions && ` • ${field.dimensions}`}
+                                </p>
+                              </FileDropZone>
+                            )}
+                          </div>
                         )}
-                        {formData[fieldKey] === " " && (
-                          <p className="text-xs text-blue-500/80 mt-1 flex items-center gap-1.5">
-                            <Info className="w-3 h-3" />
-                            Field cleared. A space will be used for rendering purpose.
+
+                        {/* Video Upload */}
+                        {field.type === "video" && (
+                          <div>
+                            {videoResizeProgress[fieldKey] !== undefined ? (
+                              <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                <div className="text-center">
+                                  <p className="text-sm font-medium text-foreground">
+                                    Resizing video...{" "}
+                                    {videoResizeProgress[fieldKey]}%
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Cropping to {field.dimensions}
+                                  </p>
+                                </div>
+                                <div className="w-full bg-muted rounded-full h-1.5">
+                                  <div
+                                    className="bg-primary h-full rounded-full transition-all duration-300"
+                                    style={{
+                                      width: `${videoResizeProgress[fieldKey]}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ) : filePreviews[fieldKey] ||
+                              uploadedAssets[fieldKey] ? (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="video/mp4,video/quicktime"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
+                              >
+                                <div className="bg-checker aspect-square flex items-center justify-center">
+                                  <video
+                                    src={
+                                      filePreviews[fieldKey] ||
+                                      uploadedAssets[fieldKey]
+                                    }
+                                    className="max-h-72 max-w-72 object-contain"
+                                    controls
+                                    muted
+                                    onClick={(event) => event.stopPropagation()}
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <Upload className="w-3 h-3" /> Click or drag to
+                                    replace
+                                  </span>
+                                  <button
+                                    onClick={async (event) => {
+                                      event.stopPropagation();
+                                      uploadedAssets[fieldKey]
+                                        ? await deleteAsset(fieldKey)
+                                        : removeFile(fieldKey);
+                                    }}
+                                    disabled={deletingAssets.has(fieldKey)}
+                                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                      deletingAssets.has(fieldKey)
+                                        ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                        : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                    }`}
+                                    type="button"
+                                  >
+                                    {deletingAssets.has(fieldKey) ? (
+                                      <>
+                                        <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                      </>
+                                    ) : (
+                                      <>
+                                        <X className="w-3 h-3" /> Remove
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </FileDropZone>
+                            ) : (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="video/mp4,video/quicktime"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                  <Upload className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <p className="text-sm font-medium text-foreground">
+                                  Upload {field.label}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Click or drag to upload • MP4 (max. 50MB)
+                                  {field.dimensions && ` • ${field.dimensions}`}
+                                </p>
+                              </FileDropZone>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Media Upload (accepts both image and video) */}
+                        {field.type === "media" && (
+                          <div>
+                            {videoResizeProgress[fieldKey] !== undefined ? (
+                              <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                <div className="text-center">
+                                  <p className="text-sm font-medium text-foreground">
+                                    Resizing video...{" "}
+                                    {videoResizeProgress[fieldKey]}%
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Cropping to {field.dimensions}
+                                  </p>
+                                </div>
+                                <div className="w-full bg-muted rounded-full h-1.5">
+                                  <div
+                                    className="bg-primary h-full rounded-full transition-all duration-300"
+                                    style={{
+                                      width: `${videoResizeProgress[fieldKey]}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ) : filePreviews[fieldKey] ||
+                              uploadedAssets[fieldKey] ? (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
+                              >
+                                <div className="bg-checker aspect-square flex items-center justify-center p-3">
+                                  {(formData[fieldKey] as File)?.type?.startsWith(
+                                    "video/"
+                                  ) ||
+                                  uploadedAssets[fieldKey]?.includes("/video/") ? (
+                                    <video
+                                      src={
+                                        filePreviews[fieldKey] ||
+                                        uploadedAssets[fieldKey]
+                                      }
+                                      className="max-h-72 max-w-72 object-contain"
+                                      controls
+                                      muted
+                                      onClick={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                    />
+                                  ) : (
+                                    <img
+                                      src={
+                                        filePreviews[fieldKey] ||
+                                        uploadedAssets[fieldKey]
+                                      }
+                                      alt={`${field.label} preview`}
+                                      onLoad={() =>
+                                        setImagePreviewReady((prev) => ({
+                                          ...prev,
+                                          [fieldKey]: true,
+                                        }))
+                                      }
+                                      onError={() =>
+                                        setImagePreviewReady((prev) => ({
+                                          ...prev,
+                                          [fieldKey]: true,
+                                        }))
+                                      }
+                                      className="max-h-72 max-w-72 object-contain pointer-events-none"
+                                    />
+                                  )}
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
+                                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <Upload className="w-3 h-3" /> Click or drag to
+                                    replace
+                                  </span>
+                                  <button
+                                    onClick={async (event) => {
+                                      event.stopPropagation();
+                                      uploadedAssets[fieldKey]
+                                        ? await deleteAsset(fieldKey)
+                                        : removeFile(fieldKey);
+                                    }}
+                                    disabled={deletingAssets.has(fieldKey)}
+                                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                      deletingAssets.has(fieldKey)
+                                        ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                        : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                    }`}
+                                    type="button"
+                                  >
+                                    {deletingAssets.has(fieldKey) ? (
+                                      <>
+                                        <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                      </>
+                                    ) : (
+                                      <>
+                                        <X className="w-3 h-3" /> Remove
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </FileDropZone>
+                            ) : (
+                              <FileDropZone
+                                inputId={`upload-${fieldKey}`}
+                                accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
+                                onFileSelect={(file, input) =>
+                                  handleFileUpload(fieldKey, file, input)
+                                }
+                                className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                                  <Upload className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <p className="text-sm font-medium text-foreground">
+                                  Upload {field.label}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Click or drag to upload • Image (PNG, JPG) or
+                                  Video (MP4)
+                                  {field.dimensions && ` • ${field.dimensions}`}
+                                </p>
+                              </FileDropZone>
+                            )}
+                          </div>
+                        )}
+
+                        {field.dimensions && (
+                          <p className="flex items-start gap-1.5 text-xs text-muted-foreground/60 mt-1">
+                            <Info className="w-3 h-3 shrink-0 mt-px" />
+                            Templates use square dimensions. Non-square uploads are
+                            center-cropped, so keep important content centered.
                           </p>
                         )}
                       </div>
-                    )}
+                    ))}
+                  </TabsContent>
+                )}
 
-                    {/* Color Input */}
-                    {field.type === "color" && (
-                      <div className="space-y-2">
+                {/* ─── TAB 3: COLORS ─── */}
+                {colorFields.length > 0 && (
+                  <TabsContent value="colors" className="space-y-5 pt-2">
+                    {colorFields.map(([fieldKey, field]) => (
+                      <div key={fieldKey} className="space-y-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          {field.label}
+                          {field.required && (
+                            <span className="text-red-500 text-xs">*</span>
+                          )}
+                        </label>
                         <div className="flex items-center gap-3">
                           <div className="relative flex items-center justify-center h-10 w-12 rounded-lg border border-border bg-background overflow-hidden hover:border-primary/50 transition-colors">
                             <input
@@ -287,7 +700,11 @@ const CustomizePage = () => {
                               }
                               onChange={(e) => {
                                 let val = e.target.value;
-                                if (val && !val.startsWith("#") && !val.startsWith(" ")) {
+                                if (
+                                  val &&
+                                  !val.startsWith("#") &&
+                                  !val.startsWith(" ")
+                                ) {
                                   val = `#${val}`;
                                 }
                                 handleTextChange(fieldKey, val);
@@ -302,463 +719,132 @@ const CustomizePage = () => {
                           Select color for {field.label.toLowerCase()}.
                         </p>
                       </div>
-                    )}
+                    ))}
+                  </TabsContent>
+                )}
 
-                    {/* Image Upload */}
-                    {field.type === "image" && (
-                      <div>
-                        {filePreviews[fieldKey] || uploadedAssets[fieldKey] ? (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="image/png,image/jpeg,image/jpg,image/webp"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
-                          >
-                            <div className="bg-checker aspect-square flex items-center justify-center p-3">
-                              <img
-                                src={
-                                  filePreviews[fieldKey] ||
-                                  uploadedAssets[fieldKey]
-                                }
-                                alt={`${field.label} preview`}
-                                onLoad={() =>
-                                  setImagePreviewReady((prev) => ({
-                                    ...prev,
-                                    [fieldKey]: true,
-                                  }))
-                                }
-                                onError={() =>
-                                  setImagePreviewReady((prev) => ({
-                                    ...prev,
-                                    [fieldKey]: true,
-                                  }))
-                                }
-                                className="max-h-72 max-w-72 object-contain pointer-events-none"
-                              />
-                            </div>
-                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <Upload className="w-3 h-3" /> Click or drag to
-                                replace
-                              </span>
-                              <button
-                                onClick={async (event) => {
-                                  event.stopPropagation();
-                                  uploadedAssets[fieldKey]
-                                    ? await deleteAsset(fieldKey)
-                                    : removeFile(fieldKey);
-                                }}
-                                disabled={deletingAssets.has(fieldKey)}
-                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
-                                  deletingAssets.has(fieldKey)
-                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
-                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
-                                }`}
-                                type="button"
-                              >
-                                {deletingAssets.has(fieldKey) ? (
-                                  <>
-                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
-                                  </>
-                                ) : (
-                                  <>
-                                    <X className="w-3 h-3" /> Remove
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </FileDropZone>
-                        ) : (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="image/png,image/jpeg,image/jpg,image/webp"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                              <Upload className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <p className="text-sm font-medium text-foreground">
-                              Upload {field.label}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Click or drag to upload • PNG, JPG (max. 5MB)
-                              {field.dimensions && ` • ${field.dimensions}`}
-                            </p>
-                          </FileDropZone>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Video Upload */}
-                    {field.type === "video" && (
-                      <div>
-                        {videoResizeProgress[fieldKey] !== undefined ? (
-                          <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                            <div className="text-center">
-                              <p className="text-sm font-medium text-foreground">
-                                Resizing video...{" "}
-                                {videoResizeProgress[fieldKey]}%
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Cropping to {field.dimensions}
-                              </p>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-1.5">
-                              <div
-                                className="bg-primary h-full rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${videoResizeProgress[fieldKey]}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ) : filePreviews[fieldKey] ||
-                          uploadedAssets[fieldKey] ? (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="video/mp4,video/quicktime"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
-                          >
-                            <div className="bg-checker aspect-square flex items-center justify-center">
-                              <video
-                                src={
-                                  filePreviews[fieldKey] ||
-                                  uploadedAssets[fieldKey]
-                                }
-                                className="max-h-72 max-w-72 object-contain"
-                                controls
-                                muted
-                                onClick={(event) => event.stopPropagation()}
-                              />
-                            </div>
-                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <Upload className="w-3 h-3" /> Click or drag to
-                                replace
-                              </span>
-                              <button
-                                onClick={async (event) => {
-                                  event.stopPropagation();
-                                  uploadedAssets[fieldKey]
-                                    ? await deleteAsset(fieldKey)
-                                    : removeFile(fieldKey);
-                                }}
-                                disabled={deletingAssets.has(fieldKey)}
-                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
-                                  deletingAssets.has(fieldKey)
-                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
-                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
-                                }`}
-                                type="button"
-                              >
-                                {deletingAssets.has(fieldKey) ? (
-                                  <>
-                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
-                                  </>
-                                ) : (
-                                  <>
-                                    <X className="w-3 h-3" /> Remove
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </FileDropZone>
-                        ) : (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="video/mp4,video/quicktime"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                              <Upload className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <p className="text-sm font-medium text-foreground">
-                              Upload {field.label}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Click or drag to upload • MP4 (max. 50MB)
-                              {field.dimensions && ` • ${field.dimensions}`}
-                            </p>
-                          </FileDropZone>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Media Upload (accepts both image and video) */}
-                    {field.type === "media" && (
-                      <div>
-                        {videoResizeProgress[fieldKey] !== undefined ? (
-                          <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center gap-3">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                            <div className="text-center">
-                              <p className="text-sm font-medium text-foreground">
-                                Resizing video...{" "}
-                                {videoResizeProgress[fieldKey]}%
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Cropping to {field.dimensions}
-                              </p>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-1.5">
-                              <div
-                                className="bg-primary h-full rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${videoResizeProgress[fieldKey]}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ) : filePreviews[fieldKey] ||
-                          uploadedAssets[fieldKey] ? (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="overflow-hidden rounded-xl border border-border max-w-72 mx-auto"
-                          >
-                            <div className="bg-checker aspect-square flex items-center justify-center p-3">
-                              {(formData[fieldKey] as File)?.type?.startsWith(
-                                "video/",
-                              ) ||
-                              uploadedAssets[fieldKey]?.includes("/video/") ? (
-                                <video
-                                  src={
-                                    filePreviews[fieldKey] ||
-                                    uploadedAssets[fieldKey]
-                                  }
-                                  className="max-h-72 max-w-72 object-contain"
-                                  controls
-                                  muted
-                                  onClick={(event) => event.stopPropagation()}
-                                />
-                              ) : (
-                                <img
-                                  src={
-                                    filePreviews[fieldKey] ||
-                                    uploadedAssets[fieldKey]
-                                  }
-                                  alt={`${field.label} preview`}
-                                  onLoad={() =>
-                                    setImagePreviewReady((prev) => ({
-                                      ...prev,
-                                      [fieldKey]: true,
-                                    }))
-                                  }
-                                  onError={() =>
-                                    setImagePreviewReady((prev) => ({
-                                      ...prev,
-                                      [fieldKey]: true,
-                                    }))
-                                  }
-                                  className="max-h-72 max-w-72 object-contain pointer-events-none"
-                                />
-                              )}
-                            </div>
-                            <div className="flex items-center justify-between px-3 py-2 bg-card border-t border-border">
-                              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <Upload className="w-3 h-3" /> Click or drag to
-                                replace
-                              </span>
-                              <button
-                                onClick={async (event) => {
-                                  event.stopPropagation();
-                                  uploadedAssets[fieldKey]
-                                    ? await deleteAsset(fieldKey)
-                                    : removeFile(fieldKey);
-                                }}
-                                disabled={deletingAssets.has(fieldKey)}
-                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors cursor-pointer ${
-                                  deletingAssets.has(fieldKey)
-                                    ? "text-red-400/40 pointer-events-none cursor-not-allowed"
-                                    : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
-                                }`}
-                                type="button"
-                              >
-                                {deletingAssets.has(fieldKey) ? (
-                                  <>
-                                    <Loader2 className="w-3 h-3 animate-spin" /> Removing
-                                  </>
-                                ) : (
-                                  <>
-                                    <X className="w-3 h-3" /> Remove
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </FileDropZone>
-                        ) : (
-                          <FileDropZone
-                            inputId={`upload-${fieldKey}`}
-                            accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/quicktime"
-                            onFileSelect={(file, input) =>
-                              handleFileUpload(fieldKey, file, input)
-                            }
-                            className="rounded-xl border-2 border-dashed border-border p-8 text-center hover:border-primary/50 hover:bg-primary/5"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
-                              <Upload className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <p className="text-sm font-medium text-foreground">
-                              Upload {field.label}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Click or drag to upload • Image (PNG, JPG) or
-                              Video (MP4)
-                              {field.dimensions && ` • ${field.dimensions}`}
-                            </p>
-                          </FileDropZone>
-                        )}
-                      </div>
-                    )}
-                    {field.type !== "text" && field.dimensions && (
-                      <p className="flex items-start gap-1.5 text-xs text-muted-foreground/60 mt-1">
-                        <Info className="w-3 h-3 shrink-0 mt-px" />
-                        Templates use square dimensions. Non square uploads are
-                        center-cropped, so keep important content centered to
-                        avoid edge clipping.
+                {/* ─── TAB 4: SETTINGS ─── */}
+                <TabsContent value="settings" className="space-y-5 pt-2">
+                  {/* Background mode toggle */}
+                  {template.hasTransprentBackground === false ? (
+                    <div className="p-3.5 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                      <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                        ⚠️ This template does not support transparent background.
+                        The exported video will have a colored background.
                       </p>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">
+                          Background Mode
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Colored keeps default template background. Transparent
+                          removes background for alpha export.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setUseBackgroundColor(true)}
+                          className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                            useBackgroundColor
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Colored
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUseBackgroundColor(false)}
+                          className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                            !useBackgroundColor
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Transparent
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {useBackgroundColor
+                          ? "Export target: MP4 (Standard)"
+                          : "Export target: QuickTime MOV (Animation + Alpha)"}
+                      </p>
+                    </div>
+                  )}
 
-              {/* ── Font Picker ────────────────────────────────── */}
-              <FontPicker
-                value={selectedFont}
-                onChange={(fontId) => setSelectedFont(fontId)}
-              />
+                  {/* Video Audio toggle - only show when a video has been uploaded */}
+                  {Object.values(uploadedAssets).some((url) =>
+                    url?.includes("/video/")
+                  ) && (
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">
+                          Video Audio
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Control whether uploaded video assets retain their audio
+                          in the rendered output.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setMuteAudio(true)}
+                          className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                            muteAudio
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <VolumeX className="w-4 h-4" />
+                          Off
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMuteAudio(false)}
+                          className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                            !muteAudio
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                          On
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {muteAudio
+                          ? "Audio from uploaded videos will be removed."
+                          : "Audio from uploaded videos will be included in the render."}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Dimension Disclaimer */}
-              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  💡 <strong>Note:</strong> Empty fields will keep the
-                  template&apos;s default appearance. Files are uploaded
-                  automatically when selected.
-                </p>
-              </div>
-
-              {/* Background mode toggle - template flow only */}
-              {template.hasTransprentBackground == false ? (
-                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                    ⚠️ This template does not support transparent background.
-                    The exported video will have a colored background.
-                  </p>
-                </div>
-              ) : (
-                <div className="p-4 rounded-lg border border-border bg-card space-y-3">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      Background Mode
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Colored keeps default template background. Transparent
-                      removes background for alpha export.
+                  {/* Helpful hints */}
+                  <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      💡 <strong>Note:</strong> Empty fields will keep the
+                      template&apos;s default appearance. Files are uploaded
+                      automatically when selected.
                     </p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setUseBackgroundColor(true)}
-                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                        useBackgroundColor
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Colored
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setUseBackgroundColor(false)}
-                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                        !useBackgroundColor
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Transparent
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {useBackgroundColor
-                      ? "Export target: MP4"
-                      : "Export target: QuickTime MOV (Animation + Alpha)"}
-                  </p>
-                </div>
-              )}
-
-              {/* Video Audio toggle - only show when a video has been uploaded */}
-              {Object.values(uploadedAssets).some(
-                (url) => url?.includes("/video/")
-              ) && (
-                <div className="p-4 rounded-lg border border-border bg-card space-y-3">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      Video Audio
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Control whether uploaded video assets retain their audio
-                      in the rendered output.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setMuteAudio(true)}
-                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                        muteAudio
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      <VolumeX className="w-4 h-4" />
-                      Off
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMuteAudio(false)}
-                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
-                        !muteAudio
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      <Volume2 className="w-4 h-4" />
-                      On
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {muteAudio
-                      ? "Audio from uploaded videos will be removed."
-                      : "Audio from uploaded videos will be included in the render."}
-                  </p>
-                </div>
-              )}
+                </TabsContent>
+              </Tabs>
             </div>
 
-            {/* Render Status */}
+            {/* Render Status (Always visible below tabs) */}
             {renderJob && (
-              <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+              <div className="p-4 rounded-xl border border-border bg-card space-y-3 shadow-xs">
                 <div className="flex items-center gap-3">
                   {renderJob.status === "PENDING" && (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
                       <div className="flex-1">
-                        <p className="font-medium">Job Submitted</p>
+                        <p className="font-medium text-foreground">Job Submitted</p>
                         <p className="text-sm text-muted-foreground">
                           Waiting in queue...
                         </p>
@@ -769,7 +855,7 @@ const CustomizePage = () => {
                     <>
                       <Loader2 className="w-5 h-5 animate-spin text-primary" />
                       <div className="flex-1">
-                        <p className="font-medium">Rendering</p>
+                        <p className="font-medium text-foreground">Rendering</p>
                         <p className="text-sm text-muted-foreground">
                           {renderJob.progress !== undefined
                             ? `${renderJob.progress}% complete`
@@ -782,7 +868,7 @@ const CustomizePage = () => {
                     <>
                       <CheckCircle className="w-5 h-5 text-green-500" />
                       <div className="flex-1">
-                        <p className="font-medium">Completed!</p>
+                        <p className="font-medium text-foreground">Completed!</p>
                         <p className="text-sm text-muted-foreground">
                           Your video is ready
                         </p>
@@ -793,7 +879,7 @@ const CustomizePage = () => {
                     <>
                       <AlertCircle className="w-5 h-5 text-red-500" />
                       <div className="flex-1">
-                        <p className="font-medium">Failed</p>
+                        <p className="font-medium text-foreground">Failed</p>
                         <p className="text-sm text-muted-foreground">
                           {renderJob.error || "Something went wrong"}
                         </p>
@@ -820,11 +906,10 @@ const CustomizePage = () => {
               </div>
             )}
 
-            {/* Generate/Download Button */}
+            {/* Generate/Download Button (Always accessible below tabs) */}
             {authLoading ? (
               <div className="w-full h-12 rounded-lg bg-gray-300 dark:bg-gray-700 animate-pulse" />
             ) : showRenderedVideo ? (
-              // Show Download Button when video is ready
               <div className="space-y-3">
                 <EdikitButton
                   onClick={handleDownload}
@@ -895,7 +980,6 @@ const CustomizePage = () => {
                 )}
               </div>
             ) : (
-              // Show Render Button
               <EdikitButton
                 onClick={handleGeneratePreview}
                 disabled={
