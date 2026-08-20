@@ -1447,20 +1447,27 @@ export class RenderService {
       });
     }
 
-    const fontPostScriptName = this.getFontPostScriptName(dto.fontFamily);
+    // Check if user selected a non-default font
+    const isCustomFont =
+      dto.fontFamily &&
+      dto.fontFamily.toLowerCase().trim() !== 'google-sans' &&
+      dto.fontFamily.toLowerCase().trim() !== 'googlesans' &&
+      dto.fontFamily.toLowerCase().trim() !== 'default';
 
     const pushText = (key: string, value: string) => {
       const layerName = layerMapping[key];
       if (!layerName) return;
 
-      if (fontPostScriptName) {
+      if (isCustomFont) {
+        const weight = this.getLayerFontWeight(templateId, key);
+        const font = this.getFontPostScriptName(dto.fontFamily!, weight);
         assets.push({
           type: 'function',
           name: 'nx:text-params-set',
           params: {
             layerName,
             textValue: value,
-            font: fontPostScriptName,
+            font,
           },
         });
       } else {
@@ -1515,14 +1522,16 @@ export class RenderService {
       // Template 9: sender's name propagates to all sibling text layers
       if (templateId === 9) {
         for (const ln of ['txt_5', 'txt_8', 'txt_11', 'txt_14']) {
-          if (fontPostScriptName) {
+          if (isCustomFont) {
+            const weight = this.getLayerFontWeight(templateId, ln);
+            const font = this.getFontPostScriptName(dto.fontFamily!, weight);
             assets.push({
               type: 'function',
               name: 'nx:text-params-set',
               params: {
                 layerName: ln,
                 textValue: dto.text6,
-                font: fontPostScriptName,
+                font,
               },
             });
           } else {
@@ -1538,7 +1547,7 @@ export class RenderService {
     }
 
     // If a custom font is selected, apply it to any text layers that were not overridden with custom text
-    if (fontPostScriptName) {
+    if (isCustomFont) {
       const updatedLayers = new Set(
         assets
           .filter((a) => a.name === 'nx:text-params-set' && a.params?.layerName)
@@ -1547,12 +1556,14 @@ export class RenderService {
 
       for (const [key, layerName] of Object.entries(layerMapping)) {
         if (key.startsWith('text') && layerName && !updatedLayers.has(layerName)) {
+          const weight = this.getLayerFontWeight(templateId, key);
+          const font = this.getFontPostScriptName(dto.fontFamily!, weight);
           assets.push({
             type: 'function',
             name: 'nx:text-params-set',
             params: {
               layerName,
-              font: fontPostScriptName,
+              font,
             },
           });
           updatedLayers.add(layerName);
@@ -1816,103 +1827,187 @@ export class RenderService {
   }
 
   /**
-   * Map font family / identifier to After Effects PostScript font name
+   * Get the font weight for a specific text layer in a template.
+   * Based on the actual AE template designs from Text_Properties_by_Animation.md.
+   * Accepts either slot keys (text1, text2...) or layer names (txt_1, txt_2...).
    */
-  private getFontPostScriptName(fontFamily?: string): string | null {
-    if (!fontFamily) return null;
-    const normalized = fontFamily.toLowerCase().trim();
+  private getLayerFontWeight(
+    templateId: number,
+    slotOrLayer: string,
+  ): 'semibold' | 'medium' | 'regular' | 'light' {
+    // Map of templateId -> { slotOrLayer -> weight }
+    // Default is 'regular' if not specified.
+    const weightMap: Record<number, Record<string, 'semibold' | 'medium' | 'regular' | 'light'>> = {
+      // Animation 1: txt_1=Regular, txt_2=Regular
+      1: {},
 
-    const fontMap: Record<string, string> = {
-      // Google Sans (Default)
-      'google-sans': 'GoogleSansFlex120pt-Regular',
-      googlesans: 'GoogleSansFlex120pt-Regular',
-      'googlesansflex120pt-regular': 'GoogleSansFlex120pt-Regular',
-      'googlesansflex120pt-medium': 'GoogleSansFlex120pt-Medium',
-      'googlesansflex-regular': 'GoogleSansFlex120pt-Regular',
+      // Animation 2: all Medium
+      2: {
+        text1: 'medium', text2: 'medium', text3: 'medium', text4: 'medium',
+        txt_1: 'medium', txt_2: 'medium', txt_3: 'medium', txt_4: 'medium',
+      },
 
-      // Roboto
-      roboto: 'Roboto-Regular',
-      'roboto-regular': 'Roboto-Regular',
-      'roboto-medium': 'Roboto-Medium',
-      'roboto-semibold': 'Roboto-SemiBold',
-      'roboto-bold': 'Roboto-SemiBold',
-      'roboto-light': 'Roboto-Light',
+      // Animation 3: txt_1=Regular, txt_2=Regular, txt_3=Medium, txt_4=Regular
+      3: {
+        text3: 'medium', txt_3: 'medium',
+      },
 
-      // Montserrat
-      montserrat: 'Montserrat-Regular',
-      'montserrat-regular': 'Montserrat-Regular',
-      'montserrat-medium': 'Montserrat-Medium',
-      'montserrat-semibold': 'Montserrat-SemiBold',
-      'montserrat-light': 'Montserrat-Light',
+      // Animation 4: txt_1=Medium, txt_2=Regular
+      4: {
+        text1: 'medium', txt_1: 'medium',
+      },
 
-      // Poppins
-      poppins: 'Poppins-Regular',
-      'poppins-regular': 'Poppins-Regular',
-      'poppins-medium': 'Poppins-Medium',
-      'poppins-semibold': 'Poppins-SemiBold',
-      'poppins-light': 'Poppins-Light',
+      // Animation 5: txt_1=Light, txt_2-5=Regular
+      5: {
+        text1: 'light', txt_1: 'light',
+      },
 
-      // DM Sans
-      'dm-sans': 'DMSans-Regular',
-      dmsans: 'DMSans-Regular',
-      'dmsans-regular': 'DMSans-Regular',
-      'dmsans-medium': 'DMSans-Medium',
-      'dmsans-semibold': 'DMSans-SemiBold',
-      'dmsans-light': 'DMSans-Light',
+      // Animation 6: txt_1=Regular, txt_2=SemiBold
+      6: {
+        text2: 'semibold', txt_2: 'semibold',
+      },
 
-      // Manrope
-      manrope: 'Manrope-Regular',
-      'manrope-regular': 'Manrope-Regular',
-      'manrope-medium': 'Manrope-Medium',
-      'manrope-semibold': 'Manrope-SemiBold',
-      'manrope-light': 'Manrope-Light',
+      // Animation 7: txt_5=Regular (only customizable layer)
+      7: {},
 
-      // Figtree
-      figtree: 'Figtree-Regular',
-      'figtree-regular': 'Figtree-Regular',
-      'figtree-medium': 'Figtree-Medium',
-      'figtree-semibold': 'Figtree-SemiBold',
-      'figtree-light': 'Figtree-Light',
+      // Animation 8: txt_2=Medium, txt_3=Light, txt_4=Regular
+      8: {
+        text1: 'medium', txt_2: 'medium',
+        text2: 'light', txt_3: 'light',
+      },
 
-      // Rubik
-      rubik: 'Rubik-Regular',
-      'rubik-regular': 'Rubik-Regular',
-      'rubik-medium': 'Rubik-Medium',
-      'rubik-semibold': 'Rubik-SemiBold',
-      'rubik-light': 'Rubik-Light',
+      // Animation 9: messages=Regular, sender names (txt_2/5/8/11/14)=SemiBold
+      9: {
+        text6: 'semibold', txt_2: 'semibold',
+        txt_5: 'semibold', txt_8: 'semibold', txt_11: 'semibold', txt_14: 'semibold',
+      },
 
-      // Assistant
-      assistant: 'Assistant-Regular',
-      'assistant-regular': 'Assistant-Regular',
-      'assistant-medium': 'Assistant-Medium',
-      'assistant-semibold': 'Assistant-SemiBold',
-      'assistant-light': 'Assistant-Light',
+      // Animation 10: all Regular
+      10: {},
 
-      // Hanken Grotesk
-      'hanken-grotesk': 'HankenGrotesk-Regular',
-      hankengrotesk: 'HankenGrotesk-Regular',
-      'hankengrotesk-regular': 'HankenGrotesk-Regular',
-      'hankengrotesk-medium': 'HankenGrotesk-Medium',
-      'hankengrotesk-semibold': 'HankenGrotesk-SemiBold',
-      'hankengrotesk-light': 'HankenGrotesk-Light',
+      // Animation 11: txt_3=Regular, txt_2=Regular, txt_6=Medium, txt_10=Medium
+      11: {
+        text3: 'medium', txt_6: 'medium',
+        text4: 'medium', txt_10: 'medium',
+      },
 
-      // Noto Sans
-      'noto-sans': 'NotoSans-Regular',
-      notosans: 'NotoSans-Regular',
-      'notosans-regular': 'NotoSans-Regular',
-      'notosans-medium': 'NotoSans-Medium',
-      'notosans-semibold': 'NotoSans-SemiBold',
-      'notosans-light': 'NotoSans-Light',
+      // Animation 12: txt_1=SemiBold, txt_2=Medium, txt_3=Regular
+      12: {
+        text1: 'semibold', txt_1: 'semibold',
+        text2: 'medium', txt_2: 'medium',
+      },
 
-      // Onest
-      onest: 'Onest-Regular',
-      'onest-regular': 'Onest-Regular',
-      'onest-medium': 'Onest-Medium',
-      'onest-semibold': 'Onest-SemiBold',
-      'onest-light': 'Onest-Light',
+      // Animation 13: txt_23=Regular, txt_24=Regular, txt_25=Medium
+      13: {
+        text3: 'medium', txt_25: 'medium',
+      },
+
+      // Animation 14: txt_1=SemiBold, txt_2=Regular
+      14: {
+        text1: 'semibold', txt_1: 'semibold',
+      },
+
+      // Animation 15: txt_4=Regular, txt_5=Medium, txt_6=Light, txt_1=Regular, txt_3=Medium, txt_2=Light
+      15: {
+        text2: 'medium', txt_5: 'medium',
+        text3: 'light', txt_6: 'light',
+        text5: 'medium', txt_3: 'medium',
+        text6: 'light', txt_2: 'light',
+      },
+
+      // Animation 16: txt_1=Medium, txt_2=Regular, txt_3=Regular, txt_4=Medium
+      16: {
+        text1: 'medium', txt_1: 'medium',
+        text4: 'medium', txt_4: 'medium',
+      },
     };
 
-    return fontMap[normalized] || fontFamily;
+    const templateWeights = weightMap[templateId];
+    if (templateWeights && templateWeights[slotOrLayer]) {
+      return templateWeights[slotOrLayer];
+    }
+    return 'regular';
+  }
+
+  /**
+   * Map font family + weight to the exact PostScript font name for After Effects.
+   * This is only called for non-default (custom) fonts.
+   */
+  private getFontPostScriptName(
+    fontFamily: string,
+    weight: 'semibold' | 'medium' | 'regular' | 'light' = 'regular',
+  ): string {
+    const normalized = fontFamily.toLowerCase().trim();
+
+    const fontFamilies: Record<
+      string,
+      { regular: string; semibold: string; medium: string; light: string }
+    > = {
+      roboto: {
+        light: 'Roboto-Light', regular: 'Roboto-Regular',
+        medium: 'Roboto-Medium', semibold: 'Roboto-SemiBold',
+      },
+      montserrat: {
+        light: 'Montserrat-Light', regular: 'Montserrat-Regular',
+        medium: 'Montserrat-Medium', semibold: 'Montserrat-SemiBold',
+      },
+      poppins: {
+        light: 'Poppins-Light', regular: 'Poppins-Regular',
+        medium: 'Poppins-Medium', semibold: 'Poppins-SemiBold',
+      },
+      'dm-sans': {
+        light: 'DMSans-Light', regular: 'DMSans-Regular',
+        medium: 'DMSans-Medium', semibold: 'DMSans-SemiBold',
+      },
+      dmsans: {
+        light: 'DMSans-Light', regular: 'DMSans-Regular',
+        medium: 'DMSans-Medium', semibold: 'DMSans-SemiBold',
+      },
+      manrope: {
+        light: 'Manrope-Light', regular: 'Manrope-Regular',
+        medium: 'Manrope-Medium', semibold: 'Manrope-SemiBold',
+      },
+      figtree: {
+        light: 'Figtree-Light', regular: 'Figtree-Regular',
+        medium: 'Figtree-Medium', semibold: 'Figtree-SemiBold',
+      },
+      rubik: {
+        light: 'Rubik-Light', regular: 'Rubik-Regular',
+        medium: 'Rubik-Medium', semibold: 'Rubik-SemiBold',
+      },
+      assistant: {
+        light: 'Assistant-Light', regular: 'Assistant-Regular',
+        medium: 'Assistant-Medium', semibold: 'Assistant-SemiBold',
+      },
+      'hanken-grotesk': {
+        light: 'HankenGrotesk-Light', regular: 'HankenGrotesk-Regular',
+        medium: 'HankenGrotesk-Medium', semibold: 'HankenGrotesk-SemiBold',
+      },
+      hankengrotesk: {
+        light: 'HankenGrotesk-Light', regular: 'HankenGrotesk-Regular',
+        medium: 'HankenGrotesk-Medium', semibold: 'HankenGrotesk-SemiBold',
+      },
+      'noto-sans': {
+        light: 'NotoSans-Light', regular: 'NotoSans-Regular',
+        medium: 'NotoSans-Medium', semibold: 'NotoSans-SemiBold',
+      },
+      notosans: {
+        light: 'NotoSans-Light', regular: 'NotoSans-Regular',
+        medium: 'NotoSans-Medium', semibold: 'NotoSans-SemiBold',
+      },
+      onest: {
+        light: 'Onest-Light', regular: 'Onest-Regular',
+        medium: 'Onest-Medium', semibold: 'Onest-SemiBold',
+      },
+    };
+
+    const familyEntry = fontFamilies[normalized];
+    if (familyEntry) {
+      return familyEntry[weight];
+    }
+
+    // Unknown font family — pass through as-is
+    return fontFamily;
   }
 
   /**
