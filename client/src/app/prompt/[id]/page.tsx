@@ -499,7 +499,7 @@ function PromptStep({
   onSubmit,
 }: {
   prompt: string;
-  setPrompt: (v: string) => void;
+  setPrompt: (v: string) => void; 
   assets: UploadedAssets;
   setAssets: React.Dispatch<React.SetStateAction<UploadedAssets>>;
   settings: any;
