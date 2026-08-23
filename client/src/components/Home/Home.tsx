@@ -5,6 +5,7 @@ import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
 import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
+import CarouselWithMultipleSlides from "./NewSlider";
 
 export default function Hero() {
   return (
@@ -134,11 +135,24 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Template slider — wider than header for large cards */}
-            <div className="relative z-10 mx-auto mb-4 w-full max-w-7xl px-2 sm:px-4">
-              <TemplatesSlider templates={templates} />
-            </div>
+<div className="space-y-16">
 
+              {/* OLD SLIDER */}
+              <div className="space-y-4">
+             
+                <div className="relative z-10 mx-auto w-full max-w-7xl px-2 sm:px-4">
+                  {/* <TemplatesSlider templates={templates} /> */}
+                </div>
+              </div>
+
+              {/* NEW SLIDER */}
+              <div className="space-y-4">
+                <div className="relative z-10 mx-auto w-full max-w-7xl">
+                  <CarouselWithMultipleSlides />
+                </div>
+              </div>
+
+            </div>
             <div className="max-w-6xl mx-auto">
               <div className="flex justify-center pt-6 sm:pt-8">
                 {/* <Link
