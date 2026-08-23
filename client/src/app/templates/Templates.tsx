@@ -149,7 +149,7 @@ const Templates = () => {
             </div>
           ) : (
             <>
-              <div className="grid gap-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3.5 gap-y-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
                 {visibleTemplates.map((template) => (
                   <TemplateCard key={template.id} template={template} />
                 ))}
