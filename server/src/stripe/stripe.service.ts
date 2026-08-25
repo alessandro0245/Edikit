@@ -84,12 +84,14 @@ export class StripeService {
       let planType: PlanType = PlanType.FREE;
       const planName = session.metadata?.planName || '';
 
-      if (planName.includes('Starter')) {
-        planType = PlanType.STARTER;
-      } else if (planName.includes('Creator')) {
-        planType = PlanType.CREATOR;
+      if (planName.includes('Agency')) {
+        planType = PlanType.AGENCY;
       } else if (planName.includes('Studio')) {
         planType = PlanType.STUDIO;
+      } else if (planName.includes('Creator')) {
+        planType = PlanType.CREATOR;
+      } else if (planName.includes('Starter')) {
+        planType = PlanType.STARTER;
       }
 
       if (userId) {
@@ -383,13 +385,15 @@ export class StripeService {
     // Convert cents to dollars
     const dollars = amount / 100;
 
-    // Match based on amount: Studio ($44), Creator ($22), Starter ($8)
-    if (dollars >= 40) {
+    // Match based on amount: Agency ($99), Studio ($44), Creator ($22), Starter ($9)
+    if (dollars >= 90) {
+      return PlanType.AGENCY; // $99 = Agency
+    } else if (dollars >= 40) {
       return PlanType.STUDIO; // $44 = Studio
     } else if (dollars >= 20) {
       return PlanType.CREATOR; // $22 = Creator
     } else if (dollars >= 5) {
-      return PlanType.STARTER; // $8 = Starter
+      return PlanType.STARTER; // $9 = Starter
     } else {
       return PlanType.FREE; // $0 = FREE
     }

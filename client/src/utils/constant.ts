@@ -5,12 +5,13 @@ export const plans = [
     id: "prod_TffitWtEKT88s6",
     name: "Starter",
     planType: "Starter",
-    price: "$8",
+    price: "$9",
     period: "per month",
     description:
       "Perfect for exploring Edikit and creating your first AI videos",
     features: [
-      "60 video generation credits per month",
+      "100 video generation credits per month",
+      // "20 video renders per month",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -25,7 +26,8 @@ export const plans = [
     period: "per month",
     description: "Ideal for creators producing content regularly",
     features: [
-      "300 video generation credits per month",
+      "340 video generation credits per month",
+      // "68 video renders per month",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -40,13 +42,30 @@ export const plans = [
     period: "per month",
     description: "Built for teams, agencies, and power creators",
     features: [
-      "600 video generation credits per month",
+      "680 video generation credits per month",
+      // "136 video renders per month",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
     cta: "Go Studio",
     popular: false,
   },
+  {
+    id: "prod_TffAgency99",
+    name: "Agency",
+    planType: "Agency",
+    price: "$99",
+    period: "per month",
+    description: "Built for teams, agencies, and power creators",
+    features: [
+      "2,000 video generation credits per month",
+      // "400 video renders per month",
+      "MP4 and MOV export formats",
+      "Transparent background support",
+    ],
+    cta: "Go Agency",
+    popular: false,
+  }
 ];
 
 export const categories = [

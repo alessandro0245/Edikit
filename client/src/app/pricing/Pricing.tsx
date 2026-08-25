@@ -1,110 +1,124 @@
 "use client";
+
 import { Check } from "lucide-react";
 import { handlePayment } from "@/lib/payment";
 import { plans } from "@/utils/constant";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 
-const Pricing = () => {
+export default function Pricing() {
   const user = useSelector((state: RootState) => state.user.user);
+
   return (
-    <div className="min-h-screen bg-background">
-      <main>
-        <section className="py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h1 className="text-4xl md:text-6xl font-bold text-balance text-foreground">
-                Choose the perfect plan for you
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground text-pretty">
-                Start free and scale as you grow. All plans include our core
-                features with no hidden fees.
-              </p>
-            </div>
-          </div>
-        </section>
+    <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 selection:text-foreground py-10 px-4 sm:px-6 lg:px-8 font-sans antialiased">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <p className="text-sm font-medium text-muted-foreground mb-2 tracking-normal">
+            Pricing
+          </p>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4">
+            Pricing on your terms
+          </h1>
+          <p className="text-muted-foreground text-base font-normal">
+            Get started for free. Upgrade as you grow.
+          </p>
+        </div>
 
-        <section className="pb-16">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {plans.map((plan) => (
-                <div
-                  key={plan.name}
-                  className={`p-8 rounded-lg border bg-card relative ${
-                    plan.popular
-                      ? "border-primary shadow-lg shadow-primary/10 scale-105"
-                      : "border-border"
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                      Most Popular
-                    </div>
-                  )}
+        {/* Pricing Cards Grid mapped from constant.ts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+          {plans.map((plan) => {
+            const isCurrentPlan = Boolean(
+              user && user.planType && user.planType.toLowerCase() === plan.planType.toLowerCase()
+            );
 
-                  <div className="space-y-6">
-                    {/* Plan Header */}
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-bold text-foreground">
-                        {plan.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {plan.description}
-                      </p>
-                    </div>
+            return (
+              <div
+                key={plan.name}
+                className={`flex flex-col justify-between p-6 rounded-2xl transition-all duration-200 ${
+                  plan.popular
+                    ? "bg-card border border-border shadow-2xl relative"
+                    : "bg-transparent border border-transparent"
+                }`}
+              >
+                <div>
+                  {/* Plan Header */}
+                  <div className="h-6 flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-foreground">
+                      {plan.name}
+                    </h3>
+                    {plan.popular && (
+                      <span className="bg-primary text-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full leading-none">
+                        POPULAR
+                      </span>
+                    )}
+                  </div>
 
-                    {/* Pricing */}
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-bold text-foreground">
+                  {/* Price */}
+                  <div className="mt-3">
+                    <div className="flex items-baseline text-foreground">
+                      <span className="text-3xl sm:text-4xl font-bold tracking-tight">
                         {plan.price}
                       </span>
-                      <span className="text-muted-foreground">
-                        /{plan.period}
+                      <span className="text-base font-normal ml-1 text-muted-foreground">
+                        /{plan.period === "per month" ? "month" : plan.period}
                       </span>
                     </div>
-
-                    {/* CTA Button */}
-                    {(() => {
-                      const isCurrentPlan:boolean | null | undefined =
-                        user && user.planType === plan.planType;
-
-                      return (
-                        <EdikitButton
-                          variant={plan.popular ? "primary" : "secondary"}
-                          width="w-full"
-                          disabled={isCurrentPlan ?? undefined}
-                          onClick={() => {
-                            if (isCurrentPlan) return;
-                            handlePayment(plan.id, user?.userId || user?.id);
-                          }}
-                        >
-                          {isCurrentPlan ? "Current Plan" : plan.cta}
-                        </EdikitButton>
-                      );
-                    })()}
-                    {/* Features List */}
-                    <div className="pt-6 border-t border-border">
-                      <ul className="space-y-3">
-                        {plan.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-3">
-                            <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                            <span className="text-sm text-foreground">
-                              {feature}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <p className="text-muted-foreground text-sm mt-3 min-h-[40px] leading-relaxed">
+                      {plan.description}
+                    </p>
                   </div>
+
+                  {/* Divider */}
+                  <div
+                    className={`my-6 border-t ${
+                      plan.popular ? "border-border" : "border-border"
+                    }`}
+                  />
+
+                  {/* Features List */}
+                  <ul className="space-y-4">
+                    {plan.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-center gap-3 text-[13px] text-foreground"
+                      >
+                        <Check
+                          className={`w-4 h-4 text-muted-foreground shrink-0 ${
+                            plan.popular ? "stroke-[2.2]" : "stroke-[1.75]"
+                          }`}
+                        />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
+
+                {/* CTA Button */}
+                <div className="mt-8 pt-2">
+                  <button
+                    type="button"
+                    disabled={isCurrentPlan}
+                    onClick={() => {
+                      if (isCurrentPlan) return;
+                      handlePayment(plan.id, user?.userId || user?.id);
+                    }}
+                    className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-150 text-center ${
+                      isCurrentPlan
+                        ? "border border-border bg-background/40 text-foreground/40 cursor-not-allowed"
+                        : plan.popular
+                        ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
+                        : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary/20 text-foreground/80 font-medium cursor-pointer"
+                    }`}
+                  >
+                    {isCurrentPlan ? "Current Plan" : plan.cta}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Pricing;
+}

@@ -14,7 +14,7 @@ const pricingPlans: Record<
   }
 > = {
   prod_TffitWtEKT88s6: {
-    amount: 8,
+    amount: 9,
     productName: "Starter Plan",
     interval: "month",
     currency: "usd",
@@ -28,6 +28,12 @@ const pricingPlans: Record<
   prod_TffnEJPkjRMHpY: {
     amount: 44,
     productName: "Studio Plan",
+    interval: "month",
+    currency: "usd",
+  },
+  prod_TffAgency99: {
+    amount: 99,
+    productName: "Agency Plan",
     interval: "month",
     currency: "usd",
   },

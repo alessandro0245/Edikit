@@ -129,7 +129,7 @@ export default function ManagePlansPage() {
                       </p>
                       <ul className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground mt-2">
                          <li className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-yellow-500"/> {plan.features[0]}</li>
-                         <li className="flex items-center gap-1.5">• {plan.features[3]}</li>
+                         <li className="flex items-center gap-1.5">• {plan.features[1]}</li>
                       </ul>
                     </div>
 
