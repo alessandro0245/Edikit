@@ -71,9 +71,9 @@ export default function CarouselWithMultipleSlides() {
         type="button"
         onClick={() => api?.scrollPrev()}
         aria-label="Previous templates"
-        className="absolute left-0 top-[42%] z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 sm:top-1/2 sm:h-10 sm:w-10 md:h-11 md:w-11"
+        className="absolute left-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 sm:h-10 sm:w-10 md:h-11 md:w-11"
       >
-        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+        <ChevronLeft className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
       </button>
 
       {/* Next button — positioned to the side like old slider */}
@@ -81,17 +81,20 @@ export default function CarouselWithMultipleSlides() {
         type="button"
         onClick={() => api?.scrollNext()}
         aria-label="Next templates"
-        className="absolute right-0 top-[42%] z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 sm:top-1/2 sm:h-10 sm:w-10 md:h-11 md:w-11"
+        className="absolute right-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 sm:h-10 sm:w-10 md:h-11 md:w-11"
       >
-        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+        <ChevronRight className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
       </button>
 
       <Carousel
         setApi={setApi}
         className="overflow-hidden"
         opts={{
-          align: "start",
+          align: "center", // Centered on mobile (< 640px)
           loop: true,
+          breakpoints: {
+            "(min-width: 640px)": { align: "start" }, // Exact original layout on medium and desktop (>= 640px)
+          },
         }}
       >
         <CarouselContent className="-ml-1.5 sm:-ml-2 md:-ml-3">
