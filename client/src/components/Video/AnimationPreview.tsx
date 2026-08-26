@@ -27,6 +27,7 @@ interface AnimationPreviewProps {
   poster?: string | StaticImageData;
   orientation?: VideoOrientation;
   fit?: "native" | "contain";
+  objectPosition?: "center" | "top" | "bottom";
   trigger?: "hover" | "click" | "auto";
   className?: string;
   showFullscreen?: boolean;
@@ -36,11 +37,18 @@ interface AnimationPreviewProps {
   onClickHint?: string;
 }
 
+const objectPositionClasses: Record<"center" | "top" | "bottom", string> = {
+  center: "object-center",
+  top: "object-top",
+  bottom: "object-bottom",
+};
+
 export default function AnimationPreview({
   src,
   poster,
   orientation = "portrait",
   fit = "native",
+  objectPosition = "center",
   trigger = "hover",
   className = "",
   showFullscreen = false,
@@ -281,7 +289,7 @@ export default function AnimationPreview({
             src={poster}
             alt="template preview"
             fill
-            className={`object-cover transition-opacity duration-300 ${
+            className={`object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
             }`}
             sizes="(max-width: 768px) 100vw, 33vw"
@@ -292,7 +300,7 @@ export default function AnimationPreview({
             src={posterSrc}
             alt="template preview"
             fill
-            className={`object-cover transition-opacity duration-300 ${
+            className={`object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
               isPlaying && isLoaded ? "opacity-0" : "opacity-100"
             }`}
             sizes="(max-width: 768px) 100vw, 33vw"
@@ -313,7 +321,7 @@ export default function AnimationPreview({
         className={
           isFullscreen
             ? "max-h-screen max-w-[100vw] object-cover"
-            : `absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+            : `absolute inset-0 h-full w-full object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
                 isPlaying && isLoaded ? "opacity-100" : "opacity-0"
               }`
         }
