@@ -28,7 +28,7 @@ function NewSliderCard({ template }: NewSliderCardProps) {
           poster={template.thumbnail}
           orientation={orientation}
           fit="native"
-          trigger="auto"
+          trigger="auto"  
           showControls={false}
           playOverlay={false}
           className="w-full h-[500px] sm:h-[490px] md:h-[560px]"
@@ -98,7 +98,7 @@ export default function CarouselWithMultipleSlides() {
           {templates.map((template) => (
             <CarouselItem
               key={template.id}
-              className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/3"
+              className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/4"
             >
               <NewSliderCard template={template} />
             </CarouselItem>
