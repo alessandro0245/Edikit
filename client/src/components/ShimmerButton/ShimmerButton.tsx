@@ -220,7 +220,7 @@ function SecondaryInner({
         "active:translate-y-0 active:scale-[0.98] active:shadow-none",
         "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC]",
         width,
-        sizeClasses[size],
+        sizeClass,
         className,
       ].join(" ")}
     >
@@ -239,6 +239,8 @@ export default function EdikitButton(props: EdikitButtonProps) {
   const variant = props.variant ?? "primary";
   const isPrimary = variant === "primary";
   const width = props.width ?? "";
+  const borderWeight = props.borderWeight ?? "subtle";
+  const compact = props.compact ?? false;
 
   useBlobAnimation(containerRef, blobRef, isPrimary);
 
@@ -246,11 +248,23 @@ export default function EdikitButton(props: EdikitButtonProps) {
 
   function renderInner() {
     return variant === "secondary" ? (
-      <SecondaryInner size={size} width={width} className={className}>
+      <SecondaryInner
+        size={size}
+        width={width}
+        className={className}
+        borderWeight={borderWeight}
+        compact={compact}
+      >
         {children}
       </SecondaryInner>
     ) : (
-      <PrimaryInner size={size} width={width} className={className} blobRef={blobRef}>
+      <PrimaryInner
+        size={size}
+        width={width}
+        className={className}
+        compact={compact}
+        blobRef={blobRef}
+      >
         {children}
       </PrimaryInner>
     );

@@ -5,6 +5,7 @@ import { handlePayment } from "@/lib/payment";
 import { plans } from "@/utils/constant";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import ShimmerButton from "@/components/ShimmerButton/ShimmerButton";
 
 export default function Pricing() {
   const user = useSelector((state: RootState) => state.user.user);
@@ -93,22 +94,20 @@ export default function Pricing() {
 
                 {/* CTA Button */}
                 <div className="mt-8 pt-2">
-                  <button
-                    type="button"
+                  <ShimmerButton
                     disabled={isCurrentPlan}
                     onClick={() => {
                       if (isCurrentPlan) return;
                       handlePayment(plan.id, user?.userId || user?.id);
                     }}
-                    className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-150 text-center ${isCurrentPlan
-                        ? "border border-border bg-background/40 text-foreground/40 cursor-not-allowed"
-                        : plan.popular
-                          ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
-                          : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary text-foreground/80 font-medium cursor-pointer"
-                      }`}
+                    variant={plan.popular ? "primary" : "secondary"}
+                    borderWeight="subtle"
+                    compact
+                    size="lg"
+                    width="w-full"
                   >
                     {isCurrentPlan ? "Current Plan" : plan.cta}
-                  </button>
+                  </ShimmerButton>
                 </div>
               </div>
             );
