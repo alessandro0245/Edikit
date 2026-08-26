@@ -27,12 +27,11 @@ function NewSliderCard({ template }: NewSliderCardProps) {
           src={template.previewUrl}
           poster={template.thumbnail}
           orientation={orientation}
-          fit="contain"
-          objectPosition="top"
+          fit="native"
           trigger="auto"
           showControls={false}
           playOverlay={false}
-          className="w-full h-[510px] sm:h-[490px] md:h-[570px]"
+          className="w-full h-[500px] sm:h-[490px] md:h-[560px]"
         />
         <div className="bg-background p-3 transition-none sm:p-4">
           <p className="line-clamp-2 text-xs leading-relaxed text-white sm:text-sm md:text-base">
