@@ -358,7 +358,7 @@ export default function TermsPage() {
             </p>
             <a
               href="mailto:Info@edikit.net"
-              className="inline-flex items-center justify-center px-8 py-3 font-bold text-white bg-primary rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/25"
+              className="inline-flex items-center justify-center px-8 py-3 font-bold text-white bg-primary rounded-full hover:scale-105 transition-transform"
             >
               Contact us
             </a>

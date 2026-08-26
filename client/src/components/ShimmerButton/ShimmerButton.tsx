@@ -21,10 +21,10 @@ interface BlobConfig {
 }
 
 const BLOBS: BlobConfig[] = [
-  { cx: 50, cy: 50, sx: [[30,1.19,0.0],[16,2.21,1.7]], sy: [[26,1.45,2.1],[13,2.64,0.4]] },
-  { cx: 50, cy: 50, sx: [[28,1.05,2.6],[17,2.01,0.9]], sy: [[24,1.62,1.2],[14,2.41,3.0]] },
-  { cx: 50, cy: 50, sx: [[29,1.33,1.1],[15,2.13,2.4]], sy: [[25,1.22,0.7],[13,2.75,1.9]] },
-  { cx: 50, cy: 50, sx: [[31,1.12,3.1],[16,1.87,0.3]], sy: [[27,1.50,2.8],[12,2.52,1.4]] },
+  { cx: 50, cy: 50, sx: [[30, 1.19, 0.0], [16, 2.21, 1.7]], sy: [[26, 1.45, 2.1], [13, 2.64, 0.4]] },
+  { cx: 50, cy: 50, sx: [[28, 1.05, 2.6], [17, 2.01, 0.9]], sy: [[24, 1.62, 1.2], [14, 2.41, 3.0]] },
+  { cx: 50, cy: 50, sx: [[29, 1.33, 1.1], [15, 2.13, 2.4]], sy: [[25, 1.22, 0.7], [13, 2.75, 1.9]] },
+  { cx: 50, cy: 50, sx: [[31, 1.12, 3.1], [16, 1.87, 0.3]], sy: [[27, 1.50, 2.8], [12, 2.52, 1.4]] },
 ];
 
 const BLOB_ALPHAS: [number, number, number, number] = [0.88, 0.84, 0.88, 0.84];
@@ -48,8 +48,8 @@ function useBlobAnimation(
   blobRef: React.RefObject<HTMLDivElement | null>,
   enabled: boolean
 ) {
-  const rafRef    = useRef<number | null>(null);
-  const mixRef    = useRef(0);
+  const rafRef = useRef<number | null>(null);
+  const mixRef = useRef(0);
   const targetRef = useRef(0);
 
   const frame = useCallback(
@@ -86,13 +86,13 @@ function useBlobAnimation(
     const onLeave = () => { targetRef.current = 0; startLoop(); };
     el.addEventListener("pointerenter", onEnter);
     el.addEventListener("pointerleave", onLeave);
-    el.addEventListener("touchstart",   onEnter, { passive: true });
-    el.addEventListener("touchend",     onLeave);
+    el.addEventListener("touchstart", onEnter, { passive: true });
+    el.addEventListener("touchend", onLeave);
     return () => {
       el.removeEventListener("pointerenter", onEnter);
       el.removeEventListener("pointerleave", onLeave);
-      el.removeEventListener("touchstart",   onEnter);
-      el.removeEventListener("touchend",     onLeave);
+      el.removeEventListener("touchstart", onEnter);
+      el.removeEventListener("touchend", onLeave);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [containerRef, startLoop, enabled]);
@@ -100,38 +100,58 @@ function useBlobAnimation(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ButtonSize    = "sm" | "md" | "lg";
-type ButtonVariant = "primary" | "secondary";
+export type ButtonSize = "xs" | "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "secondary";
+export type BorderWeight = "subtle" | "light" | "normal" | "none";
 
 interface BaseProps {
-  children:   ReactNode;
-  size?:      ButtonSize;
-  variant?:   ButtonVariant;
-  width?: string;           // any Tailwind width class e.g. "w-full" "w-64" "w-1/2"
+  children: ReactNode;
+  size?: ButtonSize;
+  variant?: ButtonVariant;
+  borderWeight?: BorderWeight; // "subtle" | "light" | "normal" | "none"
+  compact?: boolean;          // Slimmer vertical padding for refined layouts
+  width?: string;             // any Tailwind width class e.g. "w-full" "w-64" "w-1/2"
   className?: string;
 }
 
 interface AsButtonProps
   extends BaseProps,
-    Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
   href?: never;
 }
 
 interface AsLinkProps extends BaseProps {
-  href:      string;
-  target?:   string;
-  rel?:      string;
+  href: string;
+  target?: string;
+  rel?: string;
   disabled?: boolean;
 }
 
 export type EdikitButtonProps = AsButtonProps | AsLinkProps;
 
-// ─── Size map ─────────────────────────────────────────────────────────────────
+// ─── Size maps (refined, modern proportions) ──────────────────────────────────
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "px-[1.3em] py-[.65em] text-[.82rem]",
-  md: "px-[1.6em] py-[.8em]  text-[.92rem]",
-  lg: "px-[2.0em] py-[1.0em] text-[1rem]",
+  xs: "px-3 py-1 text-[0.75rem]",
+  sm: "px-4 py-1.5 text-[0.82rem]",
+  md: "px-5 py-2 text-[0.875rem]",
+  lg: "px-6 py-2.5 text-[0.95rem]",
+};
+
+const compactSizeClasses: Record<ButtonSize, string> = {
+  xs: "px-2.5 py-0.5 text-[0.72rem]",
+  sm: "px-3.5 py-1 text-[0.78rem]",
+  md: "px-4 py-1.5 text-[0.82rem]",
+  lg: "px-5 py-2 text-[0.875rem]",
+};
+
+// ─── Border weight map ─────────────────────────────────────────────────────────
+
+const borderClasses: Record<BorderWeight, string> = {
+  subtle: "border border-white/12 hover:border-primary/80",
+  light: "border border-white/8 hover:border-primary/60",
+  normal: "border border-border hover:border-primary",
+  none: "border-0",
 };
 
 // ─── Primary inner ────────────────────────────────────────────────────────────
@@ -141,18 +161,21 @@ function PrimaryInner({
   size = "md",
   width = "",
   className = "",
+  compact = false,
   blobRef,
 }: BaseProps & { blobRef: React.RefObject<HTMLDivElement | null> }) {
+  const sizeClass = compact ? compactSizeClasses[size] : sizeClasses[size];
+
   return (
     <span
       className={[
         "relative inline-flex items-center justify-center",
-        "rounded-full overflow-hidden font-semibold uppercase tracking-[1px]",
+        "rounded-full overflow-hidden font-semibold uppercase tracking-[0.5px]",
         "text-white cursor-pointer select-none",
         "transition-transform duration-200 ease-out",
         "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
         width,
-        sizeClasses[size],
+        sizeClass,
         className,
       ].join(" ")}
       style={{ background: "linear-gradient(105deg, #1A73E8 0%, #5EB5FC 100%)" }}
@@ -170,26 +193,30 @@ function PrimaryInner({
 }
 
 // ─── Secondary inner ──────────────────────────────────────────────────────────
-// Matches the "Explore templates" link style:
-// transparent bg, border border-primary/50, hover:bg-primary/10
+// Refined secondary style with customizable borderWeight and compact height
 
 function SecondaryInner({
   children,
   size = "md",
   width = "",
   className = "",
+  borderWeight = "subtle",
+  compact = false,
 }: BaseProps) {
+  const borderClass = borderClasses[borderWeight];
+  const sizeClass = compact ? compactSizeClasses[size] : sizeClasses[size];
+
   return (
     <span
       className={[
         "inline-flex items-center justify-center",
         "rounded-full font-semibold cursor-pointer select-none no-underline",
-        // Match "Explore templates" exactly
-        "text-foreground bg-transparent",
-        "border border-primary/50",
-        "transition-[background-color,color,box-shadow,transform] duration-200 ease-in-out",
+        "text-muted-foreground bg-transparent",
+        borderClass,
+        "transition-[background-color,color,border-color,box-shadow,transform] duration-200 ease-in-out",
         "hover:bg-primary/10 hover:-translate-y-0.5",
-        "hover:shadow-[0_0_14px_2px_color-mix(in_srgb,var(--color-primary)_15%,transparent)]",
+        "hover:text-white",
+        "hover:border-primary",
         "active:translate-y-0 active:scale-[0.98] active:shadow-none",
         "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#5EB5FC]",
         width,
@@ -208,10 +235,10 @@ function SecondaryInner({
 
 export default function EdikitButton(props: EdikitButtonProps) {
   const containerRef = useRef<HTMLElement>(null);
-  const blobRef      = useRef<HTMLDivElement>(null);
-  const variant      = props.variant ?? "primary";
-  const isPrimary    = variant === "primary";
-  const width        = props.width ?? "";
+  const blobRef = useRef<HTMLDivElement>(null);
+  const variant = props.variant ?? "primary";
+  const isPrimary = variant === "primary";
+  const width = props.width ?? "";
 
   useBlobAnimation(containerRef, blobRef, isPrimary);
 

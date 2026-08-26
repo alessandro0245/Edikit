@@ -22,7 +22,7 @@ function NewSliderCard({ template }: NewSliderCardProps) {
 
   return (
     <Link href={`/customize/${template.id}`} className="group block w-full">
-      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white transition-[border-color] duration-300 ease-in-out group-hover:border-primary hover:border-[3.5px] sm:rounded-2xl">
+      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}
@@ -31,7 +31,7 @@ function NewSliderCard({ template }: NewSliderCardProps) {
           trigger="auto"
           showControls={false}
           playOverlay={false}
-          className="w-full"
+          className="w-full h-[500px] sm:h-[480px] md:h-[560px]"
         />
         <div className="bg-background p-3 transition-none sm:p-4">
           <p className="line-clamp-2 text-xs leading-relaxed text-white sm:text-sm md:text-base">

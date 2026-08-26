@@ -35,11 +35,10 @@ export default function Pricing() {
             return (
               <div
                 key={plan.name}
-                className={`flex flex-col justify-between p-6 rounded-2xl transition-all duration-200 ${
-                  plan.popular
-                    ? "bg-[#$444444] border border-border relative"
+                className={`flex flex-col justify-between p-6 rounded-2xl transition-all duration-200 ${plan.popular
+                    ? "bg-[#1F1F1F] border border-border relative"
                     : "bg-transparent border border-transparent"
-                }`}
+                  }`}
               >
                 <div>
                   {/* Plan Header */}
@@ -60,20 +59,19 @@ export default function Pricing() {
                       <span className="text-3xl sm:text-4xl font-bold tracking-tight">
                         {plan.price}
                       </span>
-                      <span className="text-base font-normal ml-1 text-muted-foreground">
+                      <span className="text-base font-normal ml-1 text-foreground">
                         /{plan.period === "per month" ? "month" : plan.period}
                       </span>
                     </div>
-                    <p className="text-muted-foreground text-sm mt-3 min-h-[40px] leading-relaxed">
+                    <p className="text-foreground text-sm mt-3 min-h-[40px] leading-relaxed">
                       {plan.description}
                     </p>
                   </div>
 
                   {/* Divider */}
                   <div
-                    className={`my-6 border-t ${
-                      plan.popular ? "border-border" : "border-border"
-                    }`}
+                    className={`my-6 border-t ${plan.popular ? "border-border" : "border-border"
+                      }`}
                   />
 
                   {/* Features List */}
@@ -84,9 +82,8 @@ export default function Pricing() {
                         className="flex items-center gap-3 text-[13px] text-foreground"
                       >
                         <Check
-                          className={`w-4 h-4 text-muted-foreground shrink-0 ${
-                            plan.popular ? "stroke-[2.2]" : "stroke-[1.75]"
-                          }`}
+                          className={`w-4 h-4 text-muted-foreground shrink-0 ${plan.popular ? "stroke-[2.2]" : "stroke-[1.75]"
+                            }`}
                         />
                         <span>{feature}</span>
                       </li>
@@ -103,13 +100,12 @@ export default function Pricing() {
                       if (isCurrentPlan) return;
                       handlePayment(plan.id, user?.userId || user?.id);
                     }}
-                    className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-150 text-center ${
-                      isCurrentPlan
+                    className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-150 text-center ${isCurrentPlan
                         ? "border border-border bg-background/40 text-foreground/40 cursor-not-allowed"
                         : plan.popular
-                        ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
-                        : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary text-foreground/80 font-medium cursor-pointer"
-                    }`}
+                          ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
+                          : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary text-foreground/80 font-medium cursor-pointer"
+                      }`}
                   >
                     {isCurrentPlan ? "Current Plan" : plan.cta}
                   </button>

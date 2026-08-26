@@ -1,7 +1,6 @@
 "use client";
 
 import { templates } from "@/utils/constant";
-import TemplatesSlider from "./TemplatesSlider";
 import { ArrowRight } from "lucide-react";
 import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
@@ -136,15 +135,6 @@ export default function Hero() {
             </div>
 
 <div className="space-y-16">
-
-              {/* OLD SLIDER */}
-              <div className="space-y-4">
-             
-                <div className="relative z-10 mx-auto w-full max-w-7xl px-2 sm:px-4">
-                  {/* <TemplatesSlider templates={templates} /> */}
-                </div>
-              </div>
-
               {/* NEW SLIDER */}
               <div className="space-y-4">
                 <div className="relative z-10 mx-auto w-full max-w-7xl">

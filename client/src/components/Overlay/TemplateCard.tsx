@@ -14,7 +14,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <Link href={`/customize/${template.id}`} className="group block w-full">
-      <div className="overflow-hidden rounded-2xl border-2 border-[#4B4B4B] bg-black transition-all duration-300 group-hover:border-primary hover:border-[3.5px] ">
+      <div className="overflow-hidden rounded-2xl border-2 border-[#4B4B4B] bg-black transition-all duration-300 group-hover:border-primary ">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}
@@ -26,7 +26,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
           className="w-full"
         />
         <div className="border-t border-border bg-card px-3.5 py-2.5">
-          <h3 className="truncate text-sm font-medium text-foreground transition-colors duration-300 group-hover:text-primary">
+          <h3 className="truncate text-sm font-medium text-foreground transition-colors duration-300 ">
             {template.name}
           </h3>
         </div>
