@@ -18,7 +18,7 @@ export default function Pricing() {
             Pricing
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Pricing on your terms
+            Choose the perfect plan for you
           </h1>
           <p className="text-muted-foreground text-base font-normal">
             Get started for free. Upgrade as you grow.
@@ -37,7 +37,7 @@ export default function Pricing() {
                 key={plan.name}
                 className={`flex flex-col justify-between p-6 rounded-2xl transition-all duration-200 ${
                   plan.popular
-                    ? "bg-card border border-border shadow-2xl relative"
+                    ? "bg-[#$444444] border border-border relative"
                     : "bg-transparent border border-transparent"
                 }`}
               >
@@ -108,7 +108,7 @@ export default function Pricing() {
                         ? "border border-border bg-background/40 text-foreground/40 cursor-not-allowed"
                         : plan.popular
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm cursor-pointer"
-                        : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary/20 text-foreground/80 font-medium cursor-pointer"
+                        : "border border-[#23252A] bg-[#0E0F12]/70 hover:bg-primary text-foreground/80 font-medium cursor-pointer"
                     }`}
                   >
                     {isCurrentPlan ? "Current Plan" : plan.cta}

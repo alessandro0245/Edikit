@@ -40,7 +40,7 @@ export const plans = [
     planType: "Studio",
     price: "$44",
     period: "per month",
-    description: "Built for teams, agencies, and power creators",
+    description: "Built for professionals with heavy usage",
     features: [
       "680 video generation credits per month",
       // "136 video renders per month",
