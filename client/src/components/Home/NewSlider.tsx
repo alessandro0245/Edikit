@@ -22,7 +22,7 @@ function NewSliderCard({ template }: NewSliderCardProps) {
 
   return (
     <Link href={`/customize/${template.id}`} className="group block w-full">
-      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl">
+      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl aspect-[9/16] w-full">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}
@@ -31,13 +31,13 @@ function NewSliderCard({ template }: NewSliderCardProps) {
           trigger="auto"  
           showControls={false}
           playOverlay={false}
-          className="w-full h-[500px] sm:h-[490px] md:h-[560px]"
+          className="w-full h-full"
         />
-        <div className="bg-background p-3 transition-none sm:p-4">
+        {/* <div className="bg-background p-3 transition-none sm:p-4">
           <p className="line-clamp-2 text-xs leading-relaxed text-white sm:text-sm md:text-base">
             {template.name}
           </p>
-        </div>
+        </div> */}
       </div>
     </Link>
   );
@@ -99,7 +99,7 @@ export default function CarouselWithMultipleSlides() {
       >
         <CarouselContent className="-ml-1.5 sm:-ml-2 md:-ml-3">
           {templates.map((template) => (
-            template.id !== 9 && (
+            template.id !== 19 && (
               <CarouselItem
                 key={template.id}
                 className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/3"

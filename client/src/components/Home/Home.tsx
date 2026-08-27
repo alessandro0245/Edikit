@@ -137,7 +137,7 @@ export default function Hero() {
 <div className="space-y-16">
               {/* NEW SLIDER */}
               <div className="space-y-4">
-                <div className="relative z-10 mx-auto w-full max-w-7xl">
+                <div className="relative z-10 mx-auto w-full max-w-6xl">
                   <CarouselWithMultipleSlides />
                 </div>
               </div>
