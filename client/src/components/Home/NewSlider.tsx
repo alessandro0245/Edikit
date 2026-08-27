@@ -99,12 +99,14 @@ export default function CarouselWithMultipleSlides() {
       >
         <CarouselContent className="-ml-1.5 sm:-ml-2 md:-ml-3">
           {templates.map((template) => (
-            <CarouselItem
-              key={template.id}
-              className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/4"
-            >
-              <NewSliderCard template={template} />
-            </CarouselItem>
+            template.id !== 9 && (
+              <CarouselItem
+                key={template.id}
+                className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/3"
+              >
+                <NewSliderCard template={template} />
+              </CarouselItem>
+            )
           ))}
         </CarouselContent>
         {/* No CarouselPrevious/CarouselNext — using custom buttons above */}
