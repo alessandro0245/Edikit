@@ -5,14 +5,11 @@ import {
   useEffect,
   useRef,
   useState,
-  type MouseEvent,
 } from "react";
 import {
   Loader2,
   Maximize2,
   Minimize2,
-  Pause,
-  Play,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -54,7 +51,7 @@ export default function AnimationPreview({
   showFullscreen = false,
   showControls = true,
   prefetchOnVisible = true,
-  playOverlay = true,
+  playOverlay: _playOverlay = true,
   onClickHint,
 }: AnimationPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,9 +66,21 @@ export default function AnimationPreview({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [posterError, setPosterError] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   const posterSrc =
     typeof poster === "string" ? poster : poster?.src ?? undefined;
+
+  // Reset playback and error state whenever the video src changes
+  useEffect(() => {
+    setHasStarted(false);
+    setIsLoaded(false);
+    setIsPlaying(false);
+    setVideoRequested(false);
+    setIsLoading(false);
+    setPosterError(false);
+    setVideoError(false);
+  }, [src]);
 
   const requestVideo = useCallback(() => {
     const video = videoRef.current;
@@ -86,15 +95,13 @@ export default function AnimationPreview({
   const playVideo = useCallback(() => {
     const video = videoRef.current;
     if (!video || !isLoaded) return;
-    video.play().catch(() => {});
-    setIsPlaying(true);
+    video.play().catch(() => { });
   }, [isLoaded]);
 
   const pauseVideo = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     video.pause();
-    setIsPlaying(false);
   }, []);
 
   const handleMouseEnter = () => {
@@ -132,6 +139,7 @@ export default function AnimationPreview({
           setIsLoaded(false);
           setIsPlaying(false);
           setIsLoading(false);
+          setHasStarted(false);
           const video = videoRef.current;
           if (video) {
             video.removeAttribute("src");
@@ -146,59 +154,6 @@ export default function AnimationPreview({
     return () => observer.disconnect();
   }, [trigger, src]);
 
-  const handleContainerClick = (event: MouseEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("[data-preview-control]")) {
-      return;
-    }
-
-    if (trigger === "click") {
-      if (!videoRequested) {
-        setIsActive(true);
-        requestVideo();
-        return;
-      }
-
-      if (isLoaded) {
-        if (isPlaying) {
-          pauseVideo();
-          setIsActive(false);
-        } else {
-          setIsActive(true);
-          playVideo();
-        }
-      }
-      return;
-    }
-
-    if (trigger === "hover" && isLoaded) {
-      if (isPlaying) {
-        pauseVideo();
-      } else {
-        playVideo();
-      }
-    }
-  };
-
-  const handleCanPlay = () => {
-    setIsLoading(false);
-    setIsLoaded(true);
-
-    const shouldPlay =
-      trigger === "auto" ||
-      (trigger === "hover" ? isActive : trigger === "click" && isActive);
-
-    if (shouldPlay && videoRef.current) {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    }
-  };
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -213,13 +168,34 @@ export default function AnimationPreview({
     }
   };
 
+  const handleCanPlay = () => {
+    setIsLoading(false);
+    setIsLoaded(true);
+
+    const shouldPlay =
+      trigger === "auto" ||
+      (trigger === "hover" ? isActive : trigger === "click" && isActive);
+
+    if (shouldPlay && videoRef.current) {
+      videoRef.current.play().catch(() => { });
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
 
     if (!document.fullscreenElement) {
-      await containerRef.current.requestFullscreen?.().catch(() => {});
+      await containerRef.current.requestFullscreen?.().catch(() => { });
     } else {
-      await document.exitFullscreen?.().catch(() => {});
+      await document.exitFullscreen?.().catch(() => { });
     }
   };
 
@@ -264,50 +240,29 @@ export default function AnimationPreview({
   const containerAspectClass =
     fit === "native" ? orientationContainerClass[orientation] : "h-full w-full";
 
-  const showPoster = !isLoaded || !isPlaying;
-  const showPlayOverlay =
-    playOverlay &&
-    trigger !== "auto" &&
-    ((trigger === "click" && !isPlaying && !isLoading) ||
-      (trigger === "hover" && !isActive && !isLoading));
-
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden bg-black group/preview ${
-        isFullscreen
-          ? "flex min-h-screen w-full items-center justify-center"
-          : containerAspectClass
-      } ${className}`}
+      className={`relative overflow-hidden bg-black group/preview cursor-pointer ${isFullscreen
+        ? "flex min-h-screen w-full items-center justify-center"
+        : containerAspectClass
+        } ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleContainerClick}
+      onClick={togglePlay}
     >
-      {posterSrc && showPoster && !posterError && (
-        typeof poster === "object" && poster ? (
-          <Image
-            src={poster}
-            alt="template preview"
-            fill
-            className={`object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
-              isPlaying && isLoaded ? "opacity-0" : "opacity-100"
+      {poster && !posterError && (
+        <Image
+          src={poster}
+          alt="template preview"
+          fill
+          className={`object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${hasStarted ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
-            sizes="(max-width: 768px) 100vw, 33vw"
-            onError={() => setPosterError(true)}
-          />
-        ) : (
-          <Image
-            src={posterSrc}
-            alt="template preview"
-            fill
-            className={`object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
-              isPlaying && isLoaded ? "opacity-0" : "opacity-100"
-            }`}
-            sizes="(max-width: 768px) 100vw, 33vw"
-            onError={() => setPosterError(true)}
-          />
-        )
+          sizes="(max-width: 768px) 100vw, 33vw"
+          onError={() => setPosterError(true)}
+        />
       )}
+
 
       {!posterSrc && !isLoaded && !videoError && (
         <div className="absolute inset-0 flex items-center justify-center bg-black">
@@ -321,16 +276,18 @@ export default function AnimationPreview({
         className={
           isFullscreen
             ? "max-h-screen max-w-[100vw] object-cover"
-            : `absolute inset-0 h-full w-full object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${
-                isPlaying && isLoaded ? "opacity-100" : "opacity-0"
-              }`
+            : `absolute inset-0 h-full w-full object-cover ${objectPositionClasses[objectPosition]} transition-opacity duration-300 ${hasStarted ? "opacity-100" : "opacity-0"
+            }`
         }
         loop
         muted={isMuted}
         playsInline
         preload="none"
         onCanPlay={handleCanPlay}
-        onPlay={() => setIsPlaying(true)}
+        onPlay={() => {
+          setIsPlaying(true);
+          setHasStarted(true);
+        }}
         onPause={() => setIsPlaying(false)}
         onError={() => {
           setVideoError(true);
@@ -338,17 +295,10 @@ export default function AnimationPreview({
         }}
       />
 
+
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
           <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-      )}
-
-      {showPlayOverlay && !videoError && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90">
-            <Play className="ml-0.5 h-5 w-6 text-gray-900" fill="currentColor" />
-          </div>
         </div>
       )}
 
@@ -361,33 +311,21 @@ export default function AnimationPreview({
       {showControls && isLoaded && (
         <div
           className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-2 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
+          onClick={(e) => e.stopPropagation()}
           data-preview-control
         >
           <div className="flex items-center gap-2">
             <button
               type="button"
               data-preview-control
-              onClick={togglePlay}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control cursor-pointer"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? (
-                <Pause className="h-4 w-4 fill-white text-white transition-transform group-hover/control:scale-110" />
-              ) : (
-                <Play className="h-4 w-4 fill-white text-white transition-transform group-hover/control:scale-110" />
-              )}
-            </button>
-            <button
-              type="button"
-              data-preview-control
               onClick={toggleMute}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                <VolumeX className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                <VolumeX className="h-4 w-4 text-white" />
               ) : (
-                <Volume2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                <Volume2 className="h-4 w-4 text-white" />
               )}
             </button>
           </div>
@@ -397,13 +335,13 @@ export default function AnimationPreview({
               type="button"
               data-preview-control
               onClick={toggleFullscreen}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
-                <Minimize2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                <Minimize2 className="h-4 w-4 text-white" />
               ) : (
-                <Maximize2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                <Maximize2 className="h-4 w-4 text-white" />
               )}
             </button>
           )}

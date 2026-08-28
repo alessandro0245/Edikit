@@ -22,7 +22,7 @@ function NewSliderCard({ template }: NewSliderCardProps) {
 
   return (
     <Link href={`/customize/${template.id}`} className="group block w-full">
-      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] bg-white transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl aspect-[9/16] w-full">
+      <div className="flex origin-center flex-col overflow-hidden rounded-xl border-2 border-[#4B4B4B] transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-2xl aspect-[9/16] w-full">
         <AnimationPreview
           src={template.previewUrl}
           poster={template.thumbnail}
@@ -99,14 +99,12 @@ export default function CarouselWithMultipleSlides() {
       >
         <CarouselContent className="-ml-1.5 sm:-ml-2 md:-ml-3">
           {templates.map((template) => (
-            template.id !== 19 && (
               <CarouselItem
                 key={template.id}
                 className="pl-1.5 sm:pl-2 md:pl-3 basis-[calc(100vw-6rem)] sm:basis-[320px] md:basis-1/2 lg:basis-1/3"
               >
                 <NewSliderCard template={template} />
               </CarouselItem>
-            )
           ))}
         </CarouselContent>
         {/* No CarouselPrevious/CarouselNext — using custom buttons above */}
