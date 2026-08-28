@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Maximize2,
   Minimize2,
   Volume2,
   VolumeX,
+  Loader2,
 } from "lucide-react";
+import Image from "next/image";
 import VideoDownloadButton from "./VideoDownloadButton";
 
 interface VideoPlayerProps {
@@ -50,6 +49,19 @@ export default function VideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  const [hasStarted, setHasStarted] = useState(false);
+  const [posterError, setPosterError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setHasStarted(false);
+    setIsLoaded(false);
+    setIsPlaying(false);
+    setPosterError(false);
+  }, [src]);
+
   const isMinimal = variant === "minimal";
 
   const togglePlay = () => {
@@ -58,9 +70,8 @@ export default function VideoPlayer({
     if (isPlaying) {
       videoRef.current.pause();
     } else {
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -122,8 +133,27 @@ export default function VideoPlayer({
     <div className={isMinimal && aspectRatio === "none" ? "h-full w-full" : "space-y-4"}>
       <div
         ref={containerRef}
-        className={`relative overflow-hidden rounded-lg bg-black group ${containerAspectClass} ${className}`}
+        className={`relative overflow-hidden rounded-lg bg-black group cursor-pointer ${containerAspectClass} ${className}`}
+        onClick={togglePlay}
       >
+        {poster && !posterError && (
+          <Image
+            src={poster}
+            alt="video thumbnail"
+            fill
+            className={`object-cover transition-opacity duration-300 ${hasStarted ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            onError={() => setPosterError(true)}
+          />
+        )}
+
+        {isLoading && !hasStarted && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 pointer-events-none">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        )}
+
         <video
           ref={videoRef}
           src={src}
@@ -135,40 +165,37 @@ export default function VideoPlayer({
           className={
             isFullscreen
               ? "max-h-screen max-w-[100vw] object-contain"
-              : "h-full w-full object-contain"
+              : `absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasStarted ? "opacity-100" : "opacity-0"}`
           }
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-          onPlay={() => setIsPlaying(true)}
+          onCanPlay={() => {
+            setIsLoading(false);
+            setIsLoaded(true);
+          }}
+          onPlay={() => {
+            setIsPlaying(true);
+            setHasStarted(true);
+          }}
           onPause={() => setIsPlaying(false)}
+          onError={() => setIsLoading(false)}
         />
 
-        {controls && (
+        {controls && isLoaded && (
           <div
-            className={`absolute bottom-4 left-0 right-0 flex items-center justify-between px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20`}
+            className={`absolute bottom-4 left-0 right-0 flex items-center justify-between px-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-20`}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2">
               <button
-                onClick={togglePlay}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control ml-1 cursor-pointer"
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? (
-                  <Pause className="h-4 w-4 fill-white text-white transition-transform group-hover/control:scale-110" />
-                ) : (
-                  <Play className="h-4 w-4 fill-white text-white transition-transform group-hover/control:scale-110" />
-                )}
-              </button>
-
-              <button
                 onClick={toggleMute}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted ? (
-                  <VolumeX className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                  <VolumeX className="h-4 w-4 text-white" />
                 ) : (
-                  <Volume2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                  <Volume2 className="h-4 w-4 text-white" />
                 )}
               </button>
             </div>
@@ -193,13 +220,13 @@ export default function VideoPlayer({
             {showFullscreen && (
               <button
                 onClick={toggleFullscreen}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all hover:scale-110 active:scale-95 group/control mr-1 cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control mr-1 cursor-pointer"
                 aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
                 {isFullscreen ? (
-                  <Minimize2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                  <Minimize2 className="h-4 w-4 text-white" />
                 ) : (
-                  <Maximize2 className="h-4 w-4 text-white transition-transform group-hover/control:scale-110" />
+                  <Maximize2 className="h-4 w-4 text-white" />
                 )}
               </button>
             )}

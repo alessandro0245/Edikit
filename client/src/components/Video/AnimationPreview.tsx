@@ -310,7 +310,7 @@ export default function AnimationPreview({
 
       {showControls && isLoaded && (
         <div
-          className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-2 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
+          className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-2 opacity-100 md:opacity-0 md:group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
           onClick={(e) => e.stopPropagation()}
           data-preview-control
         >
