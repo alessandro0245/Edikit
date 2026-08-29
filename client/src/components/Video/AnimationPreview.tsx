@@ -310,7 +310,7 @@ export default function AnimationPreview({
 
       {showControls && isLoaded && (
         <div
-          className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-2 opacity-100 md:opacity-0 md:group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
+          className="absolute bottom-2 left-0 right-0 flex items-center justify-between px-2 opacity-100 md:opacity-0 md:group-hover/preview:opacity-100 transition-opacity duration-300 z-20"
           onClick={(e) => e.stopPropagation()}
           data-preview-control
         >
@@ -319,13 +319,13 @@ export default function AnimationPreview({
               type="button"
               data-preview-control
               onClick={toggleMute}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#191919] backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                <VolumeX className="h-4 w-4 text-white" />
+                <VolumeX className="h-3 w-3 text-white" />
               ) : (
-                <Volume2 className="h-4 w-4 text-white" />
+                <Volume2 className="h-3 w-3 text-white" />
               )}
             </button>
           </div>
@@ -335,13 +335,13 @@ export default function AnimationPreview({
               type="button"
               data-preview-control
               onClick={toggleFullscreen}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#191919] backdrop-blur-sm transition-all active:scale-95 group/control cursor-pointer"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
-                <Minimize2 className="h-4 w-4 text-white" />
+                <Minimize2 className="h-3 w-3 text-white" />
               ) : (
-                <Maximize2 className="h-4 w-4 text-white" />
+                <Maximize2 className="h-3 w-3 text-white" />
               )}
             </button>
           )}

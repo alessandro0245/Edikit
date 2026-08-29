@@ -117,7 +117,7 @@ const Templates = () => {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-7xl space-y-10">
           <div className="text-center">
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+            <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
               Templates
             </h1>
           </div>
@@ -134,7 +134,7 @@ const Templates = () => {
                 className="mb-2 h-10 w-10 text-muted-foreground"
                 aria-hidden
               />
-              <h2 className="text-lg font-semibold">No templates found</h2>
+              <h2 className="text-lg font-medium">No templates found</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 Try a different keyword or browse all templates
               </p>

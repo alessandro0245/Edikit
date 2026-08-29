@@ -262,7 +262,7 @@ export default function EdikitHero() {
         <div className="relative max-w-245 mx-auto">
           {/* ── Headline ── */}
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-balance mx-auto max-w-[30ch]">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white text-balance mx-auto max-w-[30ch]">
             {["Pro", "motion", "graphics", "in"].map((word, i) => (
               <span
                 key={word}

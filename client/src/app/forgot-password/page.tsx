@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
         <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
           <Mail className="w-8 h-8 text-green-500" />
         </div>
-        <h1 className="text-2xl font-bold text-foreground">Check your inbox</h1>
+        <h1 className="text-2xl font-medium text-foreground">Check your inbox</h1>
         <p className="text-muted-foreground text-sm leading-relaxed">
           If <strong className="text-foreground">{email}</strong> is registered,
           you'll receive a reset link shortly.
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
         </Link>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">Forgot your password?</h1>
+          <h1 className="text-2xl font-medium text-foreground">Forgot your password?</h1>
           <p className="text-muted-foreground text-sm">
             Enter your email and we'll send you a link to reset your password.
           </p>

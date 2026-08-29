@@ -91,7 +91,7 @@ function SuccessContent() {
 
             {/* Content */}
             <div className="text-center space-y-3 mb-8">
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-medium text-foreground">
                 Payment Successful!
               </h1>
               <p className="text-muted-foreground text-base">
@@ -105,7 +105,7 @@ function SuccessContent() {
                   <p className="text-lg font-semibold text-foreground">
                     {sessionData.planName}
                   </p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-2xl font-medium text-foreground">
                     {sessionData.amount}
                   </p>
                 </div>

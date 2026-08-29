@@ -60,7 +60,7 @@ export default function Credits() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Credits</h1>
+        <h1 className="text-3xl font-medium mb-2">Credits</h1>
         <p className="text-muted-foreground">
           Manage your rendering credits and view transaction history
         </p>
@@ -90,7 +90,7 @@ export default function Credits() {
 
           <div className="mb-4">
             <div className="flex items-baseline gap-2">
-              <span className={`text-5xl font-bold ${isLow ? "text-red-500" : ""}`}>
+              <span className={`text-5xl font-medium ${isLow ? "text-red-500" : ""}`}>
                 {credits ?? 0}
               </span>
               <span className="text-2xl text-muted-foreground">/ {limit ?? 0}</span>
@@ -127,7 +127,7 @@ export default function Credits() {
 
         {/* Quick Actions Card */}
         <div className="bg-card border border-border rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
           <div className="space-y-3">
             <EdikitButton 
             href="/pricing"

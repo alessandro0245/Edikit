@@ -298,7 +298,7 @@ export default function Sidebar() {
                   className="size-7 rounded-full object-cover"
                 />
               ) : (
-                <div className="flex size-7 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                <div className="flex size-7 items-center justify-center rounded-full bg-primary/20 text-[10px] font-medium text-primary">
                   {userAvatarValue}
                 </div>
               )}

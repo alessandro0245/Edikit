@@ -38,7 +38,7 @@ export default function ManagePlansPage() {
         <div className="max-w-4xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Subscription & Billing</h1>
+            <h1 className="text-3xl font-medium text-foreground mb-2">Subscription & Billing</h1>
             <p className="text-muted-foreground">
               Manage your current plan, check billing details, and update your tier.
             </p>
@@ -56,7 +56,7 @@ export default function ManagePlansPage() {
                     Your Current Plan
                   </h2>
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl sm:text-3xl font-bold text-foreground">
+                    <span className="text-2xl sm:text-3xl font-medium text-foreground">
                       {currentPlanType.toUpperCase()}
                     </span>
                     {currentPlanType.toUpperCase() !== "FREE" ? (
@@ -95,7 +95,7 @@ export default function ManagePlansPage() {
 
           {/* Upgrade / Change Plan Section */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Change Plan</h2>
+            <h2 className="text-xl font-medium text-foreground mb-4">Change Plan</h2>
             <div className="flex flex-col gap-4">
               {plans.map((plan, index) => {
                 const isCurrentPlan = currentPlanType.toUpperCase() === plan.planType.toUpperCase();
@@ -112,7 +112,7 @@ export default function ManagePlansPage() {
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-bold text-foreground">{plan.name}</h3>
+                        <h3 className="text-lg font-medium text-foreground">{plan.name}</h3>
                         {plan.popular && !isCurrentPlan && (
                           <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-semibold border border-blue-500/20">
                             Recommended

@@ -210,7 +210,7 @@ export default function DashboardJobsPage() {
     <div className="space-y-6">
       <div className="ml-10 mt-10 flex flex-wrap items-end justify-between gap-4 pr-4">
         <div>
-          <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+          <h1 className="mb-2 text-2xl font-medium text-foreground md:text-3xl">
             Jobs
           </h1>
           <p className="text-sm text-muted-foreground md:text-base">

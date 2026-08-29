@@ -23,7 +23,7 @@ export default function CancelPage() {
 
             {/* Content */}
             <div className="text-center space-y-3 mb-8">
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-medium text-foreground">
                 Payment Cancelled
               </h1>
               <p className="text-muted-foreground text-base">

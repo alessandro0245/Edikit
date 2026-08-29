@@ -147,7 +147,7 @@ export default function SignUpPage() {
               <div className="h-10 flex items-center justify-center mx-auto mb-2">
                 <Image src="/logo.png" alt="Logo" width={100} height={40} className="object-contain" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-medium text-foreground tracking-tight">
                 Create your account
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground">

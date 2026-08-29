@@ -23,7 +23,7 @@ export default function SettingsPage() {
         <div className="mx-auto max-w-2xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+            <h1 className="text-3xl font-medium text-foreground mb-2">Settings</h1>
             <p className="text-muted-foreground">Manage your profile and account settings</p>
           </div>
 
