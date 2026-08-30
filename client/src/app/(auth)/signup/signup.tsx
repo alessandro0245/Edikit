@@ -138,31 +138,58 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center items-center py-6 sm:py-12">
-      <main className="container mx-auto px-4 w-full">
-        <div className="max-w-md mx-auto w-full">
-          <div className="p-6 sm:p-8 rounded-xl border border-border bg-card shadow-sm">
-            {/* Header - Tightened spacing */}
-            <div className="text-center space-y-2 mb-6">
-              <div className="h-10 flex items-center justify-center mx-auto mb-2">
-                <Image src="/logo.png" alt="Logo" width={100} height={40} className="object-contain" />
-              </div>
-              <h1 className="text-xl sm:text-2xl font-medium text-foreground tracking-tight">
-                Create your account
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 bg-background overflow-y-auto">
+      <main className="w-full max-w-[1040px] bg-[#1F1F1F] rounded-[2rem]  flex flex-col md:flex-row overflow-hidden min-h-[600px]">
+        
+        {/* Left Side - Form */}
+        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="w-full max-w-[400px] mx-auto">
+            {/* Header */}
+            <div className="space-y-3 mb-8">
+              {/* <div className="h-10 flex items-center justify-start mb-6">
+                <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+              </div> */}
+              <h1 className="text-2xl sm:text-3xl text-center
+               font-semibold text-foreground tracking-tight leading-tight">
+                You're one click away from motion graphics
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Start creating stunning motion graphics today
+              <p className="text-sm text-muted-foreground text-center">
+                Try Edikit for free. No credit card required.
               </p>
             </div>
 
+            {/* Social Login */}
+            <div>
+              <button
+                onClick={handleGoogleLogin}
+                type="button"
+                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors"
+              >
+                <GoogleIcon size={18} />
+                Continue with Google
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-[11px]">
+                <span className="bg-[#1F1F1F] px-4 text-muted-foreground uppercase tracking-wider">
+                  Or
+                </span>
+              </div>
+            </div>
+
             {/* Sign Up Form */}
-            <form id="signup-form" onSubmit={handleSubmit} className="space-y-3.5">
+            <form id="signup-form" onSubmit={handleSubmit} className="space-y-4">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label htmlFor="name" className="text-xs font-medium text-foreground">
+                <label htmlFor="name" className="text-sm font-medium text-foreground">
                   Full Name
                 </label>
-                <div className="relative">
+                <div className="relative mt-1">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     id="name"
@@ -171,7 +198,7 @@ export default function SignUpPage() {
                     placeholder="John Doe"
                     value={formData.fullName}
                     onChange={(e) => handleFieldChange("fullName", e.target.value)}
-                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.fullName ? "border-red-500" : "border-border"
+                    className={`w-full h-11 pl-10 pr-3 text-sm rounded-xl border ${errors.fullName ? "border-red-500" : "border-border"
                       } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.fullName ? "focus:ring-red-500" : "focus:ring-ring"
                       }`}
                   />
@@ -183,10 +210,10 @@ export default function SignUpPage() {
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label htmlFor="email" className="text-xs font-medium text-foreground">
+                <label htmlFor="email" className="text-sm font-medium text-foreground">
                   Email
                 </label>
-                <div className="relative">
+                <div className="relative mt-1">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     id="email"
@@ -195,7 +222,7 @@ export default function SignUpPage() {
                     placeholder="you@gmail.com"
                     value={formData.email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
-                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.email ? "border-red-500" : "border-border"
+                    className={`w-full h-11 pl-10 pr-3 text-sm rounded-xl border ${errors.email ? "border-red-500" : "border-border"
                       } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.email ? "focus:ring-red-500" : "focus:ring-ring"
                       }`}
                   />
@@ -207,10 +234,10 @@ export default function SignUpPage() {
 
               {/* Password */}
               <div className="space-y-1.5">
-                <label htmlFor="password" className="text-xs font-medium text-foreground">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </label>
-                <div className="relative">
+                <div className="relative mt-1">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     id="password"
@@ -218,13 +245,13 @@ export default function SignUpPage() {
                     placeholder="Create a strong password"
                     value={formData.password}
                     onChange={(e) => handleFieldChange("password", e.target.value)}
-                    className={`w-full h-9 pl-10 pr-3 text-sm rounded-lg border ${errors.password ? "border-red-500" : "border-border"
+                    className={`w-full h-11 pl-10 pr-3 text-sm rounded-xl border ${errors.password ? "border-red-500" : "border-border"
                       } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.password ? "focus:ring-red-500" : "focus:ring-ring"
                       }`}
                   />
                 </div>
 
-                {/* Password Requirements - Made inline/grid to save vertical space */}
+                {/* Password Requirements */}
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1.5">
                   {passwordCriteria.map((criterion, index) => {
                     const isValid = criterion.test(formData.password);
@@ -257,60 +284,37 @@ export default function SignUpPage() {
               {/* Terms */}
               <div className="pt-1">
                 <p className="text-xs text-muted-foreground leading-normal">
-                  By creating an account, you agree to our{" "}
-                  <Link href="https://www.iubenda.com/privacy-policy/82026734" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>{" "}and{" "}
-                  <Link href="https://www.iubenda.com/privacy-policy/82026734/cookie-policy" className="text-primary hover:underline">
-                    Cookie Policy
-                  </Link>
+                  By signing up, you agree to Edikit's{" "}
+                  <Link href="https://www.iubenda.com/privacy-policy/82026734" className="text-primary hover:underline font-medium">
+                    Terms of Service
+                  </Link>{" "}and acknowledge the{" "}
+                  <Link href="https://www.iubenda.com/privacy-policy/82026734/cookie-policy" className="text-primary hover:underline font-medium">
+                    Privacy Statement
+                  </Link>.
                 </p>
               </div>
 
               {/* Submit Button */}
-              <EdikitButton
-                type="submit"
-                disabled={loading}
-                variant="primary"
-                width="w-full"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <LoaderCircle className="animate-spin h-4 w-4 text-primary-foreground" />
-                    {/* Creating Account... */}
-                  </div>
-                ) : (
-                  "Create Account"
-                )}
-              </EdikitButton>
+              <div className="pt-2">
+                <EdikitButton
+                  type="submit"
+                  disabled={loading}
+                  variant="primary"
+                  width="w-full"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <LoaderCircle className="animate-spin h-5 w-5 text-primary-foreground" />
+                    </div>
+                  ) : (
+                    "Create Account"
+                  )}
+                </EdikitButton>
+              </div>
             </form>
 
-            {/* Divider */}
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-[11px]">
-                <span className="bg-card px-2 text-muted-foreground uppercase tracking-wider">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            {/* Social Sign Up */}
-            <div>
-              <button
-                onClick={handleGoogleLogin}
-                type="button"
-                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors"
-              >
-                <GoogleIcon size={18} />
-                Continue with Google
-              </button>
-            </div>
-
             {/* Login Link */}
-            <p className="text-center text-xs text-muted-foreground mt-4">
+            <p className="text-start text-sm text-muted-foreground mt-6">
               Already have an account?{" "}
               <Link
                 href="/login"
@@ -321,7 +325,21 @@ export default function SignUpPage() {
             </p>
           </div>
         </div>
+
+        {/* Right Side - Image */}
+       <div className="hidden md:flex md:w-1/2 items-center justify-center relative">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                  <Image
+                    src="/auth.png"
+                    alt="Authentication visual"
+                    fill
+                    className="object-cover object-[20%]"
+                    priority
+                  />
+                </div>
+        </div>
+
       </main>
     </div>
- );
+  );
 }
