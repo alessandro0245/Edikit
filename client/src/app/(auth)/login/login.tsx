@@ -94,17 +94,17 @@ const Login = () => {
 
   return (
     <div className=" flex items-center justify-center p-4 sm:p-8 bg-background overflow-hidden">
-      <main className="w-full max-w-[1040px] bg-[#1F1F1F] rounded-[2rem] flex flex-col md:flex-row overflow-hidden min-h-[500px]">
+      <main className="w-full max-w-[550px] bg-background rounded-[2rem] flex flex-col md:flex-row overflow-hidden min-h-[500px]">
 
         {/* Left Side - Form */}
-        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+        <div className="w-full md:w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
           <div className="w-full max-w-[400px] mx-auto">
             {/* Header */}
             <div className="space-y-3 mb-8">
               {/* <div className="h-10 flex items-center justify-start mb-6">
                 <Image src="/logo.png" alt="Logo" width={100} height={40} className="object-contain" />
               </div> */}
-              <h1 className="text-3xl sm:text-4xl font-semibold text-foreground tracking-tight leading-tight text-center">
+              <h1 className="text-3xl sm:text-4xl font-medium text-foreground tracking-tight leading-tight text-center">
                 Welcome back
               </h1>
               <p className="text-sm text-muted-foreground text-center">
@@ -130,7 +130,7 @@ const Login = () => {
                 <div className="w-full border-t border-white/10 " />
               </div>
               <div className="relative flex justify-center text-[11px]">
-                <span className="bg-[#1F1F1F] px-4 text-muted-foreground uppercase tracking-wider">
+                <span className="bg-background px-4 text-muted-foreground uppercase tracking-wider">
                   Or
                 </span>
               </div>
@@ -225,7 +225,7 @@ const Login = () => {
         </div>
 
         {/* Right Side - Image */}
-        <div className="hidden md:flex md:w-1/2 items-center justify-center relative">
+        {/* <div className="hidden md:flex md:w-1/2 items-center justify-center relative">
           <div className="relative w-full h-full rounded-2xl overflow-hidden">
             <Image
               src="/auth.png"
@@ -235,7 +235,7 @@ const Login = () => {
               priority
             />
           </div>
-        </div>
+        </div> */}
 
       </main>
     </div>

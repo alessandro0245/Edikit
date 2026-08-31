@@ -66,6 +66,8 @@ export default function SignUpPage() {
     password: "",
   });
 
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
   // Clear error when user starts typing
   const handleFieldChange = (field: keyof SignupFormData, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -139,10 +141,10 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 bg-background overflow-y-auto">
-      <main className="w-full max-w-[1040px] bg-[#1F1F1F] rounded-[2rem]  flex flex-col md:flex-row overflow-hidden min-h-[600px]">
+      <main className="w-full max-w-[550px] bg-background rounded-[2rem]  flex flex-col md:flex-row overflow-hidden min-h-[600px]">
         
         {/* Left Side - Form */}
-        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+        <div className="w-full md:w-full p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
           <div className="w-full max-w-[400px] mx-auto">
             {/* Header */}
             <div className="space-y-3 mb-8">
@@ -150,8 +152,8 @@ export default function SignUpPage() {
                 <Image src="/logo.png" alt="Logo" fill className="object-contain" />
               </div> */}
               <h1 className="text-2xl sm:text-3xl text-center
-               font-semibold text-foreground tracking-tight leading-tight">
-                You're one click away from motion graphics
+                font-medium text-foreground tracking-tight leading-tight">
+                You&rsquo;re one click away from your best looking videos
               </h1>
               <p className="text-sm text-muted-foreground text-center">
                 Try Edikit for free. No credit card required.
@@ -176,7 +178,7 @@ export default function SignUpPage() {
                 <div className="w-full border-t border-white/10" />
               </div>
               <div className="relative flex justify-center text-[11px]">
-                <span className="bg-[#1F1F1F] px-4 text-muted-foreground uppercase tracking-wider">
+                <span className="bg-background px-4 text-muted-foreground uppercase tracking-wider">
                   Or
                 </span>
               </div>
@@ -245,6 +247,8 @@ export default function SignUpPage() {
                     placeholder="Create a strong password"
                     value={formData.password}
                     onChange={(e) => handleFieldChange("password", e.target.value)}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
                     className={`w-full h-11 pl-10 pr-3 text-sm rounded-xl border ${errors.password ? "border-red-500" : "border-border"
                       } bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${errors.password ? "focus:ring-red-500" : "focus:ring-ring"
                       }`}
@@ -252,29 +256,31 @@ export default function SignUpPage() {
                 </div>
 
                 {/* Password Requirements */}
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1.5">
-                  {passwordCriteria.map((criterion, index) => {
-                    const isValid = criterion.test(formData.password);
-                    const showCheck = formData.password.length > 0;
+                {(isPasswordFocused || (formData.password.length > 0 && !passwordCriteria.every(c => c.test(formData.password)))) && (
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1.5 transition-all duration-300">
+                    {passwordCriteria.map((criterion, index) => {
+                      const isValid = criterion.test(formData.password);
+                      const showCheck = formData.password.length > 0;
 
-                    return (
-                      <div key={index} className="flex items-center gap-1.5 text-[11px]">
-                        {showCheck ? (
-                          isValid ? (
-                            <Check className="w-3.5 h-3.5 text-green-500" />
+                      return (
+                        <div key={index} className="flex items-center gap-1.5 text-[11px]">
+                          {showCheck ? (
+                            isValid ? (
+                              <Check className="w-3.5 h-3.5 text-green-500" />
+                            ) : (
+                              <X className="w-3.5 h-3.5 text-red-500" />
+                            )
                           ) : (
-                            <X className="w-3.5 h-3.5 text-red-500" />
-                          )
-                        ) : (
-                          <div className="w-3.5 h-3.5 rounded-full border border-muted-foreground/50" />
-                        )}
-                        <span className={showCheck && isValid ? "text-green-500" : "text-muted-foreground"}>
-                          {criterion.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                            <div className="w-3.5 h-3.5 rounded-full border border-muted-foreground/50" />
+                          )}
+                          <span className={showCheck && isValid ? "text-green-500" : "text-muted-foreground"}>
+                            {criterion.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {errors.password && (
                   <p className="text-[11px] text-red-500 mt-1">{errors.password}</p>
@@ -327,7 +333,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Right Side - Image */}
-       <div className="hidden md:flex md:w-1/2 items-center justify-center relative">
+       {/* <div className="hidden md:flex md:w-1/2 items-center justify-center relative">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
                   <Image
                     src="/auth.png"
@@ -337,7 +343,7 @@ export default function SignUpPage() {
                     priority
                   />
                 </div>
-        </div>
+        </div> */}
 
       </main>
     </div>

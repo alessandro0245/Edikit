@@ -18,6 +18,8 @@ import {
   Palette,
   SlidersHorizontal,
   ChevronDown,
+  Lightbulb,
+  TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
 import useCustomizeLogic from "./useCustomizeLogic";
@@ -604,8 +606,8 @@ const CustomizePage = () => {
                   {/* Background mode toggle */}
                   {template.hasTransprentBackground === false ? (
                     <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-                      <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                        ⚠️ This template does not support transparent background.
+                      <p className="text-xs text-yellow-600 dark:text-yellow-400 flex gap-2">
+                        <TriangleAlert className="w-4 h-4" />This template does not support transparent background.
                         The exported video will have a colored background.
                       </p>
                     </div>
@@ -690,8 +692,9 @@ const CustomizePage = () => {
 
                   {/* Helpful hints */}
                   <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                    <p className="text-xs text-blue-600 dark:text-blue-400">
-                      💡 <strong>Note:</strong> Empty fields keep default appearance.
+                    <p className="text-xs text-blue-600 dark:text-blue-400 flex gap-2">
+                      <Lightbulb className="w-4 h-4" />
+                      <span className="font-medium">Note:</span> Empty fields keep default appearance.
                       Files are uploaded automatically when selected.
                     </p>
                   </div>

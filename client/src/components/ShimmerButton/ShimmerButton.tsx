@@ -102,13 +102,13 @@ function useBlobAnimation(
 
 export type ButtonSize = "xs" | "sm" | "md" | "lg";
 export type ButtonVariant = "primary" | "secondary";
-export type BorderWeight = "subtle" | "light" | "normal" | "none";
+export type borderweight = "subtle" | "light" | "normal" | "none";
 
 interface BaseProps {
   children: ReactNode;
   size?: ButtonSize;
   variant?: ButtonVariant;
-  borderWeight?: BorderWeight; // "subtle" | "light" | "normal" | "none"
+  borderweight?: borderweight; // "subtle" | "light" | "normal" | "none"
   compact?: boolean;          // Slimmer vertical padding for refined layouts
   width?: string;             // any Tailwind width class e.g. "w-full" "w-64" "w-1/2"
   className?: string;
@@ -147,7 +147,7 @@ const compactSizeClasses: Record<ButtonSize, string> = {
 
 // ─── Border weight map ─────────────────────────────────────────────────────────
 
-const borderClasses: Record<BorderWeight, string> = {
+const borderClasses: Record<borderweight, string> = {
   subtle: "border border-white/12 hover:border-primary/80",
   light: "border border-white/8 hover:border-primary/60",
   normal: "border border-border hover:border-primary",
@@ -193,17 +193,17 @@ function PrimaryInner({
 }
 
 // ─── Secondary inner ──────────────────────────────────────────────────────────
-// Refined secondary style with customizable borderWeight and compact height
+// Refined secondary style with customizable borderweight and compact height
 
 function SecondaryInner({
   children,
   size = "md",
   width = "",
   className = "",
-  borderWeight = "subtle",
+  borderweight = "subtle",
   compact = false,
 }: BaseProps) {
-  const borderClass = borderClasses[borderWeight];
+  const borderClass = borderClasses[borderweight];
   const sizeClass = compact ? compactSizeClasses[size] : sizeClasses[size];
 
   return (
@@ -239,7 +239,7 @@ export default function EdikitButton(props: EdikitButtonProps) {
   const variant = props.variant ?? "primary";
   const isPrimary = variant === "primary";
   const width = props.width ?? "";
-  const borderWeight = props.borderWeight ?? "subtle";
+  const borderweight = props.borderweight ?? "subtle";
   const compact = props.compact ?? false;
 
   useBlobAnimation(containerRef, blobRef, isPrimary);
@@ -252,7 +252,7 @@ export default function EdikitButton(props: EdikitButtonProps) {
         size={size}
         width={width}
         className={className}
-        borderWeight={borderWeight}
+        borderweight={borderweight}
         compact={compact}
       >
         {children}

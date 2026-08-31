@@ -37,8 +37,8 @@ export default function Pricing() {
               <div
                 key={plan.name}
                 className={`flex flex-col justify-between p-6 rounded-2xl transition-all duration-200 ${plan.popular
-                    ? "bg-[#1F1F1F] border border-border relative"
-                    : "bg-transparent border border-transparent"
+                  ? "bg-[#1F1F1F] border border-border relative"
+                  : "bg-transparent border border-transparent"
                   }`}
               >
                 <div>
@@ -101,7 +101,7 @@ export default function Pricing() {
                       handlePayment(plan.id, user?.userId || user?.id);
                     }}
                     variant={plan.popular ? "primary" : "secondary"}
-                    borderWeight="subtle"
+                    borderweight="subtle"
                     compact
                     size="lg"
                     width="w-full"
