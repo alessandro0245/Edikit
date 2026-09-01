@@ -91,6 +91,7 @@ export interface Template {
       value?: string;
       maxLength?: number;
       dimensions?: string;
+      videoDimensions?: string;
       required: boolean;
     };
   };
@@ -110,12 +111,14 @@ export const templates: Template[] = [
         type: "media",
         label: "Media 1",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       media2: {
         type: "media",
         label: "Media 2",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       background: {
@@ -141,24 +144,28 @@ export const templates: Template[] = [
         type: "media",
         label: "Media 1",
         dimensions: "1080x1080",
+        videoDimensions: "1040x1056",
         required: false,
       },
       media2: {
         type: "media",
         label: "Media 2",
         dimensions: "1080x1080",
+        videoDimensions: "1040x1056",
         required: false,
       },
       media3: {
         type: "media",
         label: "Media 3",
         dimensions: "1080x1080",
+        videoDimensions: "1040x1056",
         required: false,
       },
       media4: {
         type: "media",
         label: "Media 4",
         dimensions: "1080x1080",
+        videoDimensions: "1040x1056",
         required: false,
       },
       background: {
@@ -196,6 +203,7 @@ export const templates: Template[] = [
         type: "media",
         label: "Media 3",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       image4: {
@@ -497,18 +505,21 @@ export const templates: Template[] = [
         type: "media",
         label: "Media 1",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       media2: {
         type: "media",
         label: "Media 2",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       media3: {
         type: "media",
         label: "Media 3",
         dimensions: "1080x1000",
+        videoDimensions: "1176x1058",
         required: false,
       },
       background: {

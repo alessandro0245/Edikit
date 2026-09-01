@@ -594,9 +594,10 @@ export const useCustomizeLogic = () => {
     } else if (processedFile.type.startsWith("video/")) {
       // Get the field to check if it has required dimensions
       const field = template?.fields[fieldKey];
-      if (field && field.dimensions) {
+      const targetDimensions = field?.videoDimensions || field?.dimensions;
+      if (field && targetDimensions) {
         // Parse dimensions (format: "1920x1080")
-        const [width, height] = field.dimensions
+        const [width, height] = targetDimensions
           .split("x")
           .map((d) => parseInt(d.trim()));
 
