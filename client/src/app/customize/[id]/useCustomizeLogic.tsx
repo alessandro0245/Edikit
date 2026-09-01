@@ -458,9 +458,12 @@ export const useCustomizeLogic = () => {
   ) => {
     if (!file) return;
 
-    let processedFile = file;
+    setUploadingAssets((prev) => new Set(prev).add(fieldKey));
 
-    if (processedFile.type.startsWith("image/")) {
+    try {
+      let processedFile = file;
+
+      if (processedFile.type.startsWith("image/")) {
       // Get the field to check if it has required dimensions
       const field = template?.fields[fieldKey];
       if (field && field.dimensions) {
@@ -646,13 +649,17 @@ export const useCustomizeLogic = () => {
 
     setFormData((prev) => ({ ...prev, [fieldKey]: processedFile }));
     await uploadSingleAsset(fieldKey, processedFile);
+    } finally {
+      setUploadingAssets((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fieldKey);
+        return newSet;
+      });
+    }
   };
 
   const uploadSingleAsset = async (fieldKey: string, file: File) => {
     if (!isLoggedIn) return;
-
-    // Mark this field as uploading
-    setUploadingAssets((prev) => new Set(prev).add(fieldKey));
 
     try {
       const formDataToSend = new FormData();
@@ -680,13 +687,6 @@ export const useCustomizeLogic = () => {
           ? `Failed to upload ${fieldKey}: ${details}`
           : `Failed to upload ${fieldKey}`,
       );
-    } finally {
-      // Remove from uploading set
-      setUploadingAssets((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(fieldKey);
-        return newSet;
-      });
     }
   };
 
