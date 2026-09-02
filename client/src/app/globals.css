@@ -102,8 +102,20 @@
 }
 
 @theme inline {
-  /* --font-sans: var(--font-google-sans-flex),  -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; */
-  /* --font-mono: var(--font-google-sans-flex),  'SF Mono', 'Courier New', monospace; */
+  /* Native system UI font — Segoe UI on Windows, San Francisco on Apple,
+     Roboto on Android. Nothing is downloaded. */
+  --font-sans:
+    "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* Self-hosted Google Sans Flex — parked. To switch back, comment out the
+     --font-sans above, uncomment the one below, and follow the steps in
+     src/fonts/index.ts.
+  --font-sans:
+    var(--font-sans-latin), var(--font-sans-ext), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  */
+  --font-heading: var(--font-sans);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -142,8 +154,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-primary-solid: var(--primary-solid);
   --color-primary-gradient: var(--primary-gradient);
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
@@ -159,12 +169,6 @@
   html {
     @apply font-sans;
   }
-}
-
-@theme inline {
-  --font-sans:
-    "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
 }
 
 html {

@@ -29,9 +29,9 @@ const FONTS: FontOption[] = [
   {
     id: "google-sans",
     name: "Google Sans (Default)",
-    family: "'Google Sans', sans-serif",
-    googleFontUrl:
-      "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap",
+    // self-hosted, already loaded by the root layout
+    family: "var(--font-sans)",
+    googleFontUrl: "",
   },
   {
     id: "roboto",
@@ -166,7 +166,7 @@ export default function FontPicker({
   return (
     <>
       {/* Preload all Google Fonts once */}
-      {FONTS.map((f) => (
+      {FONTS.filter((f) => f.googleFontUrl).map((f) => (
         <link key={f.id} rel="stylesheet" href={f.googleFontUrl} />
       ))}
 
