@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/redux/Provider";
 import SimpleFooter from "@/components/Footer/Footer";
 import Script from "next/script";
+import { cn } from "@/lib/utils";
+import { googleSans, googleSansExt } from "@/fonts";
 
 export const metadata: Metadata = {
   title: "Edikit | Create Production-Level Motion Graphics in Seconds",
@@ -21,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn(googleSans.variable, googleSansExt.variable)}>
       <head>
         <link rel="preconnect" href="https://edikit-api-mc9p.onrender.com" />
         {/* Preload logo so it's ready before browser finds the img tag */}
