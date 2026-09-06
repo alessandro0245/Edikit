@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
 import CarouselWithMultipleSlides from "./NewSlider";
+import MatchCut from "./Match-cut";
 
 export default function Hero() {
   return (
@@ -12,7 +13,7 @@ export default function Hero() {
       <main>
         {/* <Prompt /> */}
         <EdikitHero />
-
+        <MatchCut />
         {/* Templates Section */}
         <section
           className="relative overflow-hidden bg-[#191919] py-10 md:py-16"

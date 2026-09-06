@@ -165,7 +165,8 @@ export class RemotionLambdaService {
       region: this.region as any,
       functionName: this.functionName,
       serveUrl: this.serveUrl,
-      composition: 'AIVideoComposition',
+      composition:
+        ((config as any).compositionId as string) || 'AIVideoComposition',
       inputProps: config as unknown as Record<string, unknown>,
       codec: 'h264',
       maxRetries: 2,

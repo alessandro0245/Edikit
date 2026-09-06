@@ -29,10 +29,12 @@ async function run() {
 
   parentPort!.postMessage({ type: 'progress', progress: 0.15 });
 
+  const compositionId = (config.compositionId as string) || 'AIVideoComposition';
   const composition = await selectComposition({
     serveUrl: bundleLocation,
-    id: 'AIVideoComposition',
+    id: compositionId,
     inputProps: config,
+    timeoutInMilliseconds: 120000,
   });
 
   await fs.mkdir(outputDir, { recursive: true });
@@ -47,6 +49,7 @@ async function run() {
     inputProps: config,
     codec: 'h264',
     crf: 20,
+    timeoutInMilliseconds: 120000,
     onProgress: ({ progress }: { progress: number }) => {
       parentPort!.postMessage({
         type: 'progress',

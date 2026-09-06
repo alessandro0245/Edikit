@@ -10,6 +10,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreditsService } from '../credits/credits.service';
 import { S3Service } from '../s3/s3.service';
 import { GeneratePromptDto } from './dto/generate-prompt.dto';
+import { GenerateMatchCutDto } from './dto/generate-matchcut.dto';
 import { PromptService } from './prompt.service';
 import { RemotionLambdaService } from './remotion-lambda.service';
 
@@ -115,6 +116,164 @@ async generatePrompt(dto: GeneratePromptDto, userId: string) {
     status:      renderJob.status,
     videoConfig,
   };
+}
+
+async generateMatchCut(dto: GenerateMatchCutDto, userId: string) {
+  const {
+    word,
+    durationInSeconds = 6,
+    aspectRatio = '9:16',
+    resolution = '1080p',
+    zoomIntensity = 100,
+  } = dto;
+
+  const hasCredits = await this.creditsService.hasEnoughCredits(
+    userId,
+    VideoService.AI_VIDEO_CREDIT_COST,
+  );
+  if (!hasCredits) {
+    throw new BadRequestException(
+      'Insufficient credits. Please purchase more credits to generate match cut.',
+    );
+  }
+
+  const trimmedWord = word?.trim();
+  if (!trimmedWord) {
+    throw new BadRequestException('Word/topic cannot be empty.');
+  }
+
+  const scenes = this.buildMatchCutScenes(trimmedWord);
+
+  const matchCutConfig = {
+    compositionId: 'MatchCut',
+    title: `Match Cut — ${trimmedWord}`,
+    word: trimmedWord,
+    durationInSeconds,
+    aspectRatio,
+    resolution: resolution.toLowerCase() === '4k' ? '4k' : '1080p',
+    zoomIntensity,
+    scenes,
+    holdStart: 10,
+    holdEnd: 3,
+    rampSeconds: 1.2,
+    maxFontSize: 120,
+    letterSpacingEm: 0.04,
+    snippetWidthEm: 13,
+    wordWeights: [400, 500, 600],
+    clickSounds: ['sfx/click.wav'],
+    clickVolume: 0.28,
+    zoomFrom: 0.5,
+    zoomTo: 1,
+    backgroundColor: '#191919',
+    linkColor: '#1A73E8',
+    textColor: '#e8eaed',
+    mutedColor: '#9aa0a6',
+  };
+
+  const renderJob = await this.prisma.renderJob.create({
+    data: {
+      userId,
+      renderType: 'AI_PROMPT',
+      status: 'PENDING',
+      promptText: trimmedWord,
+      aiConfig: matchCutConfig as any,
+      creditsUsed: VideoService.AI_VIDEO_CREDIT_COST,
+    },
+  });
+
+  await this.creditsService.deductCredits(
+    userId,
+    VideoService.AI_VIDEO_CREDIT_COST,
+    renderJob.id,
+  );
+
+  this.triggerAsyncRender(renderJob.id, userId, matchCutConfig as any).catch((err) => {
+    this.logger.error(
+      `Async matchcut render job ${renderJob.id} failed:`,
+      (err as Error).stack,
+    );
+  });
+
+  return {
+    jobId: renderJob.id,
+    status: renderJob.status,
+    videoConfig: matchCutConfig,
+  };
+}
+
+private buildMatchCutScenes(word: string) {
+  return [
+    {
+      siteName: 'Britannica',
+      url: `https://www.britannica.com > topic > ${word.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+      titleBefore: '',
+      titleAfter: '| Definition, Origins, Facts & Examples',
+      snippet: `In cultural and historical analysis, ${word} represents an essential concept that shapes understanding across disciplines and modern discussions.`,
+    },
+    {
+      siteName: 'Wikipedia',
+      url: `https://en.wikipedia.org > wiki > ${encodeURIComponent(word)}`,
+      titleBefore: '',
+      titleAfter: '— Overview, History & Notable Impact',
+      snippet: `${word} is recognized globally for its distinctive influence in modern media, popular culture, and comprehensive studies.`,
+    },
+    {
+      siteName: 'The Guardian',
+      url: 'https://www.theguardian.com > culture > perspective',
+      titleBefore: 'Why the conversation around',
+      titleAfter: 'is shifting faster than ever',
+      snippet: `An in-depth look at how ${word} became one of the most talked-about topics of the generation, and what experts say comes next.`,
+    },
+    {
+      siteName: 'Reddit',
+      url: 'https://www.reddit.com > r/deepdive > comments',
+      titleBefore: 'What everyone gets wrong about',
+      titleAfter: '(and why it matters today)',
+      snippet: `Over 840 comments breaking down the hidden intricacies of ${word}. Top comment: It really comes down to the fundamentals that most people overlook.`,
+    },
+    {
+      siteName: 'YouTube',
+      url: 'https://www.youtube.com > watch',
+      titleBefore: 'Everything you need to know about',
+      titleAfter: 'in 5 minutes',
+      snippet: `3.2M views · 2 weeks ago. A visual breakdown exploring the rise and true significance of ${word} in modern society.`,
+    },
+    {
+      siteName: 'Goodreads',
+      url: 'https://www.goodreads.com > book > quotes',
+      titleBefore: 'Top 100 quotes and reflections on',
+      titleAfter: 'from classic literature',
+      snippet: `Explore essential reflections and timeless wisdom exploring ${word} through the eyes of history greatest thinkers and authors.`,
+    },
+    {
+      siteName: 'Merriam-Webster',
+      url: 'https://www.merriam-webster.com > dictionary',
+      titleBefore: '',
+      titleAfter: 'Meaning & Etymology Explained',
+      snippet: `Definition of ${word}: the fundamental qualities, characteristics, and practical usage examined in contemporary context.`,
+    },
+    {
+      siteName: 'Quora',
+      url: 'https://www.quora.com > questions',
+      titleBefore: 'What is the real difference between',
+      titleAfter: 'and everything else?',
+      snippet: `Answered by industry professionals: when you understand how ${word} functions at its core, the distinction becomes instantly clear.`,
+    },
+    {
+      siteName: 'Nature',
+      url: 'https://www.nature.com > articles > research',
+      titleBefore: 'Systematic analysis of',
+      titleAfter: 'dynamics and patterns',
+      snippet: `A comprehensive evaluation observing the structural impact of ${word} across interconnected environments and peer-reviewed samples.`,
+    },
+    {
+      siteName: 'IMDb',
+      url: 'https://www.imdb.com > title > spotlight',
+      titleBefore: 'The Untold Story of',
+      titleAfter: '(Documentary Feature)',
+      snippet: `Directed by award-winning filmmakers, this documentary provides unprecedented access into the world and legacy of ${word}.`,
+    },
+  ];
 }
 
   private async triggerAsyncRender(
