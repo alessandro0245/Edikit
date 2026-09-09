@@ -34,8 +34,8 @@ export function useMatchCutLogic() {
 
   // Form states
   const [prompt, setPrompt] = useState("");
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("16:9");
-  const [resolution, setResolution] = useState<Resolution>("4K");
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("9:16");
+  const [resolution, setResolution] = useState<Resolution>("1080p");
   const [durationInSeconds, setDurationInSeconds] = useState(6);
   const [zoomIntensity, setZoomIntensity] = useState(100);
 

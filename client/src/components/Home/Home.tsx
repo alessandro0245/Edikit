@@ -1,6 +1,5 @@
 "use client";
 
-import { templates } from "@/utils/constant";
 import { ArrowRight } from "lucide-react";
 import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
@@ -13,7 +12,7 @@ export default function Hero() {
       <main>
         {/* <Prompt /> */}
         <EdikitHero />
-        <MatchCut />
+
         {/* Templates Section */}
         <section
           className="relative overflow-hidden bg-[#191919] py-10 md:py-16"
@@ -163,6 +162,7 @@ export default function Hero() {
                 </EdikitButton>
               </div>
             </div>
+            <MatchCut />
           </div>
         </section>
       </main>
