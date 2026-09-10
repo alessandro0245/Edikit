@@ -558,7 +558,7 @@ import {
 import { showErrorToast, showSuccessToast } from "@/components/Toast/showToast";
 
 const MATCH_CUT_PREVIEW_VIDEO = "/matchcut/preview.mp4";
-const MATCH_CUT_PREVIEW_POSTER = "/matchcut/scene01.jpg";
+const MATCH_CUT_PREVIEW_POSTER = "/matchcut/mathcut-preview.jpg";
 
 // ─── Aspect Ratio Options ───────────────────────────────────────────────────
 const ASPECT_OPTIONS: {
@@ -568,7 +568,7 @@ const ASPECT_OPTIONS: {
   icon: React.ReactNode;
 }[] = [
     {
-      value: "9:16",
+      value: "9:16",  
       label: "9:16",
       sub: "Reels / TikTok",
       icon: (
