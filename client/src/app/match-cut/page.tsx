@@ -825,8 +825,22 @@ export default function MatchCutPage() {
                           placeholder="Enter a topic, name, brand or idea..."
                         />
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-1 text-right">
-                        {prompt.length} / 14 characters
+                      <p
+                        className={`text-[11px] mt-1 text-right transition-colors ${
+                          prompt.length >= 14
+                            ? "text-red-500 font-medium"
+                            : prompt.length >= 12
+                            ? "text-amber-400"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {prompt.length} / 14
+                        {prompt.length >= 12 && prompt.length < 14 && (
+                          <span className="ml-1 opacity-80">— keeps best under 12</span>
+                        )}
+                        {prompt.length === 14 && (
+                          <span className="ml-1">— max reached</span>
+                        )}
                       </p>
                     </div>
 

@@ -324,14 +324,30 @@ export class PromptService {
           }
         }
 
+        // Separate two failure modes:
+        //  A) Invalid scenes (word in titles, title too long, missing fields) → retry,
+        //     because a broken scene produces a broken frame.
+        //  B) Slightly fewer scenes than requested → accept, because the Remotion
+        //     component cycles short arrays (README: "safe fallback but visibly
+        //     repetitive"). Only retry if below 80% of the target count.
         if (invalid.length > 0) {
           throw new Error(
             `${invalid.length} scene(s) failed validation (indices: ${invalid.join(', ')})`,
           );
         }
 
+        const minAcceptable = Math.floor(sceneCount * 0.8);
+        if (valid.length < minAcceptable) {
+          throw new Error(
+            `Too few scenes: expected ${sceneCount}, got ${valid.length} (minimum ${minAcceptable})`,
+          );
+        }
+
         if (valid.length < sceneCount) {
-          throw new Error(`Expected ${sceneCount} scenes, got ${valid.length}`);
+          this.logger.warn(
+            `MatchCut: got ${valid.length}/${sceneCount} scenes for "${word}" — ` +
+            `component will cycle the last ${sceneCount - valid.length} cut(s).`,
+          );
         }
 
         this.logger.log(
