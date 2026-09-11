@@ -234,7 +234,7 @@ export function useMatchCutLogic() {
 
   const handleDownload = async () => {
     if (!outputUrl) return;
-    const filename = `matchcut-${prompt.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "video"}.mp4`;
+    const filename = `edikit-${prompt.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "video"}.mp4`;
     try {
       const res = await fetch(outputUrl);
       const blob = await res.blob();

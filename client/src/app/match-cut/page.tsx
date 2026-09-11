@@ -702,7 +702,7 @@ export default function MatchCutPage() {
               <div className="p-2">
                 <div className="flex items-center gap-1">
                   <h2 className="font-semibold text-foreground text-xl">
-                    Preview
+                    Edikit{"      "}Preview
                   </h2>
                 </div>
               </div>
