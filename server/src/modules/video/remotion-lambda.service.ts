@@ -161,6 +161,10 @@ export class RemotionLambdaService {
       );
     }
 
+    const isMatchCut = ((config as any).compositionId as string) === 'MatchCut';
+    const is4k = isMatchCut && (config as any).resolution === '4k';
+    const videoBitrate = isMatchCut ? (is4k ? '40M' : '15M') : undefined;
+
     const { renderId, bucketName } = await renderMediaOnLambda({
       region: this.region as any,
       functionName: this.functionName,
@@ -169,6 +173,8 @@ export class RemotionLambdaService {
         ((config as any).compositionId as string) || 'AIVideoComposition',
       inputProps: config as unknown as Record<string, unknown>,
       codec: 'h264',
+      ...(videoBitrate ? { videoBitrate } : { crf: 20 }),
+      colorSpace: 'bt709',
       maxRetries: 2,
       privacy: 'no-acl',
       framesPerLambda: 20,
@@ -177,6 +183,7 @@ export class RemotionLambdaService {
         fileName: `${config.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`,
       },
     });
+
 
     this.logger.log(
       `Lambda render started: renderId=${renderId}, bucket=${bucketName}`,
