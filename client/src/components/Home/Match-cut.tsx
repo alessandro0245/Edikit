@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlignLeft, Columns2, Download } from "lucide-react";
+import { AlignLeft, Columns2, Film } from "lucide-react";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
 
 interface MatchCutProps {
@@ -84,14 +84,14 @@ const MatchCut: React.FC<MatchCutProps> = ({
               {/* Feature 3 */}
               <div className="flex items-start gap-3.5">
                 <div className="w-9 h-9 rounded-xl bg-[#111c2a] border border-[#1d3148] flex items-center justify-center text-[#38bdf8] shrink-0 mt-0.5">
-                  <Download className="w-4 h-4 text-[#38bdf8]" />
+                  <Film className="w-4 h-4 text-[#38bdf8]" />
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-semibold text-foreground leading-snug">
-                    Download in ~30s
+                    Broadcast-grade export
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-relaxed">
-                    Render happens in the cloud. MP4, ready to post.
+                    15 Mb/s · 1080p &nbsp;|&nbsp; 40 Mb/s · 4K &nbsp;·&nbsp; BT.709 colour space.
                   </p>
                 </div>
               </div>

@@ -164,7 +164,7 @@ const CustomizePage = () => {
               <div className="p-2">
                 <div className="flex items-center gap-1">
                   <h2 className="font-semibold text-foreground text-xl">
-                   Edikit{"      "}Preview
+                    Preview
                   </h2>
                 </div>
               </div>
