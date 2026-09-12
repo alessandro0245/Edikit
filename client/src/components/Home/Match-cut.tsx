@@ -17,7 +17,7 @@ interface MatchCutProps {
 const MatchCut: React.FC<MatchCutProps> = ({
   videoSrc,
   scene1Video,
-  scene1Poster = "/matchcut/scene01.jpg",
+  scene1Poster = "/matchcut/matchcut-preview.jpg",
 }) => {
   const activeVideo = videoSrc || scene1Video || "/matchcut/preview.mp4";
 
@@ -112,7 +112,7 @@ const MatchCut: React.FC<MatchCutProps> = ({
 
           {/* ─── RIGHT COLUMN: Video Player Card ─── */}
           <div>
-            <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-[#090a0d] overflow-hidden shadow-2xl">
+            <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-[#090a0d] overflow-hidden">
               <video
                 src={activeVideo}
                 poster={scene1Poster}
