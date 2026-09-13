@@ -1,14 +1,14 @@
 "use strict";
-(self["webpackChunkremotion"] = self["webpackChunkremotion"] || []).push([[651],{
+(self["webpackChunkremotion"] = self["webpackChunkremotion"] || []).push([[872],{
 
-/***/ 3651
+/***/ 4872
 (__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   registerMp3Encoder: () => (/* binding */ registerMp3Encoder)
 /* harmony export */ });
-/* harmony import */ var mediabunny__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3590);
-/* harmony import */ var mediabunny__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6525);
+/* harmony import */ var mediabunny__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3936);
+/* harmony import */ var mediabunny__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8647);
 /*!
  * Copyright (c) 2026-present, Vanilagy and contributors
  *
@@ -267,7 +267,7 @@ async function inlineWorker(scriptText) {
   } else {
     let Worker3;
     try {
-      Worker3 = (await __webpack_require__.e(/* import() */ 255).then(__webpack_require__.t.bind(__webpack_require__, 2255, 19))).Worker;
+      Worker3 = (await __webpack_require__.e(/* import() */ 892).then(__webpack_require__.t.bind(__webpack_require__, 4892, 19))).Worker;
     } catch {
       Worker3 = __require("worker_threads").Worker;
     }
@@ -448,4 +448,4 @@ function assert(x) {
 /***/ }
 
 }]);
-//# sourceMappingURL=651.bundle.js.map
+//# sourceMappingURL=872.bundle.js.map

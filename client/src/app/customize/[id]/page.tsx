@@ -171,7 +171,7 @@ const CustomizePage = () => {
 
               <div className="p-2">
                 <div
-                  className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] bg-black relative mx-auto w-full max-h-[79vh] transition-all"
+                  className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all"
                   style={{ aspectRatio: previewRatio }}
                 >
                   {showRenderedVideo && renderedVideoSrc ? (

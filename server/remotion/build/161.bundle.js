@@ -1,7 +1,7 @@
 "use strict";
-(self["webpackChunkremotion"] = self["webpackChunkremotion"] || []).push([[127],{
+(self["webpackChunkremotion"] = self["webpackChunkremotion"] || []).push([[161],{
 
-/***/ 3127
+/***/ 3161
 (__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 // ESM COMPAT FLAG
@@ -120,7 +120,7 @@ __webpack_require__.d(__webpack_exports__, {
   z: () => (/* reexport */ external_namespaceObject)
 });
 
-// NAMESPACE OBJECT: ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/external.js
+// NAMESPACE OBJECT: ./node_modules/zod/v3/external.js
 var external_namespaceObject = {};
 __webpack_require__.r(external_namespaceObject);
 __webpack_require__.d(external_namespaceObject, {
@@ -233,7 +233,7 @@ __webpack_require__.d(external_namespaceObject, {
   "void": () => (voidType)
 });
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/helpers/util.js
+;// ./node_modules/zod/v3/helpers/util.js
 var util;
 (function (util) {
     util.assertEqual = (_) => { };
@@ -368,7 +368,7 @@ const getParsedType = (data) => {
     }
 };
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/ZodError.js
+;// ./node_modules/zod/v3/ZodError.js
 
 const ZodIssueCode = util.arrayToEnum([
     "invalid_type",
@@ -503,7 +503,7 @@ ZodError.create = (issues) => {
     return error;
 };
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/locales/en.js
+;// ./node_modules/zod/v3/locales/en.js
 
 
 const errorMap = (issue, _ctx) => {
@@ -614,7 +614,7 @@ const errorMap = (issue, _ctx) => {
 };
 /* harmony default export */ const en = (errorMap);
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/errors.js
+;// ./node_modules/zod/v3/errors.js
 
 let overrideErrorMap = en;
 
@@ -625,7 +625,7 @@ function getErrorMap() {
     return overrideErrorMap;
 }
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/helpers/parseUtil.js
+;// ./node_modules/zod/v3/helpers/parseUtil.js
 
 
 const makeIssue = (params) => {
@@ -736,7 +736,7 @@ const isDirty = (x) => x.status === "dirty";
 const isValid = (x) => x.status === "valid";
 const isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/helpers/errorUtil.js
+;// ./node_modules/zod/v3/helpers/errorUtil.js
 var errorUtil;
 (function (errorUtil) {
     errorUtil.errToObj = (message) => typeof message === "string" ? { message } : message || {};
@@ -744,7 +744,7 @@ var errorUtil;
     errorUtil.toString = (message) => typeof message === "string" ? message : message?.message;
 })(errorUtil || (errorUtil = {}));
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/types.js
+;// ./node_modules/zod/v3/types.js
 
 
 
@@ -4441,7 +4441,7 @@ const coerce = {
 
 const NEVER = INVALID;
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/external.js
+;// ./node_modules/zod/v3/external.js
 
 
 
@@ -4449,7 +4449,7 @@ const NEVER = INVALID;
 
 
 
-;// ./node_modules/.pnpm/zod@4.3.6/node_modules/zod/v3/index.js
+;// ./node_modules/zod/v3/index.js
 
 
 
@@ -4459,4 +4459,4 @@ const NEVER = INVALID;
 /***/ }
 
 }]);
-//# sourceMappingURL=127.bundle.js.map
+//# sourceMappingURL=161.bundle.js.map

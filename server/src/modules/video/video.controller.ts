@@ -12,6 +12,7 @@ import {
 import type { Response } from 'express';
 import { VideoService } from './video.service';
 import { GeneratePromptDto } from './dto/generate-prompt.dto';
+import { GenerateMatchCutDto } from './dto/generate-matchcut.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtUser } from '../../common/decorators/current-user.decorator';
@@ -27,6 +28,15 @@ export class VideoController {
   @UseGuards(JwtAuthGuard)
   generatePrompt(@Body() dto: GeneratePromptDto, @CurrentUser() user: JwtUser) {
     return this.videoService.generatePrompt(dto, user.userId);
+  }
+
+  @Post('generate-matchcut')
+  @UseGuards(JwtAuthGuard)
+  generateMatchCut(
+    @Body() dto: GenerateMatchCutDto,
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.videoService.generateMatchCut(dto, user.userId);
   }
 
   @Get('job/:id')

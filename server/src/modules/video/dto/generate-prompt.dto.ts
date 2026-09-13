@@ -49,3 +49,5 @@ export class GeneratePromptDto {
   @IsBoolean()
   reviewScenes?: boolean;
 }
+
+export { GenerateMatchCutDto } from './generate-matchcut.dto';

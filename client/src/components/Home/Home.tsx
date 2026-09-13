@@ -1,10 +1,10 @@
 "use client";
 
-import { templates } from "@/utils/constant";
 import { ArrowRight } from "lucide-react";
 import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
 import CarouselWithMultipleSlides from "./NewSlider";
+import MatchCut from "./Match-cut";
 
 export default function Hero() {
   return (
@@ -162,6 +162,7 @@ export default function Hero() {
                 </EdikitButton>
               </div>
             </div>
+            <MatchCut />
           </div>
         </section>
       </main>
