@@ -20,8 +20,14 @@ async function run() {
 
   parentPort!.postMessage({ type: 'progress', progress: 0.01 });
 
+  const publicDir = path.join(
+    __dirname,
+    '../../../../remotion/public',
+  );
+
   const bundleLocation = await bundle({
     entryPoint: remotionEntry,
+    publicDir,
     onProgress: (p) => {
       parentPort!.postMessage({ type: 'progress', progress: (p / 100) * 0.15 });
     },
