@@ -742,7 +742,7 @@ export default function MatchCutPage() {
                           trigger="auto"
                           className="h-full w-full"
                         />
-                        {isGenerating && (
+                        {/* {isGenerating && (
                           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 gap-3.5 px-6 z-20">
                             <div className="flex items-center gap-2">
                               <Loader2 className="w-5 h-5 animate-spin text-primary" />
@@ -762,7 +762,7 @@ export default function MatchCutPage() {
                               </p>
                             </div>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )}
                   </div>
