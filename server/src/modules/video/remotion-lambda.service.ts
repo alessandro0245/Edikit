@@ -177,7 +177,7 @@ export class RemotionLambdaService {
       colorSpace: 'bt709',
       maxRetries: 2,
       privacy: 'no-acl',
-      framesPerLambda: 20,
+      framesPerLambda: 60,
       downloadBehavior: {
         type: 'download',
         fileName: `${config.title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`,
