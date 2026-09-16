@@ -387,7 +387,6 @@ import React, {useMemo} from 'react';
 import {
   AbsoluteFill,
   Audio,
-  Sequence,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
@@ -395,6 +394,7 @@ import {
 import {measureText} from '@remotion/layout-utils';
 import {loadFont} from '@remotion/fonts';
 import {z} from 'zod';
+import {getClickTrackDataUri} from './clickTrack';
 
 // Google Sans Flex istanziato all'ottico 120, gli stessi file dei template AE.
 // Sono tagli statici, non il font variabile: le forme sono fissate a quella
@@ -652,32 +652,16 @@ export const MatchCut: React.FC<MatchCutProps> = ({
   const metaSize = fontSize * 0.34;
   const snippetSize = fontSize * 0.42;
 
+  const clickTrackUri = useMemo(() => {
+    if (!clickSounds || clickSounds.length === 0) return null;
+    return getClickTrackDataUri(cuts, durationInFrames, fps, clickVolume);
+  }, [cuts, durationInFrames, fps, clickVolume, clickSounds]);
+
   return (
     <AbsoluteFill style={{backgroundColor, overflow: 'hidden'}}>
-      {/* Un click su ogni stacco. Ogni Sequence e' indipendente, quindi due
-          stacchi ravvicinati non si tagliano l'uno con l'altro. */}
-      {clickSounds && clickSounds.length > 0
-        ? cuts.map((cutFrame, i) => {
-            // Il click scende di tono lungo la clip scorrendo i file gia'
-            // intonati. Si fa cosi' e non con toneFrequency perche' quello
-            // vale solo in rendering: in anteprima non si sentirebbe nulla.
-            const t = cutFrame / Math.max(1, durationInFrames - 1);
-            const pick = Math.min(
-              clickSounds.length - 1,
-              Math.floor(t * clickSounds.length),
-            );
-            return (
-              <Sequence
-                key={i}
-                from={cutFrame}
-                durationInFrames={Math.max(1, Math.round(fps * 0.2))}
-                layout="none"
-              >
-                <Audio src={staticFile(clickSounds[pick])} volume={clickVolume} />
-              </Sequence>
-            );
-          })
-        : null}
+      {/* Continuous click track across the entire composition — ensures seamless
+          playback across all Lambda render chunks without dropping audio */}
+      {clickTrackUri ? <Audio src={clickTrackUri} /> : null}
       <div
         style={{
           position: 'absolute',
