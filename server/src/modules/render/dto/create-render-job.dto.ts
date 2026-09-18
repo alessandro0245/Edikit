@@ -230,6 +230,10 @@ export class CreateRenderJobDto {
   muteAudio?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  useBlurEffect?: boolean;
+
+  @IsOptional()
   @IsString()
   fontFamily?: string;
 }

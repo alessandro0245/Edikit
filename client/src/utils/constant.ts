@@ -84,6 +84,7 @@ export interface Template {
   previewUrl: string;
   thumbnail?: string;
   hasTransprentBackground?: boolean;
+  hasBlurEffect?: boolean;
   fields: {
     [key: string]: {
       type: "text" | "image" | "video" | "media" | "color";
@@ -104,6 +105,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-1.mp4",
     thumbnail: "/previews/animation 1.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "text number 1" , label: "Text 1", maxLength: 18, required: false },
       text2: { type: "text", value: "text number 2" , label: "Text 2", maxLength: 18, required: false },
@@ -135,6 +137,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-2.mp4",
     thumbnail: "/previews/animation 2.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 14, required: false },
       text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 14, required: false },
@@ -182,6 +185,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-3.mp4",
     thumbnail: "/previews/animation 3.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 15, required: false },
       text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 15, required: false },
@@ -226,6 +230,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-4.mp4",
     thumbnail: "/previews/animation 4.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: {
         type: "text",
@@ -261,6 +266,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-5.mp4",
     thumbnail: "/previews/animation 5.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "This is text number 1", label: "Text 1", maxLength: 35, required: false },
       text2: {
@@ -317,6 +323,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-6.mp4",
     thumbnail: "/previews/animation 6.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: {
         type: "text",
@@ -382,6 +389,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-7.mp4",
     thumbnail: "/previews/animation 7.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "Text 1, type here", label: "Text", maxLength: 20, required: true },
       bannerColorStart: {
@@ -410,6 +418,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-8.mp4",
     thumbnail: "/previews/animation 8.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 17, required: false },
       text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 27, required: false },
@@ -434,6 +443,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-9.mp4",
     thumbnail: "/previews/animation 9.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: {
         type: "text",
@@ -497,6 +507,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-10.mp4",
     thumbnail: "/previews/animation 10.png",
     hasTransprentBackground: true,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "text number 1", label: "Text 1", maxLength: 18, required: false },
       text2: { type: "text", value: "text number 2", label: "Text 2", maxLength: 18, required: false },
@@ -536,6 +547,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-11.mp4",
     thumbnail: "/previews/animation 11.png",
     hasTransprentBackground: false,
+    hasBlurEffect: true,
     fields: {
       video1: {
         type: "video",
@@ -573,6 +585,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-12.mp4",
     thumbnail: "/previews/animation 12.png",
     hasTransprentBackground: false,
+    hasBlurEffect: true,
     fields: {
       text1: {
         type: "text",
@@ -609,6 +622,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-13.mp4",
     thumbnail: "/previews/animation 13.png",
     hasTransprentBackground: false,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "Month here", label: "Month", maxLength: 18, required: false },
       text2: { type: "text", value: "2026", label: "Year", maxLength: 18, required: false },
@@ -639,6 +653,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-14.mp4",
     thumbnail: "/previews/animation 14.png",
     hasTransprentBackground: true,
+    hasBlurEffect: false,
     fields: {
       text1: { type: "text", value: "Text number 1", label: "Line 1", maxLength: 20, required: false },
       text2: {
@@ -664,6 +679,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-15.mp4",
     thumbnail: "/previews/animation 15.png",
     hasTransprentBackground: false,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "This is text number 1, type something here!", label: "Text 1", maxLength: 47, required: false },
       text2: {
@@ -727,6 +743,7 @@ export const templates: Template[] = [
     previewUrl: "/previews/animation-16.mp4",
     thumbnail: "/previews/animation 16.png",
     hasTransprentBackground: false,
+    hasBlurEffect: true,
     fields: {
       text1: { type: "text", value: "2k", label: "Likes", maxLength: 6, required: false },
       text2: { type: "text", value: "@username", label: "Username", maxLength: 27, required: false },

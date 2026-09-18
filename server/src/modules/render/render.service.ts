@@ -1823,6 +1823,27 @@ export class RenderService {
       });
     }
 
+    if (dto.useBlurEffect === false && templateId !== 6) {
+      assets.push({
+        type: 'function',
+        name: 'nx:layer-state-set',
+        params: {
+          layerName: 'adjustment_1',
+          visible: false,
+        },
+      });
+    }
+
+    if (dto.useBlurEffect === false && templateId === 6) {
+      assets.push({
+        type: 'function',
+        name: 'nx:layer-state-set',
+        params: {
+          layerName: 'adjustment_2',
+          visible: false,
+        },
+      });
+    }
     return assets;
   }
 

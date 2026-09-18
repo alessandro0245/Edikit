@@ -68,6 +68,7 @@ export const useCustomizeLogic = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
+  const [useBlurEffect, setUseBlurEffect] = useState(true);
   const [muteAudio, setMuteAudio] = useState(true);
   const [selectedFont, setSelectedFont] = useState<FontId>("google-sans");
   const [videoResizeProgress, setVideoResizeProgress] = useState<{
@@ -854,6 +855,7 @@ export const useCustomizeLogic = () => {
           ...renderDto,
           fontFamily: selectedFont,
           useBackgroundColor,
+          useBlurEffect,
           muteAudio,
         },
         {
@@ -930,6 +932,8 @@ export const useCustomizeLogic = () => {
     handleDownload,
     useBackgroundColor,
     setUseBackgroundColor,
+    useBlurEffect,
+    setUseBlurEffect,
     muteAudio,
     setMuteAudio,
     selectedFont,

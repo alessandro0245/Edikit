@@ -69,6 +69,8 @@ const CustomizePage = () => {
     handleDownload,
     useBackgroundColor,
     setUseBackgroundColor,
+    useBlurEffect,
+    setUseBlurEffect,
     muteAudio,
     setMuteAudio,
     selectedFont,
@@ -603,6 +605,49 @@ const CustomizePage = () => {
                     onChange={(fontId) => setSelectedFont(fontId)}
                   />
 
+                  {/* Camera Refocus Blur Effect */}
+                     {template.hasBlurEffect === false ? (
+                    <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                      <p className="text-xs text-yellow-600 dark:text-yellow-400 flex gap-2">
+                        <TriangleAlert className="w-4 h-4" />This template does not support Camera Refocus Blur Effect.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-xl border border-border bg-muted/20 space-y-2.5">
+                      <div>
+                        <p className="text-xs font-semibold text-foreground">
+                         Camera Refocus Blur Effect
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                         Adds a cinematic camera-refocus blur that briefly kicks in during animations, then fades out just like a real lens re-focusing.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setUseBlurEffect(true)}
+                          className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                            useBlurEffect
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                         Enable Blur
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUseBlurEffect(false)}
+                          className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                            !useBlurEffect
+                              ? "border-primary bg-primary/10 text-foreground shadow-xs"
+                              : "border-border bg-background text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Disable Blur
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   {/* Background mode toggle */}
                   {template.hasTransprentBackground === false ? (
                     <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
