@@ -30,6 +30,8 @@ import { getTemplateOrientation } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 import FontPicker from "@/components/FontPicker/FontPicker";
+import ImageCropEditor from "@/components/ImageCropEditor/ImageCropEditor";
+import { Crop as CropIcon } from "lucide-react";
 
 const CustomizePage = () => {
   const [previewRatio] = useState("9/16");
@@ -78,6 +80,10 @@ const CustomizePage = () => {
     setImagePreviewReady,
     videoResizeProgress,
     deletingAssets,
+    cropPending,
+    applyCrop,
+    cancelCrop,
+    editCrop,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -341,10 +347,29 @@ const CustomizePage = () => {
                           filePreviews[fieldKey] || uploadedAssets[fieldKey];
                         const isResizing =
                           videoResizeProgress[fieldKey] !== undefined;
+                        const isCropping = !!cropPending[fieldKey];
+                        const isImage =
+                          field.type === "image" ||
+                          (field.type === "media" &&
+                            !uploadedAssets[fieldKey]?.includes("/video/") &&
+                            !(formData[fieldKey] as File)?.type?.startsWith("video/"));
 
                         return (
                           <div key={fieldKey} className="space-y-1.5">
-                            {isResizing ? (
+                            {/* ── Crop editor (inline, replaces the card) ── */}
+                            {isCropping ? (
+                              <ImageCropEditor
+                                src={cropPending[fieldKey].rawSrc}
+                                targetWidth={cropPending[fieldKey].targetWidth}
+                                targetHeight={cropPending[fieldKey].targetHeight}
+                                originalFile={cropPending[fieldKey].originalFile}
+                                fieldLabel={field.label}
+                                onApply={(croppedFile) =>
+                                  applyCrop(fieldKey, croppedFile)
+                                }
+                                onCancel={() => cancelCrop(fieldKey)}
+                              />
+                            ) : isResizing ? (
                               <div className="rounded-xl border border-border p-5 flex flex-col items-center justify-center gap-2 min-h-[110px]">
                                 <Loader2 className="w-6 h-6 animate-spin text-primary" />
                                 <p className="text-xs font-medium text-foreground">
@@ -421,31 +446,48 @@ const CustomizePage = () => {
                                   <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                                     <Upload className="w-3 h-3" /> {field.label}
                                   </span>
-                                  <button
-                                    onClick={async (event) => {
-                                      event.stopPropagation();
-                                      uploadedAssets[fieldKey]
-                                        ? await deleteAsset(fieldKey)
-                                        : removeFile(fieldKey);
-                                    }}
-                                    disabled={deletingAssets.has(fieldKey)}
-                                    className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
-                                      deletingAssets.has(fieldKey)
-                                        ? "text-red-400/40 pointer-events-none cursor-not-allowed"
-                                        : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
-                                    }`}
-                                    type="button"
-                                  >
-                                    {deletingAssets.has(fieldKey) ? (
-                                      <>
-                                        <Loader2 className="w-3 h-3 animate-spin" /> Removing
-                                      </>
-                                    ) : (
-                                      <>
-                                        <X className="w-3 h-3" /> Remove
-                                      </>
+                                  <div className="flex items-center gap-1">
+                                    {/* Edit Crop — only for image slots */}
+                                    {isImage && filePreviews[fieldKey] && (
+                                      <button
+                                        type="button"
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          editCrop(fieldKey);
+                                        }}
+                                        className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md text-primary/70 hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                                      >
+                                        <CropIcon className="w-3 h-3" />
+                                        Edit Crop
+                                      </button>
                                     )}
-                                  </button>
+                                    {/* Remove / Delete */}
+                                    <button
+                                      onClick={async (event) => {
+                                        event.stopPropagation();
+                                        uploadedAssets[fieldKey]
+                                          ? await deleteAsset(fieldKey)
+                                          : removeFile(fieldKey);
+                                      }}
+                                      disabled={deletingAssets.has(fieldKey)}
+                                      className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                                        deletingAssets.has(fieldKey)
+                                          ? "text-red-400/40 pointer-events-none cursor-not-allowed"
+                                          : "text-red-400/70 hover:text-red-400 hover:bg-red-400/10"
+                                      }`}
+                                      type="button"
+                                    >
+                                      {deletingAssets.has(fieldKey) ? (
+                                        <>
+                                          <Loader2 className="w-3 h-3 animate-spin" /> Removing
+                                        </>
+                                      ) : (
+                                        <>
+                                          <X className="w-3 h-3" /> Remove
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
                                 </div>
                               </FileDropZone>
                             ) : (

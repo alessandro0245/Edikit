@@ -16,6 +16,18 @@ interface FormDataState {
   [key: string]: string | File | null | undefined;
 }
 
+/** Per-field crop state */
+export interface CropState {
+  /** Raw data-URL of the original image before any crop */
+  rawSrc: string;
+  /** The original File object (needed to preserve mime type) */
+  originalFile: File;
+  /** Target width derived from the field's dimensions config */
+  targetWidth: number;
+  /** Target height derived from the field's dimensions config */
+  targetHeight: number;
+}
+
 interface RenderJob {
   id: string;
   status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -73,6 +85,14 @@ export const useCustomizeLogic = () => {
   const [selectedFont, setSelectedFont] = useState<FontId>("google-sans");
   const [videoResizeProgress, setVideoResizeProgress] = useState<{
     [key: string]: number;
+  }>({});
+
+  /**
+   * cropPending[fieldKey] = CropState means the field is waiting for user crop.
+   * Once the user applies or cancels the crop is removed from this map.
+   */
+  const [cropPending, setCropPending] = useState<{
+    [key: string]: CropState;
   }>({});
 
   // Redirect if template not found
@@ -452,6 +472,184 @@ export const useCustomizeLogic = () => {
     });
   };
 
+  /**
+   * Internal helper — runs the actual resize + upload pipeline
+   * after the user has confirmed their crop (or for video, immediately).
+   */
+  const processAndUploadFile = async (
+    fieldKey: string,
+    file: File,
+    inputElement?: HTMLInputElement,
+  ) => {
+    setUploadingAssets((prev) => new Set(prev).add(fieldKey));
+
+    try {
+      let processedFile = file;
+
+      if (processedFile.type.startsWith("image/")) {
+      // Get the field to check if it has required dimensions
+      const field = template?.fields[fieldKey];
+      if (field && field.dimensions) {
+        // Check if dimensions contain a range (e.g., "800x800-1920x1920")
+        if (field.dimensions.includes("-")) {
+          // Parse range dimensions
+          const [minDimensions, maxDimensions] = field.dimensions.split("-");
+          const [minWidth, minHeight] = minDimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
+          const [maxWidth, maxHeight] = maxDimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
+
+          if (minWidth && minHeight && maxWidth && maxHeight) {
+            try {
+              const result = await validateImageDimensionsRange(
+                processedFile,
+                minWidth,
+                minHeight,
+                maxWidth,
+                maxHeight,
+              );
+              if (!result.isValid) {
+                showInfoToast("Auto-resizing image to fit dimensions...");
+                try {
+                  processedFile = await resizeAndStretchImage(
+                    processedFile,
+                    maxWidth,
+                    maxHeight,
+                  );
+                } catch (resizeErr) {
+                  console.error("Auto-resize failed", resizeErr);
+                  showErrorToast("Failed to resize image automatically");
+                  if (inputElement) {
+                    inputElement.value = "";
+                  }
+                  setImagePreviewReady((prev) => {
+                    const next = { ...prev };
+                    delete next[fieldKey];
+                    return next;
+                  });
+                  return;
+                }
+              }
+            } catch (error) {
+              console.error("Image range validation failed", error);
+              showErrorToast("Failed to validate image");
+              if (inputElement) {
+                inputElement.value = "";
+              }
+              setImagePreviewReady((prev) => {
+                const next = { ...prev };
+                delete next[fieldKey];
+                return next;
+              });
+              return;
+            }
+          }
+        } else {
+          // Parse exact dimensions (format: "1920x1080")
+          const [width, height] = field.dimensions
+            .split("x")
+            .map((d) => parseInt(d.trim()));
+
+          if (width && height) {
+            try {
+              const isValid = await validateImageDimensions(
+                processedFile,
+                width,
+                height,
+              );
+              if (!isValid) {
+                // No toast here — the crop already produced the right dimensions
+              }
+            } catch (error) {
+              console.error("Image validation failed", error);
+            }
+          }
+        }
+      }
+
+      setImagePreviewReady((prev) => ({
+        ...prev,
+        [fieldKey]: false,
+      }));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFilePreviews((prev) => ({
+          ...prev,
+          [fieldKey]: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(processedFile);
+    } else if (processedFile.type.startsWith("video/")) {
+      // Get the field to check if it has required dimensions
+      const field = template?.fields[fieldKey];
+      const targetDimensions = field?.videoDimensions || field?.dimensions;
+      if (field && targetDimensions) {
+        // Parse dimensions (format: "1920x1080")
+        const [width, height] = targetDimensions
+          .split("x")
+          .map((d) => parseInt(d.trim()));
+
+        if (width && height) {
+          try {
+            const isValid = await validateVideoDimensions(
+              processedFile,
+              width,
+              height,
+            );
+            if (!isValid) {
+              showInfoToast("Resizing video to fit template dimensions...");
+              try {
+                processedFile = await resizeVideo(
+                  processedFile,
+                  width,
+                  height,
+                  (progress) => {
+                    setVideoResizeProgress((prev) => ({
+                      ...prev,
+                      [fieldKey]: progress,
+                    }));
+                  },
+                );
+              } catch (resizeErr) {
+                console.error("Video auto-resize failed", resizeErr);
+                showInfoToast(
+                  "Video resize failed, uploading original file instead.",
+                );
+              } finally {
+                setVideoResizeProgress((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
+              }
+            }
+          } catch (error) {
+            console.error("Video validation failed", error);
+            showInfoToast(
+              "Video validation failed, uploading original file instead.",
+            );
+          }
+        }
+      }
+
+      const videoUrl = URL.createObjectURL(processedFile);
+      setFilePreviews((prev) => ({ ...prev, [fieldKey]: videoUrl }));
+    }
+
+    setFormData((prev) => ({ ...prev, [fieldKey]: processedFile }));
+    await uploadSingleAsset(fieldKey, processedFile);
+    } finally {
+      setUploadingAssets((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fieldKey);
+        return newSet;
+      });
+    }
+  };
+
   const handleFileUpload = async (
     fieldKey: string,
     file: File | null,
@@ -459,6 +657,59 @@ export const useCustomizeLogic = () => {
   ) => {
     if (!file) return;
 
+    // ── Enforce field-level MIME type — accept attribute is only a browser hint ──
+    const field = template?.fields[fieldKey];
+    const isImageFile = file.type.startsWith("image/");
+    const isVideoFile = file.type.startsWith("video/");
+
+    if (field?.type === "video" && !isVideoFile) {
+      showErrorToast("This field only accepts video files (MP4, MOV).");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
+    if (field?.type === "image" && !isImageFile) {
+      showErrorToast("This field only accepts image files (PNG, JPG, WEBP).");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
+    // "media" accepts both — no guard needed
+
+    // ── For image fields, open the inline crop editor first ──
+    if (isImageFile) {
+      // Determine target dimensions (use the non-range exact dimensions string)
+      let targetWidth = 0;
+      let targetHeight = 0;
+      if (field?.dimensions && !field.dimensions.includes("-")) {
+        const parts = field.dimensions.split("x").map((d) => parseInt(d.trim()));
+        targetWidth = parts[0] ?? 0;
+        targetHeight = parts[1] ?? 0;
+      } else if (field?.dimensions && field.dimensions.includes("-")) {
+        // For range dims, use the max as target
+        const maxPart = field.dimensions.split("-")[1];
+        const parts = maxPart.split("x").map((d) => parseInt(d.trim()));
+        targetWidth = parts[0] ?? 0;
+        targetHeight = parts[1] ?? 0;
+      }
+
+      if (targetWidth > 0 && targetHeight > 0) {
+        // Read the file as a data URL for the crop preview
+        const rawSrc = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        // Enter crop mode — the UI will pick this up and show the crop editor
+        setCropPending((prev) => ({
+          ...prev,
+          [fieldKey]: { rawSrc, originalFile: file, targetWidth, targetHeight },
+        }));
+        return; // Don't upload yet — wait for user to apply crop
+      }
+    }
+
+    // Video or image with no dimensions config → process immediately
     setUploadingAssets((prev) => new Set(prev).add(fieldKey));
 
     try {
@@ -657,6 +908,73 @@ export const useCustomizeLogic = () => {
         newSet.delete(fieldKey);
         return newSet;
       });
+    }
+  };
+
+  /**
+   * Called by ImageCropEditor when the user confirms a crop.
+   * Receives the already-cropped File at the correct dimensions.
+   */
+  const applyCrop = async (fieldKey: string, croppedFile: File) => {
+    // Dismiss the crop editor
+    setCropPending((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+
+    // Run the normal upload pipeline with the cropped file
+    await processAndUploadFile(fieldKey, croppedFile);
+  };
+
+  /**
+   * Called when the user cancels the crop editor.
+   * If there was already a previous uploaded asset we keep it; otherwise clear.
+   */
+  const cancelCrop = (fieldKey: string) => {
+    setCropPending((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+  };
+
+  /**
+   * Re-opens the crop editor for a field that already has an uploaded image.
+   * Uses the current file preview (data-URL) as the raw source.
+   */
+  const editCrop = (fieldKey: string) => {
+    const existingSrc = filePreviews[fieldKey];
+    const existingFile = formData[fieldKey] as File | null;
+    const field = template?.fields[fieldKey];
+    if (!existingSrc || !field) return;
+
+    let targetWidth = 0;
+    let targetHeight = 0;
+    if (field.dimensions && !field.dimensions.includes("-")) {
+      const parts = field.dimensions.split("x").map((d) => parseInt(d.trim()));
+      targetWidth = parts[0] ?? 0;
+      targetHeight = parts[1] ?? 0;
+    } else if (field.dimensions && field.dimensions.includes("-")) {
+      const maxPart = field.dimensions.split("-")[1];
+      const parts = maxPart.split("x").map((d) => parseInt(d.trim()));
+      targetWidth = parts[0] ?? 0;
+      targetHeight = parts[1] ?? 0;
+    }
+
+    if (targetWidth > 0 && targetHeight > 0) {
+      setCropPending((prev) => ({
+        ...prev,
+        [fieldKey]: {
+          rawSrc: existingSrc,
+          // Use the stored File or fabricate a dummy one (mime is preserved from src)
+          originalFile: existingFile instanceof File
+            ? existingFile
+            : new File([], "image.png", { type: "image/png" }),
+          targetWidth,
+          targetHeight,
+        },
+      }));
     }
   };
 
@@ -947,6 +1265,11 @@ export const useCustomizeLogic = () => {
     setUploadingAssets,
     videoResizeProgress,
     deletingAssets,
+    // Crop
+    cropPending,
+    applyCrop,
+    cancelCrop,
+    editCrop,
   } as const;
 };
 
