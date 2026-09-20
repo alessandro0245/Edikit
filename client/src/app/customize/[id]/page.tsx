@@ -399,7 +399,7 @@ const CustomizePage = () => {
                                 }
                                 className="overflow-hidden rounded-xl border border-border"
                               >
-                                <div className="bg-checker aspect-video flex items-center justify-center p-2">
+                                <div className="bg-checker h-48 sm:h-64 flex items-center justify-center p-4">
                                   {field.type === "video" ||
                                   (formData[fieldKey] as File)?.type?.startsWith(
                                     "video/"
@@ -412,7 +412,7 @@ const CustomizePage = () => {
                                         filePreviews[fieldKey] ||
                                         uploadedAssets[fieldKey]
                                       }
-                                      className="max-h-36 max-w-full object-contain"
+                                      className="max-h-full max-w-full object-contain"
                                       controls
                                       muted
                                       onClick={(event) =>
@@ -438,7 +438,7 @@ const CustomizePage = () => {
                                           [fieldKey]: true,
                                         }))
                                       }
-                                      className="max-h-36 max-w-full object-contain pointer-events-none"
+                                      className="max-h-full max-w-full object-contain pointer-events-none"
                                     />
                                   )}
                                 </div>
