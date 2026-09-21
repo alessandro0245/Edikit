@@ -168,7 +168,10 @@ const CustomizePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 max-w-7xl mx-auto items-start">
           {/* Left Column - Sticky Preview */}
           <div className="lg:sticky lg:top-16 space-y-4 order-2 lg:order-1">
-            <div className="rounded-2xl overflow-hidden shadow-sm">
+            <div 
+              className="rounded-2xl overflow-hidden shadow-sm mx-auto transition-all w-full"
+              style={{ maxWidth: `calc(79vh * (${previewRatio}) + 1rem)` }}
+            >
               <div className="p-2">
                 <div className="flex items-center gap-1">
                   <h2 className="font-semibold text-foreground text-xl">
