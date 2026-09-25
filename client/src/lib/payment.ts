@@ -1,6 +1,5 @@
 import { showErrorToast } from "@/components/Toast/showToast";
-import { baseUrl } from "@/utils/constant";
-import axios from "axios";
+import api from "./api";
 import { refreshUser } from "./auth";
 import type { AppDispatch } from "@/redux/store";
 
@@ -53,8 +52,8 @@ export const handlePayment = (planId: string, userId?: string) => {
     return;
   }
 
-  axios
-    .post(`${baseUrl}/stripe/create-checkout-session`, {
+  api
+    .post("/stripe/create-checkout-session", {
       amount: plan.amount,
       productName: plan.productName,
       currency: plan.currency,
@@ -68,26 +67,37 @@ export const handlePayment = (planId: string, userId?: string) => {
     })
     .catch((error) => {
       console.error("Error creating checkout session:", error);
+      const message =
+        error?.response?.data?.message ||
+        "Could not initiate checkout. Please try again.";
+      showErrorToast(
+        Array.isArray(message) ? message.join(", ") : message
+      );
     });
 };
 
-  export const cancelSubscription = async (
-    userId: string,
-    dispatch?: AppDispatch,
-  ) => {
-    if (!userId) {
-      showErrorToast("User not logged in");
-      return;
-    }
+export const cancelSubscription = async (
+  userId: string,
+  dispatch?: AppDispatch,
+) => {
+  if (!userId) {
+    showErrorToast("User not logged in");
+    return;
+  }
 
-    try {
-      await axios.post(`${baseUrl}/stripe/cancel-subscription`, { userId });
-      if (dispatch) {
-        await refreshUser(dispatch);
-      }
-    } catch (error) {
-      console.error("Error cancelling subscription:", error);
-      showErrorToast("Could not cancel subscription. Please try again.");
-      throw error;
+  try {
+    await api.post("/stripe/cancel-subscription", { userId });
+    if (dispatch) {
+      await refreshUser(dispatch);
     }
-  };
+  } catch (error: any) {
+    console.error("Error cancelling subscription:", error);
+    const message =
+      error?.response?.data?.message ||
+      "Could not cancel subscription. Please try again.";
+    showErrorToast(
+      Array.isArray(message) ? message.join(", ") : message
+    );
+    throw error;
+  }
+};

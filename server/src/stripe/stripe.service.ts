@@ -401,14 +401,24 @@ export class StripeService {
 
   async cancelSubscription(userId: string) {
     const user = await this.userService.findOne(userId);
-    if (!user.stripeSubscriptionId) {
-      throw new Error('No active subscription to cancel');
+
+    // If user has an active Stripe subscription, attempt to cancel it on Stripe
+    if (user.stripeSubscriptionId) {
+      try {
+        await this.stripe.subscriptions.cancel(user.stripeSubscriptionId);
+        console.log(`✅ Stripe subscription ${user.stripeSubscriptionId} cancelled successfully`);
+      } catch (stripeError: any) {
+        console.warn(
+          `⚠️ Stripe subscription cancellation warning for ${user.stripeSubscriptionId}:`,
+          stripeError?.message || stripeError,
+        );
+        // If already cancelled or not found on Stripe, proceed with database downgrade
+      }
+    } else {
+      console.log(`ℹ️ User ${userId} has no active stripeSubscriptionId, resetting plan to FREE`);
     }
 
-    // Cancel the Stripe subscription
-    await this.stripe.subscriptions.cancel(user.stripeSubscriptionId);
-
-    // Reset user subscription fields and downgrade to FREE
+    // Reset user subscription fields and downgrade to FREE in database
     await this.userService.updateSubscription(userId, {
       planType: PlanType.FREE,
       stripeSubscriptionId: null,
@@ -423,6 +433,9 @@ export class StripeService {
       console.error(`Failed to downgrade credits:`, error);
     }
 
-    return { success: true };
+    return {
+      success: true,
+      message: 'Subscription successfully cancelled and downgraded to Free',
+    };
   }
 }

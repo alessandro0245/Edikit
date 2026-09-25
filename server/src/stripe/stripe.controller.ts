@@ -10,6 +10,9 @@ import {
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import type { RawBodyRequest } from '@nestjs/common';
+import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
+import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
+
 @Controller('stripe')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
@@ -17,23 +20,25 @@ export class StripeController {
   @Post('create-checkout-session')
   async createCheckoutSession(
     @Body()
-    body: {
-      amount: number;
-      productName: string;
-      currency?: string;
-      userId: string;
-    },
+    body: CreateCheckoutSessionDto,
   ) {
     if (!body.userId) {
       throw new BadRequestException('User ID is required');
     }
 
-    return this.stripeService.payment(
-      body.amount,
-      body.productName,
-      body.currency || 'usd',
-      body.userId,
-    );
+    try {
+      return await this.stripeService.payment(
+        body.amount,
+        body.productName,
+        body.currency || 'usd',
+        body.userId,
+      );
+    } catch (error: any) {
+      console.error('Error in createCheckoutSession controller:', error);
+      throw new BadRequestException(
+        error?.message || 'Unable to create checkout session',
+      );
+    }
   }
   @Get('verify-session')
   async verifySession(@Query('session_id') sessionId: string) {
@@ -49,15 +54,18 @@ export class StripeController {
   }
 
   @Post('cancel-subscription')
-  async cancelSubscription(@Body() body: { userId: string }) {
+  async cancelSubscription(@Body() body: CancelSubscriptionDto) {
     if (!body.userId) {
       throw new BadRequestException('User ID is required');
     }
 
     try {
       return await this.stripeService.cancelSubscription(body.userId);
-    } catch (error) {
-      throw new BadRequestException('Unable to cancel subscription');
+    } catch (error: any) {
+      console.error('Error in cancelSubscription controller:', error);
+      throw new BadRequestException(
+        error?.message || 'Unable to cancel subscription',
+      );
     }
   }
   @Post('webhook')
