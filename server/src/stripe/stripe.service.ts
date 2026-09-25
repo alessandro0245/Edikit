@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
 import { UserService } from 'src/modules/user/user.service';
 import { PlanType } from '@generated/prisma/enums';
@@ -24,21 +24,46 @@ export class StripeService {
     userId: string,
   ) {
     const user = await this.userService.findOne(userId);
-    let customerId = user?.stripeCustomerId;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
+    let customerId = user.stripeCustomerId;
+
+    // Verify customer exists in the currently configured Stripe account/mode
+    if (customerId) {
+      try {
+        const existingCustomer = await this.stripe.customers.retrieve(customerId);
+        if ((existingCustomer as any).deleted) {
+          customerId = null;
+        }
+      } catch (err: any) {
+        console.warn(
+          `Customer ${customerId} not found in active Stripe environment (${err?.message || err}). Creating a new customer.`,
+        );
+        customerId = null;
+      }
+    }
+
+    // If customer doesn't exist in Stripe, create one and persist to DB
     if (!customerId) {
       const customer = await this.stripe.customers.create({
         email: user.email,
-        name: user.fullName,
+        name: user.fullName || undefined,
         metadata: {
           userId: user.id,
         },
       });
       customerId = customer.id;
+      await this.userService.update(user.id, {
+        stripeCustomerId: customerId,
+      });
     }
 
-    const session = await this.stripe.checkout.sessions.create({
-      customer: customerId,
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.edikit.net';
+
+    const buildSessionParams = (cId: string): Stripe.Checkout.SessionCreateParams => ({
+      customer: cId,
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [
@@ -60,9 +85,38 @@ export class StripeService {
         userId: userId,
         planName: productName,
       },
-      success_url: `${process.env.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
+      success_url: `${frontendUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${frontendUrl}/payment/cancel`,
     });
+
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await this.stripe.checkout.sessions.create(buildSessionParams(customerId));
+    } catch (sessionErr: any) {
+      // If Stripe still rejects with No such customer, recreate customer and retry once
+      if (
+        sessionErr?.message?.includes('No such customer') ||
+        sessionErr?.code === 'resource_missing'
+      ) {
+        console.warn(
+          `Stripe checkout session creation failed due to customer (${sessionErr?.message}). Recreating customer and retrying...`,
+        );
+        const newCustomer = await this.stripe.customers.create({
+          email: user.email,
+          name: user.fullName || undefined,
+          metadata: {
+            userId: user.id,
+          },
+        });
+        customerId = newCustomer.id;
+        await this.userService.update(user.id, {
+          stripeCustomerId: customerId,
+        });
+        session = await this.stripe.checkout.sessions.create(buildSessionParams(customerId));
+      } else {
+        throw sessionErr;
+      }
+    }
 
     return { url: session.url, sessionId: session.id };
   }
@@ -95,6 +149,24 @@ export class StripeService {
       }
 
       if (userId) {
+        const existingUser = await this.userService.findOne(userId);
+        if (
+          existingUser?.stripeSubscriptionId &&
+          existingUser.stripeSubscriptionId !== subscription?.id
+        ) {
+          try {
+            await this.stripe.subscriptions.cancel(existingUser.stripeSubscriptionId);
+            console.log(
+              `✅ Cancelled previous subscription ${existingUser.stripeSubscriptionId} on plan upgrade/change`,
+            );
+          } catch (cancelErr: any) {
+            console.warn(
+              `⚠️ Failed to cancel previous subscription ${existingUser.stripeSubscriptionId}:`,
+              cancelErr?.message || cancelErr,
+            );
+          }
+        }
+
         await this.userService.updateSubscription(userId, {
           planType,
           stripeCustomerId:
@@ -229,6 +301,21 @@ export class StripeService {
     if (!user) {
       console.error('User not found for customer:', customerId);
       return;
+    }
+
+    // Cancel old subscription on Stripe if upgrading or switching plans
+    if (user.stripeSubscriptionId && user.stripeSubscriptionId !== subscription.id) {
+      try {
+        await this.stripe.subscriptions.cancel(user.stripeSubscriptionId);
+        console.log(
+          `✅ Cancelled previous subscription ${user.stripeSubscriptionId} via webhook on plan change`,
+        );
+      } catch (err: any) {
+        console.warn(
+          `⚠️ Failed to cancel previous subscription ${user.stripeSubscriptionId}:`,
+          err?.message || err,
+        );
+      }
     }
 
     const planType = this.determinePlanType(subscription);
