@@ -23,7 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             'JWT_TOKEN_NAME',
             'user_token',
           );
-          const cookieToken = req?.cookies?.[tokenName] as string | undefined;
+          const cookieToken = (req?.cookies?.[tokenName] ||
+            req?.cookies?.['user_token'] ||
+            req?.cookies?.['token']) as string | undefined;
           if (cookieToken) return cookieToken;
 
           const authHeader = req.headers.authorization;

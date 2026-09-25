@@ -1,13 +1,18 @@
 import { Body, Controller, Put, Delete, Request, Response, UseGuards, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { UpdateProfileDto, UpdatePasswordDto } from './dto/update-user.dto';
+import { clearAuthCookie } from '../../common/utils/auth-cookie.util';
 import * as argon2 from 'argon2';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Put('profile')
   async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
@@ -57,12 +62,7 @@ export class UserController {
     await this.userService.delete(userId);
     
     // Clear auth cookie
-    res.clearCookie('user_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      path: '/',
-    });
+    clearAuthCookie(res, this.configService);
     
     return res.status(200).json({ success: true, message: 'Account deleted successfully' });
   }

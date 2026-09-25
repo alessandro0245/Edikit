@@ -1,4 +1,9 @@
-export const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+export const baseUrl =
+  typeof window !== "undefined"
+    ? "/api"
+    : process.env.BACKEND_API_URL ||
+      process.env.NEXT_PUBLIC_BACKEND_URL ||
+      "http://localhost:8000";
 
 export const plans = [
   {

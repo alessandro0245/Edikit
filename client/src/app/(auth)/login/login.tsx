@@ -82,7 +82,11 @@ const Login = () => {
         dispatch
       );
       console.log("Login successful:", response);
-      router.push("/dashboard");
+      const callbackUrl =
+        (typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).get("callbackUrl")) ||
+        "/dashboard";
+      router.push(callbackUrl);
       showSuccessToast("Logged in successfully!");
     } catch (error: any) {
       showErrorToast("Login failed", error.response?.data?.message);

@@ -5,11 +5,15 @@ import { parseJwtExpiresIn } from './parse-jwt-expires-in.util';
 function getCookieOptions(configService: ConfigService, maxAge?: number) {
   const isProduction = configService.get<string>('NODE_ENV') === 'production';
   const tokenName = configService.get<string>('JWT_TOKEN_NAME', 'user_token');
+  const sameSite = configService.get<'lax' | 'none' | 'strict'>(
+    'COOKIE_SAMESITE',
+    'lax',
+  );
 
   const baseOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax' | 'strict',
+    sameSite,
     path: '/',
     ...(maxAge && { maxAge }),
   };

@@ -37,10 +37,6 @@ export const loginUser = async (
   try {
     const { data } = await api.post("/auth/login", { email, password });
 
-    if (data.token) {
-      localStorage.setItem("user_token", data.token);
-    }
-
     const avatar = data.avatar?.startsWith("http")
       ? data.avatar
       : getInitialsAvatar(data.fullName);
@@ -82,24 +78,9 @@ export const refreshUser = async (dispatch: AppDispatch) => {
       console.error("Failed to fetch credits:", error);
     }
   } catch (error: unknown) {
-    console.log("❌/auth/me failed", error);
-
-    // Only remove token if we get a 401 (Unauthorized) - means token is invalid
-    // Don't remove on network errors or other issues
-    const status = (error as { response?: { status?: number } })?.response
-      ?.status;
-    if (status === 401) {
-      console.log("🔒 401 Unauthorized - removing invalid token");
-      dispatch(clearUser());
-      dispatch(clearCredits());
-    } else {
-      console.log(
-        "⚠️ Auth check failed but keeping token (might be network issue)"
-      );
-      // Keep token for retry, but clear user state
-      dispatch(clearUser());
-      dispatch(clearCredits());
-    }
+    console.log("❌ /auth/me failed", error);
+    dispatch(clearUser());
+    dispatch(clearCredits());
   }
 };
 
@@ -115,10 +96,6 @@ export const signupUser = async (
     email,
     password,
   });
-
-  if (data.token) {
-    localStorage.setItem("user_token", data.token);
-  }
 
   const avatar = data.avatar?.startsWith("http")
     ? data.avatar
@@ -154,10 +131,6 @@ export const appleLogin = async (dispatch: AppDispatch) => {
 
   const data = await res.json();
 
-  if (data.token) {
-    localStorage.setItem("user_token", data.token);
-  }
-
   if (res.ok && data) {
     const avatar = data.avatar?.startsWith("http")
       ? data.avatar
@@ -180,20 +153,17 @@ export const appleLogin = async (dispatch: AppDispatch) => {
 export const logoutUser = async (dispatch: AppDispatch) => {
   try {
     await api.post("/auth/logout");
-    localStorage.removeItem("user_token");
+  } catch (error) {
+    console.error("Logout request error:", error);
+  } finally {
     dispatch(clearUser());
     dispatch(clearCredits());
-  } catch {
-    localStorage.removeItem("user_token");
-    dispatch(clearUser());
-    dispatch(clearCredits());
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
   }
 };
 
-export const handleGoogleLogin = async () => {
+export const handleGoogleLogin = () => {
   window.location.href = `${baseUrl}/auth/google`;
-  const { data } = await api.get("/auth/me");
-  localStorage.setItem("user", JSON.stringify(data));
-  console.log("Logged in user:", data);
-  return data;
 };

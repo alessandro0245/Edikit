@@ -20,27 +20,26 @@ function AuthCallbackContent() {
 
       if (success === "true") {
         if (token) {
-          localStorage.setItem("user_token", token);
-          console.log(
-            "💾 Token stored in localStorage:",
-            token.substring(0, 20) + "..."
-          );
+          try {
+            await fetch("/api/auth/set-cookie", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token }),
+            });
+          } catch (e) {
+            console.error("Failed to set auth cookie:", e);
+          }
         }
 
-        setTimeout(
-          async () => {
-            try {
-              await refreshUser(dispatch);
-              showSuccessToast("Successfully logged in!");
-              router.push("/");
-            } catch (error) {
-              console.error("Failed to get user data:", error);
-              showErrorToast("Authentication failed", "Please try again");
-              router.push("/login");
-            }
-          },
-          token ? 200 : 50
-        );
+        try {
+          await refreshUser(dispatch);
+          showSuccessToast("Successfully logged in!");
+          router.push("/dashboard");
+        } catch (error) {
+          console.error("Failed to get user data:", error);
+          showErrorToast("Authentication failed", "Please try again");
+          router.push("/login");
+        }
       } else {
         showErrorToast("Authentication failed", "Please try again");
         router.push("/login");

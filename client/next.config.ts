@@ -33,6 +33,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    const rawBackendUrl =
+      process.env.BACKEND_API_URL ||
+      process.env.NEXT_PUBLIC_BACKEND_URL ||
+      "http://localhost:8000";
+    const backendUrl = rawBackendUrl.replace(/\/+$/, "");
+
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backendUrl}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
