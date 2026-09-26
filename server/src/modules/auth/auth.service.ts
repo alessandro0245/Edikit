@@ -122,7 +122,7 @@ export class AuthService {
     try {
       const user = await this.userService.findUserByEmail(email);
 
-      if (!user.password) {
+      if (!user || !user.password) {
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -144,7 +144,7 @@ export class AuthService {
   }
 
   async validateJwtUser(userId: string): Promise<JwtUser> {
-    const user = await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -153,6 +153,10 @@ export class AuthService {
         role: true,
       },
     });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found or session expired');
+    }
 
     return {
       userId: user.id,
@@ -329,7 +333,7 @@ export class AuthService {
   }
 
   async getCurrentUser(userId: string) {
-    return await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -343,10 +347,16 @@ export class AuthService {
         updatedAt: true,
       },
     });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
   async forgotPassword(email: string){
     try{
-    const user = await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUnique({
       where: { email },
     });
 
