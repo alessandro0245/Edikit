@@ -40,7 +40,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <Script id="iubenda-cons-init" strategy="afterInteractive">
-          {`var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "Ki9lMDUKaWtobf92UIKJbCdOZTIDFFFi"}]);`}
+          {`var _iub = _iub || {}; _iub.cons_instructions = _iub.cons_instructions || []; _iub.cons_instructions.push(["init", {api_key: "${process.env.NEXT_PUBLIC_IUBENDA_API_KEY || ''}"}]);`}
         </Script>
         <Script
           src="https://cdn.iubenda.com/cons/iubenda_cons.js"

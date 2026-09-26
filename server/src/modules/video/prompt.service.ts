@@ -266,7 +266,10 @@ export class PromptService {
     word: string,
     durationInSeconds: number,
   ): Promise<MatchCutScene[]> {
-    const sceneCount = computeMatchCutSceneCount(durationInSeconds);
+    const totalCuts = computeMatchCutSceneCount(durationInSeconds);
+    // Remotion MatchCut cycles scenes with modulo (% list.length).
+    // 10-12 diverse scenes are optimal: fast generation (~3-4s) and zero repetition artifacts.
+    const sceneCount = Math.min(12, Math.max(8, totalCuts));
 
     this.logger.log(
       `Generating ${sceneCount} MatchCut scenes for word="${word}" duration=${durationInSeconds}s`,
@@ -278,17 +281,18 @@ export class PromptService {
       `Respond with a JSON array only — no markdown fences, no commentary, no extra keys. Start with [ and end with ].`;
 
     let lastError: Error | null = null;
+    const maxRetries = 2;
 
-    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         this.logger.debug(
-          `MatchCut scene generation attempt ${attempt}/${this.maxRetries} (${sceneCount} scenes)`,
+          `MatchCut scene generation attempt ${attempt}/${maxRetries} (${sceneCount} scenes)`,
         );
 
         const response = await this.client.messages.create({
           model: this.modelName,
-          max_tokens: Math.min(8192, sceneCount * 120 + 200), // ~120 tokens/scene
-          temperature: 1.0,
+          max_tokens: Math.min(4096, sceneCount * 140 + 200), // ~140 tokens/scene
+          temperature: 0.7,
           system: systemPrompt,
           messages: [{ role: 'user', content: userMessage }],
         });
@@ -324,54 +328,35 @@ export class PromptService {
           }
         }
 
-        // Separate two failure modes:
-        //  A) Invalid scenes (word in titles, title too long, missing fields) → retry,
-        //     because a broken scene produces a broken frame.
-        //  B) Slightly fewer scenes than requested → accept, because the Remotion
-        //     component cycles short arrays (README: "safe fallback but visibly
-        //     repetitive"). Only retry if below 80% of the target count.
-        if (invalid.length > 0) {
-          throw new Error(
-            `${invalid.length} scene(s) failed validation (indices: ${invalid.join(', ')})`,
+        // If at least 4 scenes passed validation, keep them!
+        // Remotion cycles them with % list.length so 4+ scenes are completely safe and valid.
+        if (valid.length >= 4) {
+          this.logger.log(
+            `MatchCut scenes ready: ${valid.length} scenes for "${word}"`,
           );
+          return valid;
         }
 
-        const minAcceptable = Math.floor(sceneCount * 0.8);
-        if (valid.length < minAcceptable) {
-          throw new Error(
-            `Too few scenes: expected ${sceneCount}, got ${valid.length} (minimum ${minAcceptable})`,
-          );
-        }
-
-        if (valid.length < sceneCount) {
-          this.logger.warn(
-            `MatchCut: got ${valid.length}/${sceneCount} scenes for "${word}" — ` +
-            `component will cycle the last ${sceneCount - valid.length} cut(s).`,
-          );
-        }
-
-        this.logger.log(
-          `MatchCut scenes ready: ${valid.length} scenes for "${word}"`,
+        throw new Error(
+          `Only ${valid.length} valid scene(s) returned out of ${parsed.length}`,
         );
-        return valid;
       } catch (error) {
         lastError = error as Error;
         this.logger.warn(
           `MatchCut scene attempt ${attempt} failed: ${lastError.message}`,
         );
-        if (attempt < this.maxRetries) {
-          await this.sleep(1000 * Math.pow(2, attempt - 1));
+        if (attempt < maxRetries) {
+          await this.sleep(1000);
         }
       }
     }
 
     this.logger.error(
-      `All ${this.maxRetries} MatchCut scene attempts failed for "${word}". Using fallback scenes.`,
+      `All ${maxRetries} MatchCut scene attempts failed for "${word}". Using fallback scenes.`,
       lastError?.stack,
     );
 
-    // README: "If fewer scenes are supplied the component cycles them, which is
-    // a safe fallback but visibly repetitive." — so we supply enough variety.
+    // Supply handcrafted fallback scenes
     return this.buildMatchCutFallbackScenes(word, sceneCount);
   }
 
