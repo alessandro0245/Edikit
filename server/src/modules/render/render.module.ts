@@ -5,11 +5,12 @@ import { RenderService } from './render.service';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { PrismaModule } from '../../common/prisma/prisma.module';
 import { CreditsModule } from '../credits/credits.module';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @Module({
   imports: [HttpModule, CloudinaryModule, PrismaModule, CreditsModule],
   controllers: [RenderController],
-  providers: [RenderService],
+  providers: [RenderService, RolesGuard],
   exports: [RenderService],
 })
 export class RenderModule {}

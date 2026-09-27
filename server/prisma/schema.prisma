@@ -113,6 +113,7 @@ model User {
 
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
+  tokenVersion         Int       @default(0)
 
   @@map("users")
 }

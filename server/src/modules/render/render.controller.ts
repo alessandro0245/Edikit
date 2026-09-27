@@ -26,6 +26,8 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { RenderService } from './render.service';
@@ -34,7 +36,7 @@ import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Render')
 @Controller('render')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RenderController {
   private readonly logger = new Logger(RenderController.name);
   constructor(
@@ -76,8 +78,8 @@ export class RenderController {
 
     const uploadResults = await Promise.all(
       files.map((file) => {
-        // Detect asset type based on mimetype
-        const assetType = this.getAssetType(file.mimetype);
+        // Detect asset type based on magic bytes inspection
+        const assetType = this.getAssetType(file);
         return this.renderService.uploadAsset(file, userId, assetType);
       }),
     );
@@ -120,11 +122,11 @@ export class RenderController {
       throw new BadRequestException('No files uploaded');
     }
 
-    // Validate that all files are videos
+    // Validate that all files are videos via magic bytes
     for (const file of files) {
-      if (!file.mimetype.startsWith('video/')) {
+      if (!this.isVideoBuffer(file.buffer)) {
         throw new BadRequestException(
-          `Invalid file type: ${file.originalname}. Only video files are allowed.`,
+          `Invalid file type: ${file.originalname}. Only verified video files (MP4, MOV, WEBM) are allowed.`,
         );
       }
     }
@@ -142,13 +144,130 @@ export class RenderController {
   }
 
   /**
-   * Detect asset type based on mimetype
+   * Magic bytes verification helper methods
    */
-  private getAssetType(mimetype: string): 'image' | 'video' {
-    if (mimetype.startsWith('video/')) {
+  private isImageBuffer(buffer: Buffer): boolean {
+    if (!buffer || buffer.length < 12) return false;
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+      return true;
+    }
+    // PNG: 89 50 4E 47
+    if (
+      buffer[0] === 0x89 &&
+      buffer[1] === 0x50 &&
+      buffer[2] === 0x4e &&
+      buffer[3] === 0x47
+    ) {
+      return true;
+    }
+    // WEBP: RIFF....WEBP
+    if (
+      buffer[0] === 0x52 &&
+      buffer[1] === 0x49 &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x46 &&
+      buffer[8] === 0x57 &&
+      buffer[9] === 0x45 &&
+      buffer[10] === 0x42 &&
+      buffer[11] === 0x50
+    ) {
+      return true;
+    }
+    // GIF: GIF8
+    if (
+      buffer[0] === 0x47 &&
+      buffer[1] === 0x49 &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x38
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  private isVideoBuffer(buffer: Buffer): boolean {
+    if (!buffer || buffer.length < 12) return false;
+    // WebM / MKV: 1A 45 DF A3
+    if (
+      buffer[0] === 0x1a &&
+      buffer[1] === 0x45 &&
+      buffer[2] === 0xdf &&
+      buffer[3] === 0xa3
+    ) {
+      return true;
+    }
+    // MP4 / MOV ISO Base Media File Format box signatures at offset 4..7
+    const boxType = buffer.toString('ascii', 4, 8);
+    if (
+      boxType === 'ftyp' ||
+      boxType === 'moov' ||
+      boxType === 'mdat' ||
+      boxType === 'wide'
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  private isFontBuffer(buffer: Buffer): boolean {
+    if (!buffer || buffer.length < 4) return false;
+    // TrueType: 00 01 00 00 or 74 72 75 65 ('true')
+    if (
+      (buffer[0] === 0x00 &&
+        buffer[1] === 0x01 &&
+        buffer[2] === 0x00 &&
+        buffer[3] === 0x00) ||
+      (buffer[0] === 0x74 &&
+        buffer[1] === 0x72 &&
+        buffer[2] === 0x75 &&
+        buffer[3] === 0x65)
+    ) {
+      return true;
+    }
+    // OpenType: 4F 54 54 4F ('OTTO')
+    if (
+      buffer[0] === 0x4f &&
+      buffer[1] === 0x54 &&
+      buffer[2] === 0x54 &&
+      buffer[3] === 0x4f
+    ) {
+      return true;
+    }
+    // WOFF: 77 4F 46 46 ('wOFF')
+    if (
+      buffer[0] === 0x77 &&
+      buffer[1] === 0x4f &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x46
+    ) {
+      return true;
+    }
+    // WOFF2: 77 4F 46 32 ('wOF2')
+    if (
+      buffer[0] === 0x77 &&
+      buffer[1] === 0x4f &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x32
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Detect asset type based on magic bytes inspection
+   */
+  private getAssetType(file: Express.Multer.File): 'image' | 'video' {
+    if (this.isVideoBuffer(file.buffer)) {
       return 'video';
     }
-    return 'image';
+    if (this.isImageBuffer(file.buffer)) {
+      return 'image';
+    }
+    throw new BadRequestException(
+      `Invalid file type for ${file.originalname}. Only verified image (PNG, JPEG, WEBP) and video (MP4, MOV, WEBM) files are allowed.`,
+    );
   }
 
   @Delete('delete-asset')
@@ -215,13 +334,14 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Post('fonts')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max per font file
     }),
   )
-  @ApiOperation({ summary: 'Upload fonts to Nexrender Cloud' })
+  @ApiOperation({ summary: 'Upload fonts to Nexrender Cloud (admin only)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -264,15 +384,14 @@ export class RenderController {
       throw new BadRequestException('No files uploaded');
     }
 
-    // Validate that all files are TTF fonts
+    // Validate that all files are authentic font files via magic bytes and extension
     for (const file of files) {
       if (
-        !file.originalname.toLowerCase().endsWith('.ttf') &&
-        file.mimetype !== 'application/x-font-ttf' &&
-        file.mimetype !== 'font/ttf'
+        !file.originalname.toLowerCase().endsWith('.ttf') ||
+        !this.isFontBuffer(file.buffer)
       ) {
         throw new BadRequestException(
-          `Invalid file type: ${file.originalname}. Only TTF font files are allowed.`,
+          `Invalid file type: ${file.originalname}. Only verified TTF font files are allowed.`,
         );
       }
     }
@@ -286,8 +405,9 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Delete('fonts/:fontId')
-  @ApiOperation({ summary: 'Delete a font from Nexrender Cloud' })
+  @ApiOperation({ summary: 'Delete a font from Nexrender Cloud (admin only)' })
   @ApiCookieAuth()
   @ApiResponse({
     status: 200,
@@ -316,9 +436,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Post('fonts/upload-local')
   @ApiOperation({
-    summary: 'Upload all fonts from server animations/fonts directory',
+    summary: 'Upload all fonts from server animations/fonts directory (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -576,9 +697,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Put('templates/:templateId/layer-mapping')
   @ApiOperation({
-    summary: 'Manually update layer mapping for a template',
+    summary: 'Manually update layer mapping for a template (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -602,9 +724,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Post('templates/:templateId/regenerate-mapping')
   @ApiOperation({
-    summary: 'Regenerate layer mapping for a template using auto-detection',
+    summary: 'Regenerate layer mapping for a template using auto-detection (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -621,9 +744,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Post('templates/regenerate-all-mappings')
   @ApiOperation({
-    summary: 'Regenerate layer mappings for all templates',
+    summary: 'Regenerate layer mappings for all templates (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -638,9 +762,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Post('templates/upload/:templateId')
   @ApiOperation({
-    summary: 'Upload a single template to Nexrender Cloud',
+    summary: 'Upload a single template to Nexrender Cloud (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -663,6 +788,7 @@ export class RenderController {
     }
   }
 
+  @Roles('ADMIN')
   @Post('templates/upload-all')
   @ApiOperation({
     summary: 'Upload all templates to Nexrender Cloud (admin only)',
@@ -680,9 +806,10 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Delete('templates/:templateId')
   @ApiOperation({
-    summary: 'Delete a template from Nexrender and database',
+    summary: 'Delete a template from Nexrender and database (admin only)',
   })
   @ApiCookieAuth()
   @ApiResponse({
@@ -699,6 +826,7 @@ export class RenderController {
     };
   }
 
+  @Roles('ADMIN')
   @Delete('templates')
   @ApiOperation({
     summary: 'Delete ALL templates from Nexrender and database (admin only)',

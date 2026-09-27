@@ -41,9 +41,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: { userId: string } }): Promise<JwtUser> {
-    const { userId } = payload.sub;
-    const jwtUser: JwtUser = await this.authService.validateJwtUser(userId);
+  async validate(payload: {
+    sub: { userId: string; tokenVersion?: number };
+  }): Promise<JwtUser> {
+    const { userId, tokenVersion } = payload.sub;
+    const jwtUser: JwtUser = await this.authService.validateJwtUser(
+      userId,
+      tokenVersion,
+    );
     return jwtUser;
   }
 }

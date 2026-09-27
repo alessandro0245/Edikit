@@ -143,7 +143,13 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
-  logout(@Res() res: Response) {
+  async logout(
+    @CurrentUser('userId') userId: string,
+    @Res() res: Response,
+  ) {
+    if (userId) {
+      await this.authService.invalidateUserSessions(userId);
+    }
     clearAuthCookie(res, this.configService);
     return res.json({ message: 'Successfully logged out' });
   }

@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { UserService } from 'src/modules/user/user.service';
 import { PlanType } from '@generated/prisma/enums';
@@ -9,10 +10,12 @@ export class StripeService {
   private stripe: Stripe;
 
   constructor(
+    private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly creditsService: CreditsService,
   ) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    const stripeSecretKey = this.configService.getOrThrow<string>('STRIPE_SECRET_KEY');
+    this.stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2025-12-15.clover', // Fixed API version
     });
   }
@@ -60,7 +63,8 @@ export class StripeService {
       });
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'https://www.edikit.net';
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'https://www.edikit.net';
 
     const buildSessionParams = (cId: string): Stripe.Checkout.SessionCreateParams => ({
       customer: cId,
@@ -212,11 +216,8 @@ export class StripeService {
    * when important events happen (subscription cancelled, payment failed, etc.)
    */
   async handleWebhook(signature: string, rawBody: Buffer) {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    if (!webhookSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
-    }
+    const webhookSecret =
+      this.configService.getOrThrow<string>('STRIPE_WEBHOOK_SECRET');
 
     // STEP 1: VERIFY THE SIGNATURE
     // This ensures the webhook actually came from Stripe and wasn't forged

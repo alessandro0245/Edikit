@@ -43,8 +43,6 @@ export function useProfileSettings(initialUsername: string, initialEmail: string
    
       try {
         await userApi.deleteAccount();
-        // Clear tokens from local storage if any
-        localStorage.removeItem('user_token');
         // Clear redux state
         dispatch(clearUser());
         // Redirect to home/login

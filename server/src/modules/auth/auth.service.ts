@@ -143,7 +143,10 @@ export class AuthService {
     }
   }
 
-  async validateJwtUser(userId: string): Promise<JwtUser> {
+  async validateJwtUser(
+    userId: string,
+    tokenVersion?: number,
+  ): Promise<JwtUser> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -151,11 +154,18 @@ export class AuthService {
       select: {
         id: true,
         role: true,
+        tokenVersion: true,
       },
     });
 
     if (!user) {
       throw new UnauthorizedException('User not found or session expired');
+    }
+
+    if (tokenVersion !== undefined && user.tokenVersion !== tokenVersion) {
+      throw new UnauthorizedException(
+        'Session expired or invalidated. Please log in again.',
+      );
     }
 
     return {
@@ -164,13 +174,37 @@ export class AuthService {
     };
   }
 
-  async generateToken(userId: string): Promise<string> {
+  async generateToken(
+    userId: string,
+    tokenVersion?: number,
+  ): Promise<string> {
+    let version = tokenVersion;
+    if (version === undefined) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { tokenVersion: true },
+      });
+      version = user?.tokenVersion ?? 0;
+    }
+
     const payload = {
       sub: {
         userId,
+        tokenVersion: version,
       },
     };
     return await this.jwtService.signAsync(payload);
+  }
+
+  async invalidateUserSessions(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        tokenVersion: {
+          increment: 1,
+        },
+      },
+    });
   }
 
   async generateTokenAndSetCookie(
