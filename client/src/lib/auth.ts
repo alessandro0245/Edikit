@@ -59,11 +59,9 @@ export const loginUser = async (
 };
 
 export const refreshUser = async (dispatch: AppDispatch) => {
-  console.log("🔄 refreshUser called");
 
   try {
     const { data } = await api.get("/auth/me");
-    console.log("✅ /auth/me success:", data);
 
     const avatar = data.avatar?.startsWith("http")
       ? data.avatar
@@ -78,7 +76,6 @@ export const refreshUser = async (dispatch: AppDispatch) => {
       console.error("Failed to fetch credits:", error);
     }
   } catch (error: unknown) {
-    console.log("❌ /auth/me failed", error);
     dispatch(clearUser());
     dispatch(clearCredits());
   }
@@ -145,8 +142,6 @@ export const appleLogin = async (dispatch: AppDispatch) => {
       console.error("Failed to fetch credits:", error);
     }
   }
-
-  console.log("Logged in user:", data);
   return data;
 };
 

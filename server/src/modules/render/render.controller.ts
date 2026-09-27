@@ -6,11 +6,14 @@ import {
   Put,
   Body,
   Param,
+  Query,
+  Headers,
   UseGuards,
   UploadedFiles,
   UseInterceptors,
   ParseIntPipe,
   BadRequestException,
+  UnauthorizedException,
   Logger,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -40,7 +43,11 @@ export class RenderController {
   ) {}
 
   @Post('upload-asset')
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max per file
+    }),
+  )
   @ApiOperation({ summary: 'Upload user images/videos to Cloudinary' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -82,7 +89,11 @@ export class RenderController {
   }
 
   @Post('upload-video')
-  @UseInterceptors(FilesInterceptor('files', 5))
+  @UseInterceptors(
+    FilesInterceptor('files', 5, {
+      limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max per file
+    }),
+  )
   @ApiOperation({ summary: 'Upload user videos to Cloudinary' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -205,7 +216,11 @@ export class RenderController {
   }
 
   @Post('fonts')
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max per font file
+    }),
+  )
   @ApiOperation({ summary: 'Upload fonts to Nexrender Cloud' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -391,7 +406,9 @@ export class RenderController {
       const backendUrl =
         this.configService.get<string>('BACKEND_URL') ||
         this.configService.get<string>('RENDER_EXTERNAL_URL');
-      webhookUrl = backendUrl ? `${backendUrl}/render/webhook` : null;
+      const webhookSecret = this.configService.get<string>('RENDER_WEBHOOK_SECRET');
+      const secretQuery = webhookSecret ? `?secret=${encodeURIComponent(webhookSecret)}` : '';
+      webhookUrl = backendUrl ? `${backendUrl}/render/webhook${secretQuery}` : null;
     }
     // In development: webhookUrl stays null — job completion is handled via polling in getJobStatus()
 
@@ -451,6 +468,8 @@ export class RenderController {
   @ApiOperation({ summary: 'Nexrender Cloud webhook handler' })
   @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
   async handleWebhook(
+    @Query('secret') secretQuery: string | undefined,
+    @Headers('x-webhook-secret') secretHeader: string | undefined,
     @Body()
     body: {
       id?: string;
@@ -462,6 +481,15 @@ export class RenderController {
       error?: string;
     },
   ) {
+    const configuredSecret = this.configService.get<string>('RENDER_WEBHOOK_SECRET');
+    if (configuredSecret) {
+      const providedSecret = secretQuery || secretHeader;
+      if (!providedSecret || providedSecret !== configuredSecret) {
+        this.logger.warn('Unauthorized render webhook attempt detected');
+        throw new UnauthorizedException('Invalid webhook secret');
+      }
+    }
+
     this.logger.log('=== NEXRENDER WEBHOOK RECEIVED ===');
     this.logger.log('Full webhook body:', JSON.stringify(body, null, 2));
 

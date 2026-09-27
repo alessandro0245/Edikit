@@ -14,7 +14,7 @@ export class UpdateProfileDto {
 export class UpdatePasswordDto {
   @IsString()
   @IsNotEmpty()
-  currentPassword?: string;
+  currentPassword: string;
 
   @IsString()
   @IsNotEmpty()

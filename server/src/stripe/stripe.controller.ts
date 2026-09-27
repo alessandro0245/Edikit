@@ -87,7 +87,7 @@ export class StripeController {
     } catch (error) {
       const err = error as Error;
       console.error('Webhook error:', err.message);
-      throw new BadRequestException(`Webhook Error: ${err.message}`);
+      throw new BadRequestException('Webhook processing failed');
     }
   }
 }

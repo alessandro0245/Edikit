@@ -13,6 +13,10 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   const nodeEnv = process.env.NODE_ENV || 'development';
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const origins = [frontendUrl];
+  if (nodeEnv !== 'production') {
+    origins.push('http://localhost:3000', 'http://localhost:5173');
+  }
 
   // Security middleware
   app.use(helmet());
@@ -24,7 +28,7 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: [frontendUrl, 'http://localhost:3000', 'http://localhost:5173'],
+    origin: origins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
@@ -66,16 +70,20 @@ async function bootstrap() {
     .addTag('Users', 'User management endpoints')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  if(process.env.NODE_ENV !== 'production'){
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, document);
+  }
 
   await app.listen(port);
   console.log(
     `Server is running on http://localhost:${port} in ${nodeEnv} mode`,
   );
-  console.log(
-    `Swagger documentation available at http://localhost:${port}/api-docs`,
-  );
+  if (nodeEnv !== 'production') {
+    console.log(
+      `Swagger documentation available at http://localhost:${port}/api-docs`,
+    );
+  }
 }
 
 void bootstrap();

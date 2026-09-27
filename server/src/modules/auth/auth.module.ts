@@ -21,13 +21,14 @@ import { GoogleStrategy } from './strategies/google.strategy';
           throw new Error('JWT_SECRET is not defined in environment variables');
         }
         const expiresIn =
-          configService.get<string>('JWT_EXPIRES_IN', '7d') || '7d';
+          configService.get<string>('JWT_EXPIRES_IN', '1d') || '1d';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return {
           secret,
           signOptions: {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             expiresIn: expiresIn as any,
+            algorithm: 'HS256',
           },
         } as any;
       },

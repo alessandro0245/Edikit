@@ -22,6 +22,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AppleAuthDto } from './dto/apple-auth.dto';
 import { AuthResponseDto, UserResponseDto } from './dto/auth-response.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtUser } from '../../common/decorators/current-user.decorator';
@@ -165,22 +167,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiResponse({ status: 200, description: 'Reset email sent if account exists' })
-  async forgotPassword(@Body('email') email: string) {
-  await this.authService.forgotPassword(email);
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(forgotPasswordDto.email);
+    return { message: 'If that email is registered, a reset link has been sent.' };
+  }
 
-  return { message: 'If that email is registered, a reset link has been sent.'};
-}
   @Public()
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password using token from email' })
   @ApiResponse({ status: 200, description: 'Password updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  async resetPassword(
-  @Body('token') token: string,
-  @Body('password') password: string,
-) {
-  await this.authService.resetPassword(token, password);
-  return { message: 'Password updated successfully.' };
-}
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.authService.resetPassword(resetPasswordDto.token, resetPasswordDto.password);
+    return { message: 'Password updated successfully.' };
+  }
 }

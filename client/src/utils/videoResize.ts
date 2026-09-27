@@ -31,6 +31,10 @@ export const resizeVideo = async (
   targetHeight: number,
   onProgress?: (progress: number) => void
 ): Promise<File> => {
+  if (file.size > 50 * 1024 * 1024) {
+    throw new Error("File size exceeds 50MB. Only files under 50MB are accepted.");
+  }
+
   await new Promise<void>((resolve) => {
     if (!isProcessing) {
       isProcessing = true;

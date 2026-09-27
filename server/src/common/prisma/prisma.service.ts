@@ -18,9 +18,11 @@ export class PrismaService
     const pool = new Pool({ connectionString });
     const adapter = new PrismaPg(pool);
 
+    const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
     super({
       adapter,
-      log: ['info', 'warn', 'error'],
+      log: isProduction ? ['warn', 'error'] : ['info', 'warn', 'error'],
     });
   }
 

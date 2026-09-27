@@ -90,11 +90,17 @@ export class VideoController {
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  /** Serve locally-rendered video files (no auth required for video player). */
+  /** Serve locally-rendered video files with authentication and ownership check. */
   @Get('serve/:jobId')
+  @UseGuards(JwtAuthGuard)
   @Header('Content-Type', 'video/mp4')
   @Header('Accept-Ranges', 'bytes')
-  async serveVideo(@Param('jobId') jobId: string, @Res() res: Response) {
+  async serveVideo(
+    @Param('jobId') jobId: string,
+    @CurrentUser() user: JwtUser,
+    @Res() res: Response,
+  ) {
+    await this.videoService.getJobStatus(jobId, user.userId);
     const filePath = await this.videoService.getLocalVideoPath(jobId);
     if (!filePath || !fs.existsSync(filePath)) {
       res.status(404).send('Video not found');

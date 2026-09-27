@@ -481,6 +481,14 @@ export const useCustomizeLogic = () => {
     file: File,
     inputElement?: HTMLInputElement,
   ) => {
+    // ── Enforce file size limit (50MB max) ──
+    const MAX_FILE_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      showErrorToast("File size exceeds 50MB. Only files under 50MB are accepted.");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
+
     setUploadingAssets((prev) => new Set(prev).add(fieldKey));
 
     try {
@@ -656,6 +664,14 @@ export const useCustomizeLogic = () => {
     inputElement?: HTMLInputElement,
   ) => {
     if (!file) return;
+
+    // ── Enforce file size limit (50MB max) ──
+    const MAX_FILE_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      showErrorToast("File size exceeds 50MB. Only files under 50MB are accepted.");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
 
     // ── Enforce field-level MIME type — accept attribute is only a browser hint ──
     const field = template?.fields[fieldKey];
@@ -1007,6 +1023,8 @@ export const useCustomizeLogic = () => {
           ? `Failed to upload ${fieldKey}: ${details}`
           : `Failed to upload ${fieldKey}`,
       );
+      // Clean up the preview so the UI does not falsely show the asset as ready
+      removeFile(fieldKey);
     }
   };
 

@@ -185,6 +185,9 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
   }, 0);
 
   const handleUpload = async (type: AssetType, file: File) => {
+    if (file.size > 50 * 1024 * 1024) {
+      throw new Error("File size exceeds 50MB. Only files under 50MB are accepted.");
+    }
     try {
       const formData = new FormData();
       formData.append("file",      file);
@@ -214,7 +217,7 @@ export const AssetUploadStep: React.FC<AssetUploadStepProps> = ({ onComplete }) 
       setError(null);
       await Promise.all(files.map((file) => handleUpload(type, file)));
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? "Upload failed. Try again.");
+      setError(err?.response?.data?.message ?? err?.message ?? "Upload failed. Try again.");
     } finally {
       setUploading(null);
     }
