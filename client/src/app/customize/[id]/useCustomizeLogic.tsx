@@ -688,7 +688,16 @@ export const useCustomizeLogic = () => {
       if (inputElement) inputElement.value = "";
       return;
     }
-    // "media" accepts both — no guard needed
+    if (field?.type === "media" && !isImageFile && !isVideoFile) {
+      showErrorToast("This field only accepts image (PNG, JPG, WEBP) or video (MP4, MOV) files.");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
+    if (!isImageFile && !isVideoFile) {
+      showErrorToast("Only image (PNG, JPG, WEBP) and video (MP4, MOV) files are accepted.");
+      if (inputElement) inputElement.value = "";
+      return;
+    }
 
     // ── For image fields, open the inline crop editor first ──
     if (isImageFile) {
@@ -1019,9 +1028,7 @@ export const useCustomizeLogic = () => {
         ? responseMessage.join(", ")
         : responseMessage;
       showErrorToast(
-        details
-          ? `Failed to upload ${fieldKey}: ${details}`
-          : `Failed to upload ${fieldKey}`,
+        details || `Failed to upload file. Please try again.`,
       );
       // Clean up the preview so the UI does not falsely show the asset as ready
       removeFile(fieldKey);

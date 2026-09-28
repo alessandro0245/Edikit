@@ -266,7 +266,7 @@ export class RenderController {
       return 'image';
     }
     throw new BadRequestException(
-      `Invalid file type for ${file.originalname}. Only verified image (PNG, JPEG, WEBP) and video (MP4, MOV, WEBM) files are allowed.`,
+      `Invalid file type: ${file.originalname}. Only verified image (PNG, JPG, WEBP) and video (MP4, MOV, WEBM) files are allowed.`,
     );
   }
 
