@@ -16,6 +16,7 @@ import {
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
@@ -44,6 +45,7 @@ export class RenderController {
     private readonly configService: ConfigService,
   ) {}
 
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   @Post('upload-asset')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
@@ -507,6 +509,7 @@ export class RenderController {
     return template;
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('create-job/:templateId')
   @ApiOperation({ summary: 'Create render job' })
   @ApiCookieAuth()
@@ -585,6 +588,7 @@ export class RenderController {
   }
 
   @Public()
+  @SkipThrottle()
   @Post('webhook')
   @ApiOperation({ summary: 'Nexrender Cloud webhook handler' })
   @ApiResponse({ status: 200, description: 'Webhook processed successfully' })

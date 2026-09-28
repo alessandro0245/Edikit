@@ -9,6 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { VideoService } from './video.service';
 import { GeneratePromptDto } from './dto/generate-prompt.dto';
@@ -24,12 +25,14 @@ import * as path from 'path';
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('generate-prompt')
   @UseGuards(JwtAuthGuard)
   generatePrompt(@Body() dto: GeneratePromptDto, @CurrentUser() user: JwtUser) {
     return this.videoService.generatePrompt(dto, user.userId);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('generate-matchcut')
   @UseGuards(JwtAuthGuard)
   generateMatchCut(
@@ -45,6 +48,7 @@ export class VideoController {
     return this.videoService.getJobStatus(jobId, user.userId);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('job/:id/start-render')
   @UseGuards(JwtAuthGuard)
   startRender(

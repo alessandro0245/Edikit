@@ -50,7 +50,9 @@ function SuccessContent() {
     try {
       const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/stripe/verify-session?session_id=${sessionId}`;
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const errorText = await response.text();

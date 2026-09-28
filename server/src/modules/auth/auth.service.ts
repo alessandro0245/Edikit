@@ -449,15 +449,11 @@ export class AuthService {
     .update(token)
     .digest('hex');
 
-     console.log('Token received:', token);
-  console.log('Token length:', token.length);
-  console.log('Hashed token:', hashedToken);
 
   const user = await this.prisma.user.findFirst({
     where: { resetPasswordToken: hashedToken },
   });
 
-  console.log('User found:', user ? user.email : 'NOT FOUND');
 
   if (!user) {
     throw new BadRequestException('Invalid or expired reset link.');

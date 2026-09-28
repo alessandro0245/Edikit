@@ -13,11 +13,19 @@ export const showSuccessToast = (title: string, message?: string) => {
 };
 
 export const showErrorToast = (title: string, message?: string) => {
+  let displayMessage = message;
+  if (
+    displayMessage &&
+    (displayMessage.includes("ThrottlerException") ||
+      displayMessage.toLowerCase() === "too many requests")
+  ) {
+    displayMessage = "Too many requests. Try again in 60 seconds";
+  }
   toast.custom((t) => (
     <CustomToast
       t={t}
       title={title}
-      message={message}
+      message={displayMessage}
       type="error"
     />
   ));

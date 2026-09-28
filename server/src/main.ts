@@ -1,14 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
+
+  // Trust reverse proxy (Vercel, Render, Cloudflare) for accurate IP rate limiting
+  app.set('trust proxy', 1);
 
   const port = process.env.PORT || 3000;
   const nodeEnv = process.env.NODE_ENV || 'development';
@@ -23,8 +27,6 @@ async function bootstrap() {
 
   // Cookie parser
   app.use(cookieParser());
-
-  app.useGlobalPipes(new ValidationPipe());
 
   // CORS configuration
   app.enableCors({

@@ -1818,7 +1818,7 @@ export class RenderService {
         name: 'nx:layer-state-set',
         params: {
           layerName: 'background',
-          enabled: false,
+          visible: false,
         },
       });
     }

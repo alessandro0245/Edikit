@@ -23,8 +23,8 @@ export class CreateCheckoutSessionDto {
   @IsString()
   interval?: string;
 
-  @ApiProperty({ description: 'User ID', example: 'usr_123456789' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'User ID', example: 'usr_123456789', required: false })
+  @IsOptional()
   @IsString()
-  userId: string;
+  userId?: string;
 }

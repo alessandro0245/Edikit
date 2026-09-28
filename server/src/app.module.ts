@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HttpModule } from '@nestjs/axios';
 import { AppController } from './app.controller';
@@ -17,6 +19,16 @@ import { S3Module } from './modules/s3/s3.module';
 import { AssetsModule } from './modules/assets/assets.module';
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 60000,
+          limit: 60,
+        },
+      ],
+      errorMessage: 'Too many requests. Try again in 60 seconds',
+    }),
     AssetsModule,
     VideoModule,
     ConfigModule,
@@ -32,6 +44,13 @@ import { AssetsModule } from './modules/assets/assets.module';
     S3Module,
   ],
   controllers: [AppController],
-  providers: [AppService, KeepAliveService],
+  providers: [
+    AppService,
+    KeepAliveService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
