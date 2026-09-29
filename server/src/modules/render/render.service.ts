@@ -1134,8 +1134,8 @@ export class RenderService {
       // Animation 14 — single text + gradient color via colors
       14: {
         text1: 'txt_1',
-        text2: "txt_2",
-        background: 'background',
+        text2: 'txt_2',
+        background: 'background.png',
       },
 
       // Animation 15 — 6x text + 1x dual-media post (img_4/video_1) + 2x profile pics
@@ -1813,17 +1813,18 @@ export class RenderService {
     }
 
     if (dto.useBackgroundColor === false) {
+      const bgLayerName = layerMapping.background || 'background';
       assets.push({
         type: 'function',
         name: 'nx:layer-state-set',
         params: {
-          layerName: 'background',
+          layerName: bgLayerName,
           visible: false,
         },
       });
     }
 
-    if (dto.useBlurEffect === false && templateId !== 6) {
+    if (dto.useBlurEffect === false && templateId !== 6 && templateId !== 14) {
       assets.push({
         type: 'function',
         name: 'nx:layer-state-set',
