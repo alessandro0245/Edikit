@@ -11,8 +11,8 @@ async function bootstrap() {
     rawBody: true,
   });
 
-  // Trust reverse proxy (Vercel, Render, Cloudflare) for accurate IP rate limiting
-  app.set('trust proxy', 1);
+  // Trust all reverse proxy hops (Cloudflare -> Render load balancer)
+  app.set('trust proxy', true);
 
   const port = process.env.PORT || 3000;
   const nodeEnv = process.env.NODE_ENV || 'development';
