@@ -70,9 +70,8 @@ export default function Sidebar() {
   }, [isUserMenuOpen]);
 
   const handleLogout = async () => {
-    await logoutUser(dispatch);
     setIsUserMenuOpen(false);
-    router.push("/login");
+    await logoutUser(dispatch);
   };
 
   return (

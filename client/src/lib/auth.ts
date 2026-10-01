@@ -75,9 +75,15 @@ export const refreshUser = async (dispatch: AppDispatch) => {
     } catch (error) {
       console.error("Failed to fetch credits:", error);
     }
-  } catch (error: unknown) {
-    dispatch(clearUser());
-    dispatch(clearCredits());
+  } catch (error: any) {
+    // Only clear user on true 401 Unauthorized (session expired or invalid)
+    // Do NOT clear user on 429 rate limit or 500 transient server errors
+    if (error?.response?.status === 401) {
+      dispatch(clearUser());
+      dispatch(clearCredits());
+    } else {
+      console.warn("refreshUser failed with non-auth error:", error?.response?.status || error);
+    }
   }
 };
 
@@ -151,10 +157,16 @@ export const logoutUser = async (dispatch: AppDispatch) => {
   } catch (error) {
     console.error("Logout request error:", error);
   } finally {
+    try {
+      // Clear cookies from Next.js server side
+      await fetch("/api/auth/clear-cookie", { method: "POST" });
+    } catch {
+      // ignore
+    }
     dispatch(clearUser());
     dispatch(clearCredits());
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.href = "/login?logout=true";
     }
   }
 };

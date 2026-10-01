@@ -40,17 +40,20 @@ export function useProfileSettings(initialUsername: string, initialEmail: string
   };
 
   const handleDeleteAccount = async () => {
-   
+    try {
+      await userApi.deleteAccount();
       try {
-        await userApi.deleteAccount();
-        // Clear redux state
-        dispatch(clearUser());
-        // Redirect to home/login
-        router.push('/');
-      } catch (err: any) {
-        setError(err?.response?.data?.message || 'Failed to delete account');
+        await fetch("/api/auth/clear-cookie", { method: "POST" });
+      } catch {
+        // ignore
       }
-    
+      // Clear redux state
+      dispatch(clearUser());
+      // Full navigation to login to flush all memory and prevent bfcache / ghost dashboard
+      window.location.href = "/login?logout=true";
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to delete account");
+    }
   };
 
   return {

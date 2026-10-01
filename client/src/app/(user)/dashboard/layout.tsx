@@ -1,4 +1,5 @@
 import Sidebar from "../components/SideBar";
+import DashboardAuthGuard from "../components/DashboardAuthGuard";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +9,9 @@ export default function DashboardLayout({
   return (
     <main className="flex min-h-dvh flex-col bg-background lg:flex-row lg:overflow-hidden">
       <Sidebar />
-      <div className="min-w-0 flex-1 lg:overflow-y-auto">{children}</div>
+      <div className="min-w-0 flex-1 lg:overflow-y-auto">
+        <DashboardAuthGuard>{children}</DashboardAuthGuard>
+      </div>
     </main>
   );
 }

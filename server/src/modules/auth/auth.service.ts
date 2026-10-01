@@ -196,15 +196,28 @@ export class AuthService {
     return await this.jwtService.signAsync(payload);
   }
 
+  extractUserIdFromToken(token: string): string | null {
+    try {
+      const decoded: any = this.jwtService.decode(token);
+      return decoded?.sub?.userId || decoded?.userId || null;
+    } catch {
+      return null;
+    }
+  }
+
   async invalidateUserSessions(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        tokenVersion: {
-          increment: 1,
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          tokenVersion: {
+            increment: 1,
+          },
         },
-      },
-    });
+      });
+    } catch {
+      // User might already be deleted or not found, safely ignore
+    }
   }
 
   async generateTokenAndSetCookie(

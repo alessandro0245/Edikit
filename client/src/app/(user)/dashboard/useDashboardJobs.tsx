@@ -109,7 +109,11 @@ export const useDashboardJobs = () => {
           error: job.error,
         })),
       );
-    } catch (requestError) {
+    } catch (requestError: any) {
+      // If 401, axios interceptor will redirect cleanly to /login — do not display error banner
+      if (requestError?.response?.status === 401) {
+        return;
+      }
       setError(requestError instanceof Error ? requestError.message : "Failed to load your jobs");
     } finally {
       setLoading(false);

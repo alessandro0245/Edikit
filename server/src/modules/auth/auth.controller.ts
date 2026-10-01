@@ -140,19 +140,36 @@ export class AuthController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiCookieAuth()
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
   async logout(
-    @CurrentUser('userId') userId: string,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    if (userId) {
-      await this.authService.invalidateUserSessions(userId);
+    try {
+      const tokenName = this.configService.get<string>(
+        'JWT_TOKEN_NAME',
+        'user_token',
+      );
+      const token =
+        (req?.cookies?.[tokenName] ||
+          req?.cookies?.['user_token'] ||
+          req?.cookies?.['token']) as string | undefined;
+
+      if (token) {
+        const userId = this.authService.extractUserIdFromToken(token);
+        if (userId) {
+          await this.authService.invalidateUserSessions(userId);
+        }
+      }
+    } catch {
+      // Ignore token decode errors during logout
     }
+
     clearAuthCookie(res, this.configService);
     return res.json({ message: 'Successfully logged out' });
   }

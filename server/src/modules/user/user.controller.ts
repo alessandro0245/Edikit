@@ -64,7 +64,7 @@ export class UserController {
     // Clear auth cookie
     clearAuthCookie(res, this.configService);
     
-    return res.status(200).json({ success: true, message: 'Account deleted successfully' });
+    return { success: true, message: 'Account deleted successfully' };
   }
 }
 
