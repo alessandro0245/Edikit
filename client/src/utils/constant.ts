@@ -548,7 +548,7 @@ export const templates: Template[] = [
   },
   {
     id: 11,
-    name: "Animated Social Media Post",
+    name: "Social Media Post",
     previewUrl: "/previews/animation-11.mp4",
     thumbnail: "/previews/animation 11.png",
     hasTransprentBackground: false,
@@ -563,7 +563,7 @@ export const templates: Template[] = [
       image1: {
         type: "image",
         label: "Profile Pic",
-        dimensions: "512x512",
+        dimensions: "1080x1080",
         required: false,
       },
       text1: { type: "text", value: "text number 1", label: "Text 1", maxLength: 40, required: false },

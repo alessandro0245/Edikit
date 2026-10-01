@@ -1108,7 +1108,7 @@ export class RenderService {
         text2: 'txt_2',
         text3: 'txt_6',
         text4: 'txt_10',
-        image1: 'img_1',
+        image1: 'img_6',
         video1: 'video_1',
         background: 'background',
       },
