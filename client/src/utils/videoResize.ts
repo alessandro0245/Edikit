@@ -15,10 +15,15 @@ const getFFmpeg = async (): Promise<FFmpeg> => {
     console.log("[FFmpeg Log]", message);
   });
 
-  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const coreURL = `${origin}/ffmpeg/ffmpeg-core.js`;
+  const wasmURL = await toBlobURL(`${origin}/ffmpeg/ffmpeg-core.wasm`, "application/wasm");
+  const classWorkerURL = `${origin}/ffmpeg/ffmpeg-worker.js`;
+
   await ffmpegInstance.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+    coreURL,
+    wasmURL,
+    classWorkerURL,
   });
 
   ffmpegLoaded = true;
