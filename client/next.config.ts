@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizeCss: true,
+    proxyClientMaxBodySize: "55mb",
   },
   async headers() {
     return [
@@ -23,11 +24,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "credentialless",
+            value: "same-origin-allow-popups",
           },
           {
             key: "X-Frame-Options",
