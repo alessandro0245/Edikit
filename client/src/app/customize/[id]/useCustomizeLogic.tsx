@@ -1219,19 +1219,30 @@ export const useCustomizeLogic = () => {
   };
 
   const handleDownload = async () => {
-    if (!renderJob?.outputUrl) return;
+    if (!renderJob?.id) return;
 
     setIsDownloading(true);
-    setDownloadProgress(50);
+    setDownloadProgress(0);
 
     try {
+      const ext = useBackgroundColor ? "mp4" : "mov";
       const timestamp = new Date().toISOString().slice(0, 10);
-      const downloadUrl = renderJob.outputUrl;
+      const filename = `video-${timestamp}.${ext}`;
 
+      // Step 1: Call backend (auth-gated) to get a fresh presigned S3 URL
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await api.get<{ url: string; filename: string }>(
+        `/render/job/${renderJob.id}/download`
+      );
+      const s3Url = response.data.url;
+      const serverFilename = response.data.filename || filename;
+
+      // Step 2: Download from S3 directly via XHR (no credentials needed for presigned URLs)
+      // This gives a proper progress bar and avoids the redirect confusion.
       await new Promise<void>((resolve, reject) => {
-        const ext = useBackgroundColor ? "mp4" : "mov";
-        downloadVideo(downloadUrl, {
-          filename: `video-${timestamp}.${ext}`,
+        downloadVideo(s3Url, {
+          filename: serverFilename,
+          useCredentials: false, // S3 presigned URLs don't use cookies
           onProgress: (progress) => setDownloadProgress(progress),
           onSuccess: () => {
             setDownloadProgress(100);

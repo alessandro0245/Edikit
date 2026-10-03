@@ -664,6 +664,20 @@ export class RenderController {
     return { url };
   }
 
+  @Get('job/:id/download')
+  @ApiOperation({ summary: 'Get a presigned download URL for a render job video' })
+  @ApiCookieAuth()
+  @ApiResponse({ status: 200, description: 'Returns a presigned S3 download URL' })
+  async downloadJob(
+    @Param('id') jobId: string,
+    @CurrentUser('userId') userId: string,
+  ) {
+    const { url, filename } = await this.renderService.getJobDownloadUrl(jobId, userId);
+    // Return the presigned URL as JSON — frontend downloads directly from S3
+    // with progress tracking via XHR. No redirect needed.
+    return { url, filename };
+  }
+
   @Get('templates/:templateId/layers')
   @ApiOperation({
     summary: 'Get template layer names (for debugging layer mapping)',

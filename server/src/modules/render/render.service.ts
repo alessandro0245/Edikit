@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { S3Service } from '../s3/s3.service';
 import { CreateRenderJobDto } from './dto/create-render-job.dto';
 import { RenderStatus } from '@generated/prisma/enums';
 import { firstValueFrom } from 'rxjs';
@@ -67,6 +68,7 @@ export class RenderService {
     private readonly httpService: HttpService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly creditsService: CreditsService,
+    private readonly s3Service: S3Service,
   ) {
     this.nexrenderApiUrl = 'https://api.nexrender.com/api/v2';
     this.nexrenderApiKey =
@@ -2226,43 +2228,81 @@ export class RenderService {
           }
         }
 
-        // ✅ If completed and we have output URL, download and upload to Cloudinary
-        if (status === 'COMPLETED' && outputUrl && !job.outputUrl) {
-          this.logger.log('Job completed! Downloading video from Nexrender...');
+        // ✅ Concurrency guard: if nexrenderOutputUrl is already set but outputUrl is still null,
+        // another poll already started the S3 upload — skip this one to avoid duplicate streams.
+        if (status === RenderStatus.COMPLETED && job.nexrenderOutputUrl && !job.outputUrl) {
+          this.logger.log('Upload already in progress for this job, skipping duplicate poll.');
+          return {
+            id: job.id,
+            userId: job.userId,
+            templateId: job.templateId,
+            status: RenderStatus.PROCESSING,
+            outputUrl: null,
+            progress: 99,
+            createdAt: job.createdAt,
+            updatedAt: job.updatedAt,
+          };
+        }
+
+        // ✅ If completed and no upload started yet, stream to S3 (no RAM buffer, no size limit)
+        if (status === RenderStatus.COMPLETED && outputUrl && !job.outputUrl && !job.nexrenderOutputUrl) {
+          this.logger.log('Job completed! Streaming video from Nexrender to S3...');
+
+          // Atomic compare-and-set: only update if nexrenderOutputUrl is STILL null.
+          // In a race between two simultaneous polls, only ONE will get count=1.
+          const claimed = await this.prisma.renderJob.updateMany({
+            where: { id: job.id, nexrenderOutputUrl: null },
+            data: { nexrenderOutputUrl: outputUrl },
+          });
+
+          if (claimed.count === 0) {
+            // Another concurrent request already claimed this job — return PROCESSING
+            this.logger.log('Lost claim race for this job — another poll is uploading it.');
+            return {
+              id: job.id,
+              userId: job.userId,
+              templateId: job.templateId,
+              status: RenderStatus.PROCESSING,
+              outputUrl: null,
+              progress: 99,
+              createdAt: job.createdAt,
+              updatedAt: job.updatedAt,
+            };
+          }
 
           try {
             const videoResponse = await firstValueFrom(
               this.httpService.get(outputUrl, {
-                responseType: 'arraybuffer',
+                responseType: 'stream',
                 maxBodyLength: Infinity,
                 maxContentLength: Infinity,
-                timeout: 60000, // 60 second timeout for large files
+                timeout: 180000, // 3 min for large files
               }),
             );
 
-            const videoBuffer = Buffer.from(videoResponse.data);
-            this.logger.log(
-              `Downloaded video: ${(videoBuffer.length / 1024 / 1024).toFixed(2)}MB`,
-            );
+            // Detect content type from URL (mov = ProRes transparent, otherwise mp4)
+            const isMov = outputUrl.toLowerCase().includes('.mov');
+            const ext = isMov ? 'mov' : 'mp4';
+            const contentType = isMov ? 'video/quicktime' : 'video/mp4';
+            const s3Key = `renders/${job.userId}/${job.nexrenderJobId}.${ext}`;
 
-            this.logger.log('Uploading to Cloudinary...');
-            const uploadResult =
-              await this.cloudinaryService.uploadRenderedVideo(
-                videoBuffer,
-                job.userId,
-                job.nexrenderJobId,
-              );
+            this.logger.log(`Streaming to S3 key: ${s3Key}`);
+            // Stream directly — no Buffer.from(), no RAM spike
+            await this.s3Service.uploadStream(videoResponse.data, s3Key, contentType);
 
-            this.logger.log(
-              `Uploaded to Cloudinary: ${uploadResult.secure_url}`,
+            // Generate a long-lived presigned URL (7 days)
+            const presignedUrl = await this.s3Service.generatePresignedUrl(
+              s3Key,
+              7 * 24 * 3600,
             );
+            this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
 
             await this.prisma.renderJob.update({
               where: { id: job.id },
               data: {
-                status: 'COMPLETED',
-                outputUrl: uploadResult.secure_url,
-                nexrenderOutputUrl: outputUrl,
+                status: RenderStatus.COMPLETED,
+                outputUrl: presignedUrl,
+                nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
               },
             });
 
@@ -2270,22 +2310,22 @@ export class RenderService {
               id: job.id,
               userId: job.userId,
               templateId: job.templateId,
-              status: 'COMPLETED',
-              outputUrl: uploadResult.secure_url,
-              nexrenderOutputUrl: outputUrl,
+              status: RenderStatus.COMPLETED,
+              outputUrl: presignedUrl,
+              nexrenderOutputUrl: s3Key,
               progress: 100,
               createdAt: job.createdAt,
               updatedAt: job.updatedAt,
             };
           } catch (uploadError) {
-            this.logger.error('Failed to download/upload video:', uploadError);
+            this.logger.error('Failed to stream/upload video to S3:', uploadError);
 
-            // Still mark as completed with Nexrender URL
+            // Fallback: store Nexrender URL (temporary — user should retry download later)
             await this.prisma.renderJob.update({
               where: { id: job.id },
               data: {
-                status: 'COMPLETED',
-                outputUrl: outputUrl, // Use Nexrender URL directly
+                status: RenderStatus.COMPLETED,
+                outputUrl: outputUrl,
                 nexrenderOutputUrl: outputUrl,
               },
             });
@@ -2294,7 +2334,7 @@ export class RenderService {
               id: job.id,
               userId: job.userId,
               templateId: job.templateId,
-              status: 'COMPLETED',
+              status: RenderStatus.COMPLETED,
               outputUrl: outputUrl,
               nexrenderOutputUrl: outputUrl,
               progress: 100,
@@ -2303,6 +2343,7 @@ export class RenderService {
             };
           }
         }
+
 
         // Update job in database
         if (status !== job.status || (outputUrl && !job.nexrenderOutputUrl)) {
@@ -2381,46 +2422,46 @@ export class RenderService {
     if (isCompleted && outputUrl) {
       try {
         this.logger.log(
-          `Processing completed render job ${job.id}, downloading from: ${outputUrl}`,
+          `Processing completed render job ${job.id}, streaming from: ${outputUrl}`,
         );
 
-        // Download video from Nexrender
+        // Stream video from Nexrender directly to S3 — no RAM buffer
         const videoResponse = await firstValueFrom(
           this.httpService.get(outputUrl, {
-            responseType: 'arraybuffer',
+            responseType: 'stream',
             maxBodyLength: Infinity,
             maxContentLength: Infinity,
-            timeout: 60000,
+            timeout: 180000, // 3 min for large files
           }),
         );
 
-        const videoBuffer = Buffer.from(videoResponse.data);
-        this.logger.log(
-          `Downloaded video: ${(videoBuffer.length / 1024 / 1024).toFixed(2)}MB`,
-        );
+        const isMov = outputUrl.toLowerCase().includes('.mov');
+        const ext = isMov ? 'mov' : 'mp4';
+        const contentType = isMov ? 'video/quicktime' : 'video/mp4';
+        const s3Key = `renders/${job.userId}/${nexrenderJobId}.${ext}`;
 
-        // Upload to Cloudinary
-        const uploadResult = await this.cloudinaryService.uploadRenderedVideo(
-          videoBuffer,
-          job.userId,
-          nexrenderJobId,
-        );
+        this.logger.log(`Streaming to S3 key: ${s3Key}`);
+        await this.s3Service.uploadStream(videoResponse.data, s3Key, contentType);
 
-        this.logger.log(`Uploaded to Cloudinary: ${uploadResult.secure_url}`);
+        const presignedUrl = await this.s3Service.generatePresignedUrl(
+          s3Key,
+          7 * 24 * 3600,
+        );
+        this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
 
         // Update job
         await this.prisma.renderJob.update({
           where: { id: job.id },
           data: {
             status: RenderStatus.COMPLETED,
-            outputUrl: uploadResult.secure_url,
-            nexrenderOutputUrl: outputUrl,
+            outputUrl: presignedUrl,
+            nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
           },
         });
 
         return {
           jobId: job.id,
-          outputUrl: uploadResult.secure_url,
+          outputUrl: presignedUrl,
         };
       } catch (error: unknown) {
         this.logger.error('Failed to process render completion', {
@@ -2491,19 +2532,59 @@ export class RenderService {
   }
 
   /**
-   * Get optimized video URL
+   * Get optimized video URL — regenerates a fresh presigned URL for S3-backed videos
    */
   async getOptimizedVideoUrl(jobId: string, userId: string): Promise<string> {
-    const job = await this.getJobStatus(jobId, userId);
+    const job = await this.prisma.renderJob.findFirst({
+      where: { id: jobId, userId },
+    });
 
-    if (!job.outputUrl) {
+    if (!job || !job.outputUrl) {
       throw new NotFoundException('Video not ready');
     }
 
-    // Extract public_id from Cloudinary URL if needed
-    // For now, just return the URL as-is
-    // Can be enhanced with optimization transformations
+    // If nexrenderOutputUrl looks like an S3 key (starts with 'renders/'), regenerate presigned URL
+    if (job.nexrenderOutputUrl?.startsWith('renders/') && this.s3Service.isConfigured()) {
+      return this.s3Service.generatePresignedUrl(
+        job.nexrenderOutputUrl,
+        7 * 24 * 3600, // Fresh 7-day presigned URL
+      );
+    }
+
     return job.outputUrl;
+  }
+
+  /**
+   * Stream download for a render job.
+   * For S3-backed jobs: generates a fresh presigned URL and returns it (permanent, works months later).
+   * For legacy/fallback jobs: returns the stored URL directly.
+   * The controller will redirect the browser to this URL, forcing a file download.
+   */
+  async getJobDownloadUrl(jobId: string, userId: string): Promise<{ url: string; filename: string }> {
+    const job = await this.prisma.renderJob.findFirst({
+      where: { id: jobId, userId },
+    });
+
+    if (!job) throw new NotFoundException('Render job not found');
+
+    const isMov = job.nexrenderOutputUrl?.endsWith('.mov') || job.outputUrl?.includes('.mov');
+    const ext = isMov ? 'mov' : 'mp4';
+    const filename = `edikit-${job.templateId || 'render'}-${job.id.slice(0, 8)}.${ext}`;
+
+    // S3-backed: regenerate a fresh presigned URL with Content-Disposition: attachment
+    if (job.nexrenderOutputUrl?.startsWith('renders/') && this.s3Service.isConfigured()) {
+      const presignedUrl = await this.s3Service.generatePresignedUrl(
+        job.nexrenderOutputUrl,
+        3600, // 1-hour download link
+        filename,
+      );
+      return { url: presignedUrl, filename };
+    }
+
+    const downloadUrl = job.outputUrl || job.nexrenderOutputUrl;
+    if (!downloadUrl) throw new BadRequestException('Render job does not have an output URL yet');
+
+    return { url: downloadUrl, filename };
   }
 
   async deleteRenderJob(jobId: string, userId: string) {

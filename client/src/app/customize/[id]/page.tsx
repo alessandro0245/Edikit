@@ -26,6 +26,7 @@ import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
+import MovPreview from "@/components/MovPreview";
 import { getTemplateOrientation } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
@@ -96,8 +97,9 @@ const CustomizePage = () => {
 
   const templateOrientation = getTemplateOrientation(template);
 
-  const renderedVideoSrc = showRenderedVideo
-    ? (toMp4PreviewUrl(renderJob.outputUrl!) ?? renderJob.outputUrl!)
+  const isMovOutput = !!renderJob?.outputUrl?.includes('.mov');
+  const renderedVideoSrc = showRenderedVideo && !isMovOutput
+    ? (toMp4PreviewUrl(renderJob!.outputUrl!) ?? renderJob!.outputUrl!)
     : null;
 
   // Group fields into categories
@@ -185,7 +187,12 @@ const CustomizePage = () => {
                   className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all"
                   style={{ aspectRatio: previewRatio }}
                 >
-                  {showRenderedVideo && renderedVideoSrc ? (
+                  {showRenderedVideo && isMovOutput ? (
+                    <MovPreview
+                      src={renderJob!.outputUrl!}
+                      className="h-full w-full rounded-none"
+                    />
+                  ) : showRenderedVideo && renderedVideoSrc ? (
                     <VideoPlayer
                       src={renderedVideoSrc}
                       autoPlay

@@ -8,7 +8,7 @@ interface DownloadOptions {
   onSuccess?: () => void;
   onError?: (error: string) => void;
   filename?: string;
-  useCredentials?: boolean; // Default: false for public URLs like Cloudinary
+  useCredentials?: boolean; // Default: false for public URLs like S3 presigned URLs
 }
 
 export const downloadVideo = async (
@@ -20,7 +20,7 @@ export const downloadVideo = async (
     onSuccess,
     onError,
     filename = `video-${new Date().toISOString().slice(0, 10)}.mp4`,
-    useCredentials = false, // Don't include credentials by default (CORS friendly)
+    useCredentials = false,
   } = options;
 
   try {
@@ -37,7 +37,9 @@ export const downloadVideo = async (
     // Handle successful download
     xhr.addEventListener('load', () => {
       if (xhr.status === 200) {
-        const blob = new Blob([xhr.response], { type: 'video/mp4' });
+        const isMov = filename.endsWith('.mov');
+        const mimeType = isMov ? 'video/quicktime' : 'video/mp4';
+        const blob = new Blob([xhr.response], { type: mimeType });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -54,10 +56,23 @@ export const downloadVideo = async (
       }
     });
 
-    // Handle download error
+    // Handle download error — CORS fallback: trigger direct browser download via anchor tag
     xhr.addEventListener('error', () => {
-      console.error('Download error:', xhr.status);
-      onError?.('Download failed. Please try again.');
+      console.warn('XHR download failed (likely CORS on direct URL). Trying direct browser download fallback...');
+      try {
+        const link = document.createElement('a');
+        link.href = videoUrl;
+        link.download = filename;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        onSuccess?.();
+      } catch (fallbackError) {
+        console.error('Download fallback error:', fallbackError);
+        onError?.('Download failed. Please try again.');
+      }
     });
 
     // Handle abort

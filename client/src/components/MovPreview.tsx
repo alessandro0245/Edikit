@@ -9,6 +9,7 @@ interface MovPreviewProps {
 }
 
 export function toMp4PreviewUrl(url: string): string | null {
+  // S3 presigned URLs or non-Cloudinary .mov files: no on-the-fly transcoding available
   if (!url.includes("res.cloudinary.com")) return null;
   return url
     .replace(/\/upload\//, "/upload/f_mp4,vc_h264,q_auto/")

@@ -6,7 +6,9 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Readable } from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -65,6 +67,33 @@ export class S3Service {
 
     await this.s3Client.send(command);
     this.logger.log(`Uploaded ${key} to S3 bucket ${this.bucketName}`);
+
+    return key;
+  }
+
+  /**
+   * Stream a Node.js Readable directly to S3 via multipart upload.
+   * Uses ~0 extra RAM — no full-file buffer needed.
+   */
+  async uploadStream(
+    stream: Readable,
+    key: string,
+    contentType: string,
+  ): Promise<string> {
+    const upload = new Upload({
+      client: this.s3Client,
+      params: {
+        Bucket: this.bucketName,
+        Key: key,
+        Body: stream,
+        ContentType: contentType,
+      },
+      queueSize: 4,        // 4 parallel part uploads
+      partSize: 10 * 1024 * 1024, // 10 MB parts
+    });
+
+    await upload.done();
+    this.logger.log(`Stream-uploaded ${key} to S3 bucket ${this.bucketName}`);
 
     return key;
   }

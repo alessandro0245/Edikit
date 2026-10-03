@@ -16,7 +16,9 @@ import {
 } from "lucide-react";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
+import MovPreview from "@/components/MovPreview";
 import VideoDownloadButton from "@/components/Video/VideoDownloadButton";
+import api from "@/lib/auth";
 import { useDashboardJobs } from "./useDashboardJobs";
 import type { DashboardJob } from "./useDashboardJobs";
 
@@ -559,25 +561,32 @@ export default function DashboardJobsPage() {
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
                 {previewJob.outputUrl ? (
-                  (() => {
-                    const src =
-                      toMp4PreviewUrl(previewJob.outputUrl) ??
-                      previewJob.outputUrl;
-                    return (
-                      <VideoPlayer
-                        src={src}
-                        autoPlay
-                        loop
-                        muted
-                        controls
-                        variant="minimal"
-                        aspectRatio="none"
-                        showDownload={false}
-                        showFullscreen
-                        className="max-h-[70vh] w-full rounded-none"
-                      />
-                    );
-                  })()
+                  isMovUrl(previewJob.outputUrl) ? (
+                    <MovPreview
+                      src={previewJob.outputUrl}
+                      className="max-h-[70vh] w-full"
+                    />
+                  ) : (
+                    (() => {
+                      const src =
+                        toMp4PreviewUrl(previewJob.outputUrl) ??
+                        previewJob.outputUrl;
+                      return (
+                        <VideoPlayer
+                          src={src}
+                          autoPlay
+                          loop
+                          muted
+                          controls
+                          variant="minimal"
+                          aspectRatio="none"
+                          showDownload={false}
+                          showFullscreen
+                          className="max-h-[70vh] w-full rounded-none"
+                        />
+                      );
+                    })()
+                  )
                 ) : (
                   <div className="flex min-h-80 items-center justify-center text-sm text-muted-foreground">
                     Preview unavailable
@@ -603,7 +612,14 @@ export default function DashboardJobsPage() {
 
                 {previewJob.outputUrl && (
                   <VideoDownloadButton
-                    videoUrl={previewJob.outputUrl}
+                    getDownloadUrl={async () => {
+                      // Fetch presigned URL from backend (auth-gated), then return
+                      // the S3 URL directly so XHR can download with progress.
+                      const res = await api.get<{ url: string; filename: string }>(
+                        `/render/job/${previewJob.id}/download`
+                      );
+                      return res.data.url;
+                    }}
                     filename={formatFileName(previewJob.title, previewJob.outputUrl)}
                   />
                 )}
