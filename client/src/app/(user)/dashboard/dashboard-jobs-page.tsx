@@ -287,12 +287,12 @@ export default function DashboardJobsPage() {
                           <p className="truncate text-sm font-medium text-foreground">
                             {job.title}
                           </p>
-                          <p className="truncate text-xs italic text-muted-foreground">
+                          {/* <p className="truncate text-xs italic text-muted-foreground">
                             {job.subtitle}
                           </p>
                           <p className="truncate text-xs text-muted-foreground">
                             {job.id}
-                          </p>
+                          </p> */}
                         </div>
                       </div>
                     </td>
@@ -357,7 +357,7 @@ export default function DashboardJobsPage() {
               </tbody>
             </table>
           </div>
-
+                {/* mobile view */}
           <div className="space-y-3 md:hidden">
             {currentJobs.map((job) => (
               <div
@@ -383,12 +383,12 @@ export default function DashboardJobsPage() {
                       <p className="wrap-break-word text-sm font-medium text-foreground">
                         {job.title}
                       </p>
-                      <p className="text-xs italic text-muted-foreground">
+                      {/* <p className="text-xs italic text-muted-foreground">
                         {job.subtitle}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
                         {job.id}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <div
