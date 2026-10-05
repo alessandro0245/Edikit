@@ -78,12 +78,12 @@ function SuccessContent() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-linear-to-br from-background via-background to-card px-4">
+    <div className="h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         {/* Success Card */}
         <div className="relative">
           <div className="absolute " />
-          <div className="relative bg-card border border-border rounded-2xl p-8 shadow-lg">
+          <div className="relative rounded-2xl p-8 ">
             {/* Success Icon */}
             <div className="flex justify-center mb-6">
               <div className="relative w-20 h-20 bg-green-100 dark:bg-green-950 rounded-full flex items-center justify-center animate-pulse">

@@ -8,8 +8,9 @@ export default function SimpleFooter() {
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
   const isDashboardRoute = pathname.startsWith("/dashboard");
-
-  if (isDashboardRoute) return null;
+  const isPaymentRoute = pathname.startsWith("/payment");
+  const isauth = pathname.startsWith("/login") || pathname.startsWith("/signup");
+  if (isDashboardRoute || isPaymentRoute || isauth) return null;
 
   return (
     <footer className="w-full text-foreground border-t border-border/40 bg-background backdrop-blur-md py-4 mt-auto">

@@ -22,6 +22,7 @@ const Navbar = () => {
   const user = useSelector((state: RootState) => state.user.user);
   const isLoading = useSelector((state: RootState) => state.user.isLoading);
   const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isPayment = pathname.startsWith("/payment");
 
   const isFreePlan = user?.planType !== "FREE";
 
@@ -58,7 +59,7 @@ const Navbar = () => {
     };
   }, [isUserMenuOpen]);
 
-  if (isDashboardRoute) {
+  if (isDashboardRoute || isPayment) {
     return null;
   }
 
