@@ -62,6 +62,11 @@ class ColorCustomization {
   @IsOptional()
   @IsString()
   @IsHexColor()
+  buttonColor?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsHexColor()
   background?: string;
 
   @IsOptional()
@@ -213,6 +218,10 @@ export class CreateRenderJobDto {
   @IsOptional()
   @IsString()
   decorationColor?: string;
+
+  @IsOptional()
+  @IsString()
+  buttonColor?: string;
 
   // Color customizations
   @IsOptional()

@@ -1075,6 +1075,7 @@ export class RenderService {
         text2: 'txt_3',
         text3: 'txt_4',
         image1: 'img_1',
+        buttonColor: 'shape_3',
         background: 'background',
       },
 
@@ -1403,6 +1404,7 @@ export class RenderService {
     Array<{
       type: string;
       layerName?: string;
+      composition?: string;
       property?: string;
       value?: string | number | number[] | Record<string, any>;
       src?: string;
@@ -1414,6 +1416,7 @@ export class RenderService {
     type Asset = {
       type: string;
       layerName?: string;
+      composition?: string;
       property?: string;
       value?: string | number | number[] | Record<string, any>;
       src?: string;
@@ -1759,6 +1762,25 @@ export class RenderService {
           value: rgbEnd,
         });
       }
+    }
+
+    // ── Template 8: Button Color (Change to Color effect "A" / "To" on shape_3) ──
+    const buttonColorHex =
+      dto.buttonColor ||
+      dto.colors?.buttonColor ||
+      dto.colors?.primary;
+
+    if (templateId === 8 && buttonColorHex) {
+      const buttonLayer = layerMapping.buttonColor || 'shape_3';
+      const rgbButton = this.hexToRgb(buttonColorHex);
+      assets.push({
+        type: 'data',
+        layerName: buttonLayer,
+        composition: 'nested_sequence_2',
+        property:
+          'ADBE Effect Parade.ADBE Change To Color.ADBE Change To Color-0002',
+        value: rgbButton,
+      });
     }
 
     if (dto.colors || accentColorHex) {
@@ -2191,11 +2213,14 @@ export class RenderService {
         const progress = jobData.progress || jobData.renderProgress || 0;
         const outputUrl =
           jobData.output?.url || jobData.outputUrl || jobData.result?.url;
+        const errorMessage =
+          jobData.error || jobData.renderError || jobData.stats?.error;
 
         this.logger.log(`Nexrender job details:`, {
           state,
           progress,
           hasOutputUrl: !!outputUrl,
+          ...(errorMessage ? { error: errorMessage } : {}),
         });
 
         // Map Nexrender states to our RenderStatus enum

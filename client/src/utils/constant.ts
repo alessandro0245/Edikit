@@ -428,6 +428,12 @@ export const templates: Template[] = [
       text1: { type: "text", value: "Text number 1", label: "Text 1", maxLength: 17, required: false },
       text2: { type: "text", value: "Text number 2", label: "Text 2", maxLength: 27, required: false },
       text3: { type: "text", value: "$100.00", label: "Price", maxLength: 8, required: false },
+      buttonColor: {
+        type: "color",
+        value: "#1A73E8",
+        label: "Button Color",
+        required: false,
+      },
       image1: {
         type: "image",
         label: "Image 1",
