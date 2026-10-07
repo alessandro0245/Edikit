@@ -17,6 +17,7 @@ export const plans = [
     features: [
       "100 video generation credits per month",
       // "20 video renders per month",
+      "30-day video download retention",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -33,6 +34,7 @@ export const plans = [
     features: [
       "340 video generation credits per month",
       // "68 video renders per month",
+      "60-day video download retention",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -49,6 +51,7 @@ export const plans = [
     features: [
       "680 video generation credits per month",
       // "136 video renders per month",
+      "60-day video download retention",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],
@@ -65,6 +68,7 @@ export const plans = [
     features: [
       "2,000 video generation credits per month",
       // "400 video renders per month",
+      "60-day video download retention",
       "MP4 and MOV export formats",
       "Transparent background support",
     ],

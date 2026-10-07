@@ -14,6 +14,10 @@ import { GenerateMatchCutDto } from './dto/generate-matchcut.dto';
 import { PromptService } from './prompt.service';
 import type { MatchCutScene } from './prompt.service';
 import { RemotionLambdaService } from './remotion-lambda.service';
+import {
+  calculateExpirationDate,
+  isJobExpired,
+} from '../video-cleanup/video-expiration.util';
 
 @Injectable()
 export class VideoService {
@@ -293,12 +297,19 @@ private async triggerAsyncMatchCut(
           ? await this.s3Service.generatePresignedUrl(s3Key)
           : `/video/serve/${jobId}`;
 
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { planType: true },
+        });
+        const expiresAt = calculateExpirationDate(user?.planType);
+
         await this.prisma.renderJob.update({
           where: { id: jobId },
           data: {
             status: 'COMPLETED',
             s3OutputKey: s3Key,
             outputUrl: presignedUrl,
+            expiresAt,
           },
         });
         this.logger.log(`Render completed locally: jobId=${jobId}`);
@@ -351,13 +362,16 @@ private async triggerAsyncMatchCut(
     if (job.userId !== userId) throw new ForbiddenException('Access denied');
 
     if (job.status === 'COMPLETED' || job.status === 'FAILED') {
+      const expired = isJobExpired(job);
       return {
         jobId: job.id,
         status: job.status,
         progress: job.status === 'COMPLETED' ? 1 : 0,
-        outputUrl: job.outputUrl,
+        outputUrl: expired ? null : job.outputUrl,
         error: job.error,
         videoConfig: job.aiConfig,
+        expiresAt: job.expiresAt,
+        isExpired: expired,
       };
     }
 
@@ -413,16 +427,19 @@ private async triggerAsyncMatchCut(
           // Re-check DB first (fast path: already completed by a previous poll)
           const freshJob = await this.prisma.renderJob.findUnique({
             where: { id: job.id },
-            select: { status: true, outputUrl: true },
+            select: { status: true, outputUrl: true, expiresAt: true },
           });
           if (freshJob?.status === 'COMPLETED') {
+            const expired = isJobExpired(freshJob);
             return {
               jobId: job.id,
               status: 'COMPLETED' as RenderStatus,
               progress: 1,
-              outputUrl: freshJob.outputUrl,
+              outputUrl: expired ? null : freshJob.outputUrl,
               error: null,
               videoConfig: job.aiConfig,
+              expiresAt: freshJob.expiresAt,
+              isExpired: expired,
             };
           }
 
@@ -433,12 +450,19 @@ private async triggerAsyncMatchCut(
               .then(async (s3Key) => {
                 const presignedUrl =
                   await this.s3Service.generatePresignedUrl(s3Key);
+                const user = await this.prisma.user.findUnique({
+                  where: { id: job.userId },
+                  select: { planType: true },
+                });
+                const expiresAt = calculateExpirationDate(user?.planType);
+
                 await this.prisma.renderJob.update({
                   where: { id: job.id },
                   data: {
                     status: 'COMPLETED',
                     s3OutputKey: s3Key,
                     outputUrl: presignedUrl,
+                    expiresAt,
                   },
                 });
                 return presignedUrl;
@@ -548,6 +572,13 @@ private async triggerAsyncMatchCut(
     });
     if (!job) throw new NotFoundException('Render job not found');
     if (job.userId !== userId) throw new ForbiddenException('Access denied');
+
+    if (isJobExpired(job)) {
+      throw new BadRequestException(
+        'This video has expired and is no longer available for download.',
+      );
+    }
+
     if (job.status !== 'COMPLETED' || !job.s3OutputKey)
       throw new BadRequestException('Video is not ready for download');
 
@@ -568,6 +599,7 @@ private async triggerAsyncMatchCut(
       where: { id: jobId },
     });
     if (!job || !job.s3OutputKey) return null;
+    if (isJobExpired(job)) return null;
     return job.s3OutputKey;
   }
 }

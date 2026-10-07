@@ -18,6 +18,7 @@ import { CreditsModule } from './modules/credits/credits.module';
 import { VideoModule } from './modules/video/video.module';
 import { S3Module } from './modules/s3/s3.module';
 import { AssetsModule } from './modules/assets/assets.module';
+import { VideoCleanupModule } from './modules/video-cleanup/video-cleanup.module';
 @Module({
   imports: [
     ThrottlerModule.forRoot({
@@ -43,6 +44,7 @@ import { AssetsModule } from './modules/assets/assets.module';
     RenderModule,
     CreditsModule,
     S3Module,
+    VideoCleanupModule,
   ],
   controllers: [AppController],
   providers: [

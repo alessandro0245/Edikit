@@ -77,6 +77,8 @@ model RenderJob {
   promptText         String?
   aiConfig           Json?
 
+  expiresAt          DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -84,6 +86,7 @@ model RenderJob {
 
   @@index([userId])
   @@index([nexrenderJobId])
+  @@index([expiresAt])
   @@map("render_jobs")
 }
 

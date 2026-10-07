@@ -12,6 +12,8 @@ export interface RenderJobRecord {
   nexrenderOutputUrl: string | null;
   error: string | null;
   promptText: string | null;
+  expiresAt?: string | null;
+  isExpired?: boolean;
   createdAt: string;
   updatedAt: string;
 }

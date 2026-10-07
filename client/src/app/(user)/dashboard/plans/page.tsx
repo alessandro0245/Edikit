@@ -71,8 +71,8 @@ export default function ManagePlansPage() {
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     {currentPlanType.toUpperCase() === "FREE" 
-                      ? "You are currently on the Free plan. It includes 24 credits, before you upgrade." 
-                      : `You are billed ${activePlanDetails?.price} ${activePlanDetails?.period}.`}
+                      ? "You are currently on the Free plan. Generated videos expire and are permanently deleted after 3 days. Upgrade to save your videos for up to 60 days." 
+                      : `You are billed ${activePlanDetails?.price} ${activePlanDetails?.period}. Video renders are stored for ${activePlanDetails?.planType.toUpperCase() === 'STARTER' ? '30' : '60'} days.`}
                   </p>
                 </div>
               </div>

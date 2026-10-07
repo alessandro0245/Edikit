@@ -116,14 +116,15 @@ export class S3Service {
     return url;
   }
 
-  async deleteObject(key: string): Promise<void> {
+  async deleteObject(key: string, bucketName?: string): Promise<void> {
+    const targetBucket = bucketName || this.bucketName;
     const command = new DeleteObjectCommand({
-      Bucket: this.bucketName,
+      Bucket: targetBucket,
       Key: key,
     });
 
     await this.s3Client.send(command);
-    this.logger.log(`Deleted ${key} from S3 bucket ${this.bucketName}`);
+    this.logger.log(`Deleted ${key} from S3 bucket ${targetBucket}`);
   }
 
   getBucketName(): string {

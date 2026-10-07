@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 import {
   AlertCircle,
+  AlertTriangle,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Folder,
   Loader2,
   MoreVertical,
@@ -13,6 +18,7 @@ import {
   RefreshCw,
   Trash2,
   X,
+  Zap,
 } from "lucide-react";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
@@ -22,23 +28,29 @@ import api from "@/lib/auth";
 import { useDashboardJobs } from "./useDashboardJobs";
 import type { DashboardJob } from "./useDashboardJobs";
 
-const getStatusBadgeClass = (status: DashboardJob["status"]) => {
-  switch (status) {
+const getStatusBadgeClass = (job: DashboardJob) => {
+  if (job.isExpired) {
+    return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+  }
+  switch (job.status) {
     case "COMPLETED":
-      return "bg-green-100 text-green-800 border border-green-300";
+      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
     case "FAILED":
-      return "bg-red-100 text-red-800 border border-red-300";
+      return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
     case "PROCESSING":
-      return "bg-blue-100 text-blue-800 border border-blue-300";
+      return "bg-sky-500/10 text-sky-400 border border-sky-500/20 animate-pulse";
     case "PENDING":
-      return "bg-yellow-100 text-yellow-800 border border-yellow-300";
+      return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-zinc-800 text-zinc-400 border border-zinc-700";
   }
 };
 
-const getStatusIcon = (status: DashboardJob["status"]) => {
-  switch (status) {
+const getStatusIcon = (job: DashboardJob) => {
+  if (job.isExpired) {
+    return <Clock className="h-4 w-4" />;
+  }
+  switch (job.status) {
     case "COMPLETED":
       return <CheckCircle2 className="h-4 w-4" />;
     case "FAILED":
@@ -71,11 +83,10 @@ const isMovUrl = (url: string | null | undefined) =>
   Boolean(url?.toLowerCase().includes(".mov"));
 
 const formatFileName = (title: string, outputUrl?: string | null) =>
-  `${
-    title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "video"
+  `${title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "video"
   }.${isMovUrl(outputUrl) ? "mov" : "mp4"}`;
 
 const JobsSkeleton = () => (
@@ -168,12 +179,12 @@ export default function DashboardJobsPage() {
 
   const setActionsRef =
     (jobId: string, variant: "desktop" | "mobile") =>
-    (node: HTMLDivElement | null) => {
-      actionsRefs.current[jobId] = {
-        ...(actionsRefs.current[jobId] ?? { desktop: null, mobile: null }),
-        [variant]: node,
+      (node: HTMLDivElement | null) => {
+        actionsRefs.current[jobId] = {
+          ...(actionsRefs.current[jobId] ?? { desktop: null, mobile: null }),
+          [variant]: node,
+        };
       };
-    };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -183,8 +194,8 @@ export default function DashboardJobsPage() {
       const currentRefs = actionsRefs.current[activeMenuJobId];
       const isInsideMenu = currentRefs
         ? Object.values(currentRefs).some((ref) =>
-            Boolean(ref && ref.contains(target)),
-          )
+          Boolean(ref && ref.contains(target)),
+        )
         : false;
 
       if (!isInsideMenu) {
@@ -276,9 +287,16 @@ export default function DashboardJobsPage() {
                           disabled={!job.outputUrl}
                           className={`flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 transition-opacity ${job.outputUrl ? "cursor-pointer hover:opacity-90" : "cursor-not-allowed opacity-60"}`}
                           aria-label={
-                            job.outputUrl
-                              ? `Preview ${job.title}`
-                              : `${job.title} is not ready for preview`
+                            job.isExpired
+                              ? `${job.title} has expired`
+                              : job.outputUrl
+                                ? `Preview ${job.title}`
+                                : `${job.title} is not ready for preview`
+                          }
+                          title={
+                            job.isExpired
+                              ? "This video has expired and is no longer available for preview or download"
+                              : undefined
                           }
                         >
                           {getJobIcon(job)}
@@ -299,10 +317,12 @@ export default function DashboardJobsPage() {
 
                     <td className="px-4 py-4 lg:px-6">
                       <span
-                        className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(job.status)}`}
+                        className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(job)}`}
                       >
-                        {getStatusIcon(job.status)}
-                        {job.status.charAt(0) +
+                        {getStatusIcon(job)}
+                        {job.isExpired
+                          ? "Expired"
+                          : job.status.charAt(0) +
                           job.status.slice(1).toLowerCase()}
                       </span>
                     </td>
@@ -357,7 +377,7 @@ export default function DashboardJobsPage() {
               </tbody>
             </table>
           </div>
-                {/* mobile view */}
+          {/* mobile view */}
           <div className="space-y-3 md:hidden">
             {currentJobs.map((job) => (
               <div
@@ -433,10 +453,13 @@ export default function DashboardJobsPage() {
                       Status
                     </p>
                     <span
-                      className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getStatusBadgeClass(job.status)}`}
+                      className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getStatusBadgeClass(job)}`}
                     >
-                      {getStatusIcon(job.status)}
-                      {job.status.charAt(0) + job.status.slice(1).toLowerCase()}
+                      {getStatusIcon(job)}
+                      {job.isExpired
+                        ? "Expired"
+                        : job.status.charAt(0) +
+                        job.status.slice(1).toLowerCase()}
                     </span>
                   </div>
                   <div>
@@ -504,11 +527,10 @@ export default function DashboardJobsPage() {
                         key={page}
                         type="button"
                         onClick={() => setCurrentPage(page)}
-                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                          currentPage === page
+                        className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${currentPage === page
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-accent border border-transparent hover:border-border text-muted-foreground hover:text-foreground"
-                        }`}
+                          }`}
                       >
                         {page}
                       </button>

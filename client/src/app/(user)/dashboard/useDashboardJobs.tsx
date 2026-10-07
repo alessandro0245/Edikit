@@ -14,6 +14,8 @@ export interface DashboardJob {
   renderTimeLabel: string;
   outputUrl: string | null;
   error: string | null;
+  expiresAt?: string | null;
+  isExpired?: boolean;
 }
 
 const statusLabels: Record<RenderJobRecord["status"], string> = {
@@ -105,8 +107,10 @@ export const useDashboardJobs = () => {
           status: job.status,
           createdLabel: formatRelativeDate(job.createdAt),
           renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
-          outputUrl: job.outputUrl || job.nexrenderOutputUrl,
+          outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),
           error: job.error,
+          expiresAt: job.expiresAt,
+          isExpired: job.isExpired,
         })),
       );
     } catch (requestError: any) {

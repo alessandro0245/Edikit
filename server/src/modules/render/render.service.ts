@@ -17,6 +17,10 @@ import * as fs from 'fs/promises';
 import { createReadStream, existsSync } from 'fs';
 import { CreditsService } from '../credits/credits.service';
 import FormData from 'form-data';
+import {
+  calculateExpirationDate,
+  isJobExpired,
+} from '../video-cleanup/video-expiration.util';
 
 interface NexrenderTemplate {
   id: string;
@@ -2322,12 +2326,20 @@ export class RenderService {
             );
             this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
 
+            const user = await this.prisma.user.findUnique({
+              where: { id: job.userId },
+              select: { planType: true },
+            });
+            const expiresAt = calculateExpirationDate(user?.planType);
+
             await this.prisma.renderJob.update({
               where: { id: job.id },
               data: {
                 status: RenderStatus.COMPLETED,
                 outputUrl: presignedUrl,
                 nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
+                s3OutputKey: s3Key,
+                expiresAt,
               },
             });
 
@@ -2338,12 +2350,20 @@ export class RenderService {
               status: RenderStatus.COMPLETED,
               outputUrl: presignedUrl,
               nexrenderOutputUrl: s3Key,
+              expiresAt,
+              isExpired: false,
               progress: 100,
               createdAt: job.createdAt,
               updatedAt: job.updatedAt,
             };
           } catch (uploadError) {
             this.logger.error('Failed to stream/upload video to S3:', uploadError);
+
+            const user = await this.prisma.user.findUnique({
+              where: { id: job.userId },
+              select: { planType: true },
+            });
+            const expiresAt = calculateExpirationDate(user?.planType);
 
             // Fallback: store Nexrender URL (temporary — user should retry download later)
             await this.prisma.renderJob.update({
@@ -2352,6 +2372,7 @@ export class RenderService {
                 status: RenderStatus.COMPLETED,
                 outputUrl: outputUrl,
                 nexrenderOutputUrl: outputUrl,
+                expiresAt,
               },
             });
 
@@ -2362,6 +2383,8 @@ export class RenderService {
               status: RenderStatus.COMPLETED,
               outputUrl: outputUrl,
               nexrenderOutputUrl: outputUrl,
+              expiresAt,
+              isExpired: false,
               progress: 100,
               createdAt: job.createdAt,
               updatedAt: job.updatedAt,
@@ -2381,15 +2404,18 @@ export class RenderService {
           });
         }
 
+        const expired = isJobExpired(job);
         return {
           id: job.id,
           userId: job.userId,
           templateId: job.templateId,
           status,
-          outputUrl: job.outputUrl || outputUrl,
-          nexrenderOutputUrl: outputUrl,
+          outputUrl: expired ? null : (job.outputUrl || outputUrl),
+          nexrenderOutputUrl: expired ? null : outputUrl,
           nexrenderState: state,
           progress,
+          expiresAt: job.expiresAt,
+          isExpired: expired,
           createdAt: job.createdAt,
           updatedAt: job.updatedAt,
         };
@@ -2398,11 +2424,17 @@ export class RenderService {
       }
     }
 
-    return job;
+    const isExpiredJob = isJobExpired(job);
+    return {
+      ...job,
+      outputUrl: isExpiredJob ? null : job.outputUrl,
+      nexrenderOutputUrl: isExpiredJob ? null : job.nexrenderOutputUrl,
+      isExpired: isExpiredJob,
+    };
   }
 
   async getUserRenderJobs(userId: string) {
-    return this.prisma.renderJob.findMany({
+    const jobs = await this.prisma.renderJob.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -2414,9 +2446,20 @@ export class RenderService {
         nexrenderOutputUrl: true,
         error: true,
         promptText: true,
+        expiresAt: true,
         createdAt: true,
         updatedAt: true,
       },
+    });
+
+    return jobs.map((job) => {
+      const expired = isJobExpired(job);
+      return {
+        ...job,
+        outputUrl: expired ? null : job.outputUrl,
+        nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
+        isExpired: expired,
+      };
     });
   }
 
@@ -2474,6 +2517,12 @@ export class RenderService {
         );
         this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
 
+        const user = await this.prisma.user.findUnique({
+          where: { id: job.userId },
+          select: { planType: true },
+        });
+        const expiresAt = calculateExpirationDate(user?.planType);
+
         // Update job
         await this.prisma.renderJob.update({
           where: { id: job.id },
@@ -2481,12 +2530,15 @@ export class RenderService {
             status: RenderStatus.COMPLETED,
             outputUrl: presignedUrl,
             nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
+            s3OutputKey: s3Key,
+            expiresAt,
           },
         });
 
         return {
           jobId: job.id,
           outputUrl: presignedUrl,
+          expiresAt,
         };
       } catch (error: unknown) {
         this.logger.error('Failed to process render completion', {
@@ -2568,6 +2620,12 @@ export class RenderService {
       throw new NotFoundException('Video not ready');
     }
 
+    if (isJobExpired(job)) {
+      throw new BadRequestException(
+        'This video has expired and is no longer available for playback.',
+      );
+    }
+
     // If nexrenderOutputUrl looks like an S3 key (starts with 'renders/'), regenerate presigned URL
     if (job.nexrenderOutputUrl?.startsWith('renders/') && this.s3Service.isConfigured()) {
       return this.s3Service.generatePresignedUrl(
@@ -2591,6 +2649,12 @@ export class RenderService {
     });
 
     if (!job) throw new NotFoundException('Render job not found');
+
+    if (isJobExpired(job)) {
+      throw new BadRequestException(
+        'This video has expired and is no longer available for download.',
+      );
+    }
 
     const isMov = job.nexrenderOutputUrl?.endsWith('.mov') || job.outputUrl?.includes('.mov');
     const ext = isMov ? 'mov' : 'mp4';
@@ -2619,6 +2683,22 @@ export class RenderService {
 
     if (!job) {
       throw new NotFoundException('Render job not found');
+    }
+
+    // Clean up AWS S3 storage if configured
+    const s3Key =
+      job.s3OutputKey ||
+      (job.nexrenderOutputUrl?.startsWith('renders/') ? job.nexrenderOutputUrl : null);
+
+    if (s3Key && this.s3Service.isConfigured()) {
+      try {
+        await this.s3Service.deleteObject(s3Key);
+      } catch (s3Err) {
+        this.logger.warn(
+          `Failed to delete S3 object ${s3Key} on manual delete for job ${job.id}:`,
+          s3Err,
+        );
+      }
     }
 
     await this.prisma.renderJob.delete({ where: { id: job.id } });
