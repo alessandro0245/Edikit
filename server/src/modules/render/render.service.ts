@@ -68,6 +68,16 @@ export class RenderService {
   private readonly nexrenderApiKey: string;
   private readonly animationsPath: string;
   private readonly animationsFontsPath: string;
+  private readonly activeUploads = new Map<
+    string,
+    Promise<{
+      presignedUrl: string;
+      previewUrl: string | null;
+      s3Key: string;
+      s3PreviewKey: string | null;
+      expiresAt: Date;
+    }>
+  >();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -2483,6 +2493,64 @@ export class RenderService {
       throw new NotFoundException('Job not found');
     }
 
+    // Fast path: if already COMPLETED in our database and has outputUrl, return directly
+    if (job.status === RenderStatus.COMPLETED && job.outputUrl) {
+      const expired = isJobExpired(job);
+      return {
+        id: job.id,
+        userId: job.userId,
+        templateId: job.templateId,
+        status: job.status,
+        outputUrl: expired ? null : job.outputUrl,
+        previewUrl: expired ? null : job.previewUrl,
+        nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
+        progress: 100,
+        expiresAt: job.expiresAt,
+        isExpired: expired,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt,
+      };
+    }
+
+    // Concurrency guard: if an upload is currently in progress for this job, await it
+    if (this.activeUploads.has(job.id)) {
+      this.logger.log(`Upload currently in progress for job ${job.id}, awaiting completion...`);
+      try {
+        const uploadResult = (await Promise.race([
+          this.activeUploads.get(job.id)!,
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Upload timeout wait')), 20000),
+          ),
+        ])) as any;
+
+        return {
+          id: job.id,
+          userId: job.userId,
+          templateId: job.templateId,
+          status: RenderStatus.COMPLETED,
+          outputUrl: uploadResult.presignedUrl,
+          previewUrl: uploadResult.previewUrl,
+          nexrenderOutputUrl: uploadResult.s3Key,
+          expiresAt: uploadResult.expiresAt,
+          isExpired: false,
+          progress: 100,
+          createdAt: job.createdAt,
+          updatedAt: job.updatedAt,
+        };
+      } catch {
+        return {
+          id: job.id,
+          userId: job.userId,
+          templateId: job.templateId,
+          status: RenderStatus.PROCESSING,
+          outputUrl: null,
+          progress: 99,
+          createdAt: job.createdAt,
+          updatedAt: job.updatedAt,
+        };
+      }
+    }
+
     if (job.nexrenderJobId) {
       try {
         this.logger.log(
@@ -2547,67 +2615,59 @@ export class RenderService {
           }
         }
 
-        // ✅ Concurrency guard: if nexrenderOutputUrl is already set but outputUrl is still null,
-        // another poll already started the S3 upload — skip this one to avoid duplicate streams.
-        if (status === RenderStatus.COMPLETED && job.nexrenderOutputUrl && !job.outputUrl) {
-          this.logger.log('Upload already in progress for this job, skipping duplicate poll.');
-          return {
-            id: job.id,
-            userId: job.userId,
-            templateId: job.templateId,
-            status: RenderStatus.PROCESSING,
-            outputUrl: null,
-            progress: 99,
-            createdAt: job.createdAt,
-            updatedAt: job.updatedAt,
-          };
-        }
-
-        // ✅ If completed and no upload started yet, stream to S3 (no RAM buffer, no size limit)
-        if (status === RenderStatus.COMPLETED && outputUrl && !job.outputUrl && !job.nexrenderOutputUrl) {
-          this.logger.log('Job completed! Streaming video from Nexrender to S3...');
-
-          // Atomic compare-and-set: only update if nexrenderOutputUrl is STILL null.
-          // In a race between two simultaneous polls, only ONE will get count=1.
-          const claimed = await this.prisma.renderJob.updateMany({
-            where: { id: job.id, nexrenderOutputUrl: null },
-            data: { nexrenderOutputUrl: outputUrl },
-          });
-
-          if (claimed.count === 0) {
-            // Another concurrent request already claimed this job — return PROCESSING
-            this.logger.log('Lost claim race for this job — another poll is uploading it.');
-            return {
-              id: job.id,
-              userId: job.userId,
-              templateId: job.templateId,
-              status: RenderStatus.PROCESSING,
-              outputUrl: null,
-              progress: 99,
-              createdAt: job.createdAt,
-              updatedAt: job.updatedAt,
-            };
+        // If completed and no S3 upload yet, start/await upload via activeUploads
+        if (status === RenderStatus.COMPLETED && outputUrl && !job.outputUrl) {
+          if (!this.activeUploads.has(job.id)) {
+            this.logger.log(
+              `Job completed! Streaming and processing video from Nexrender to S3 for job ${job.id}...`,
+            );
+            const uploadPromise = (async () => {
+              try {
+                return await this.processAndUploadRenderResult(job, outputUrl);
+              } finally {
+                this.activeUploads.delete(job.id);
+              }
+            })();
+            this.activeUploads.set(job.id, uploadPromise);
           }
 
           try {
-            const { presignedUrl, previewUrl, s3Key, expiresAt } =
-              await this.processAndUploadRenderResult(job, outputUrl);
+            const uploadResult = (await Promise.race([
+              this.activeUploads.get(job.id)!,
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Upload timeout wait')), 20000),
+              ),
+            ])) as any;
 
             return {
               id: job.id,
               userId: job.userId,
               templateId: job.templateId,
               status: RenderStatus.COMPLETED,
-              outputUrl: presignedUrl,
-              previewUrl,
-              nexrenderOutputUrl: s3Key,
-              expiresAt,
+              outputUrl: uploadResult.presignedUrl,
+              previewUrl: uploadResult.previewUrl,
+              nexrenderOutputUrl: uploadResult.s3Key,
+              expiresAt: uploadResult.expiresAt,
               isExpired: false,
               progress: 100,
               createdAt: job.createdAt,
               updatedAt: job.updatedAt,
             };
           } catch (uploadError) {
+            if (this.activeUploads.has(job.id)) {
+              this.logger.log(`Upload in progress for job ${job.id}, returning 99%`);
+              return {
+                id: job.id,
+                userId: job.userId,
+                templateId: job.templateId,
+                status: RenderStatus.PROCESSING,
+                outputUrl: null,
+                progress: 99,
+                createdAt: job.createdAt,
+                updatedAt: job.updatedAt,
+              };
+            }
+
             this.logger.error('Failed to stream/upload video to S3:', uploadError);
 
             const user = await this.prisma.user.findUnique({
@@ -2616,7 +2676,7 @@ export class RenderService {
             });
             const expiresAt = calculateExpirationDate(user?.planType);
 
-            // Fallback: store Nexrender URL (temporary — user should retry download later)
+            // Fallback: store Nexrender URL (temporary — user can still access)
             await this.prisma.renderJob.update({
               where: { id: job.id },
               data: {
@@ -2645,15 +2705,11 @@ export class RenderService {
           }
         }
 
-
-        // Update job in database
-        if (status !== job.status || (outputUrl && !job.nexrenderOutputUrl)) {
+        // Update job status in database if changed
+        if (status !== job.status) {
           await this.prisma.renderJob.update({
             where: { id: job.id },
-            data: {
-              status,
-              nexrenderOutputUrl: outputUrl || job.nexrenderOutputUrl,
-            },
+            data: { status },
           });
         }
 
@@ -2663,9 +2719,9 @@ export class RenderService {
           userId: job.userId,
           templateId: job.templateId,
           status,
-          outputUrl: expired ? null : (job.outputUrl || outputUrl),
+          outputUrl: expired ? null : job.outputUrl,
           previewUrl: expired ? null : job.previewUrl,
-          nexrenderOutputUrl: expired ? null : outputUrl,
+          nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
           nexrenderState: state,
           progress,
           expiresAt: job.expiresAt,
@@ -2689,6 +2745,22 @@ export class RenderService {
   }
 
   async getUserRenderJobs(userId: string) {
+    // Automatically refresh up to 3 active jobs to ensure dashboard reflects finished renders
+    const activeJobs = await this.prisma.renderJob.findMany({
+      where: {
+        userId,
+        status: { in: [RenderStatus.PROCESSING, RenderStatus.PENDING] },
+      },
+      select: { id: true },
+      take: 3,
+    });
+
+    if (activeJobs.length > 0) {
+      await Promise.allSettled(
+        activeJobs.map((job) => this.getJobStatus(job.id, userId)),
+      );
+    }
+
     const jobs = await this.prisma.renderJob.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -2745,13 +2817,33 @@ export class RenderService {
       normalizedState === 'done';
 
     if (isCompleted && outputUrl) {
-      try {
-        this.logger.log(
-          `Processing completed render job ${job.id}, streaming from: ${outputUrl}`,
-        );
+      if (job.status === RenderStatus.COMPLETED && job.outputUrl) {
+        this.logger.log(`Job ${job.id} already completed, skipping`);
+        return {
+          jobId: job.id,
+          outputUrl: job.outputUrl,
+          previewUrl: job.previewUrl,
+          expiresAt: job.expiresAt,
+        };
+      }
 
-        const { presignedUrl, previewUrl, expiresAt } =
-          await this.processAndUploadRenderResult(job, outputUrl);
+      try {
+        let uploadPromise = this.activeUploads.get(job.id);
+        if (!uploadPromise) {
+          this.logger.log(
+            `Processing completed render job ${job.id}, streaming from: ${outputUrl}`,
+          );
+          uploadPromise = (async () => {
+            try {
+              return await this.processAndUploadRenderResult(job, outputUrl);
+            } finally {
+              this.activeUploads.delete(job.id);
+            }
+          })();
+          this.activeUploads.set(job.id, uploadPromise);
+        }
+
+        const { presignedUrl, previewUrl, expiresAt } = await uploadPromise;
 
         return {
           jobId: job.id,
