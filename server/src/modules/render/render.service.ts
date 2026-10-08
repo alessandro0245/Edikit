@@ -2516,12 +2516,7 @@ export class RenderService {
     if (this.activeUploads.has(job.id)) {
       this.logger.log(`Upload currently in progress for job ${job.id}, awaiting completion...`);
       try {
-        const uploadResult = (await Promise.race([
-          this.activeUploads.get(job.id)!,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Upload timeout wait')), 20000),
-          ),
-        ])) as any;
+        const uploadResult = await this.activeUploads.get(job.id)!;
 
         return {
           id: job.id,
@@ -2537,17 +2532,8 @@ export class RenderService {
           createdAt: job.createdAt,
           updatedAt: job.updatedAt,
         };
-      } catch {
-        return {
-          id: job.id,
-          userId: job.userId,
-          templateId: job.templateId,
-          status: RenderStatus.PROCESSING,
-          outputUrl: null,
-          progress: 99,
-          createdAt: job.createdAt,
-          updatedAt: job.updatedAt,
-        };
+      } catch (err) {
+        this.logger.error(`Error waiting for active upload on job ${job.id}:`, err);
       }
     }
 
@@ -2632,12 +2618,7 @@ export class RenderService {
           }
 
           try {
-            const uploadResult = (await Promise.race([
-              this.activeUploads.get(job.id)!,
-              new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Upload timeout wait')), 20000),
-              ),
-            ])) as any;
+            const uploadResult = await this.activeUploads.get(job.id)!;
 
             return {
               id: job.id,
@@ -2654,20 +2635,6 @@ export class RenderService {
               updatedAt: job.updatedAt,
             };
           } catch (uploadError) {
-            if (this.activeUploads.has(job.id)) {
-              this.logger.log(`Upload in progress for job ${job.id}, returning 99%`);
-              return {
-                id: job.id,
-                userId: job.userId,
-                templateId: job.templateId,
-                status: RenderStatus.PROCESSING,
-                outputUrl: null,
-                progress: 99,
-                createdAt: job.createdAt,
-                updatedAt: job.updatedAt,
-              };
-            }
-
             this.logger.error('Failed to stream/upload video to S3:', uploadError);
 
             const user = await this.prisma.user.findUnique({
@@ -2745,22 +2712,6 @@ export class RenderService {
   }
 
   async getUserRenderJobs(userId: string) {
-    // Automatically refresh up to 3 active jobs to ensure dashboard reflects finished renders
-    const activeJobs = await this.prisma.renderJob.findMany({
-      where: {
-        userId,
-        status: { in: [RenderStatus.PROCESSING, RenderStatus.PENDING] },
-      },
-      select: { id: true },
-      take: 3,
-    });
-
-    if (activeJobs.length > 0) {
-      await Promise.allSettled(
-        activeJobs.map((job) => this.getJobStatus(job.id, userId)),
-      );
-    }
-
     const jobs = await this.prisma.renderJob.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },

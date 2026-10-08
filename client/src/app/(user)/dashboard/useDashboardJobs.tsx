@@ -94,10 +94,8 @@ export const useDashboardJobs = () => {
   const [previewJob, setPreviewJob] = useState<DashboardJob | null>(null);
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
-  const loadJobs = async (silent = false) => {
-    if (!silent) {
-      setLoading(true);
-    }
+  const loadJobs = async () => {
+    setLoading(true);
     setError(null);
 
     try {
@@ -124,28 +122,13 @@ export const useDashboardJobs = () => {
       }
       setError(requestError instanceof Error ? requestError.message : "Failed to load your jobs");
     } finally {
-      if (!silent) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     void loadJobs();
   }, []);
-
-  useEffect(() => {
-    const hasActiveJobs = jobs.some(
-      (job) => job.status === "PROCESSING" || job.status === "PENDING",
-    );
-    if (!hasActiveJobs) return;
-
-    const intervalId = setInterval(() => {
-      void loadJobs(true);
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [jobs]);
 
   const openPreview = (job: DashboardJob) => {
     setActiveMenuJobId(null);
