@@ -67,8 +67,6 @@ model RenderJob {
   creditsUsed        Int          @default(0)
   outputUrl          String?
   nexrenderOutputUrl String?
-  previewUrl         String?
-  s3PreviewKey       String?
   error              String?
   customizations     Json?
 

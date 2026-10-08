@@ -5,7 +5,6 @@ import { Film } from "lucide-react";
 
 interface MovPreviewProps {
   src: string;
-  previewUrl?: string;
   className?: string;
 }
 
@@ -32,24 +31,17 @@ function Fallback({ className }: { className: string }) {
   );
 }
 
-export default function MovPreview({ src, previewUrl, className = "" }: MovPreviewProps) {
+export default function MovPreview({ src, className = "" }: MovPreviewProps) {
   const [errored, setErrored] = useState(false);
-  const isMp4Src = (() => {
-    try {
-      return new URL(src, "http://localhost").pathname.toLowerCase().endsWith(".mp4");
-    } catch {
-      return src.split("?")[0].toLowerCase().endsWith(".mp4");
-    }
-  })();
-  const effectivePreviewUrl = previewUrl || (isMp4Src ? src : toMp4PreviewUrl(src));
+  const previewUrl = toMp4PreviewUrl(src);
 
-  if (!effectivePreviewUrl || errored) {
+  if (!previewUrl || errored) {
     return <Fallback className={className} />;
   }
 
   return (
     <video
-      src={effectivePreviewUrl}
+      src={previewUrl}
       className={className}
       controls
       autoPlay

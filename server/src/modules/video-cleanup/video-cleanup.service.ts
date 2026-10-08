@@ -84,10 +84,8 @@ export class VideoCleanupService implements OnApplicationBootstrap {
           id: true,
           userId: true,
           s3OutputKey: true,
-          s3PreviewKey: true,
           nexrenderOutputUrl: true,
           outputUrl: true,
-          previewUrl: true,
           remotionRenderId: true,
           remotionBucketName: true,
           expiresAt: true,
@@ -138,10 +136,8 @@ export class VideoCleanupService implements OnApplicationBootstrap {
     id: string;
     userId: string;
     s3OutputKey: string | null;
-    s3PreviewKey?: string | null;
     nexrenderOutputUrl: string | null;
     outputUrl: string | null;
-    previewUrl?: string | null;
     remotionRenderId?: string | null;
     remotionBucketName?: string | null;
   }): Promise<void> {
@@ -221,10 +217,8 @@ export class VideoCleanupService implements OnApplicationBootstrap {
    */
   private extractS3Keys(job: {
     s3OutputKey: string | null;
-    s3PreviewKey?: string | null;
     nexrenderOutputUrl: string | null;
     outputUrl: string | null;
-    previewUrl?: string | null;
   }): string[] {
     const keys = new Set<string>();
 
@@ -253,10 +247,8 @@ export class VideoCleanupService implements OnApplicationBootstrap {
     };
 
     checkAndAdd(job.s3OutputKey);
-    checkAndAdd(job.s3PreviewKey);
     checkAndAdd(job.nexrenderOutputUrl);
     checkAndAdd(job.outputUrl);
-    checkAndAdd(job.previewUrl);
 
     return Array.from(keys);
   }

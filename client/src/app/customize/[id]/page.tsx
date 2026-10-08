@@ -93,30 +93,13 @@ const CustomizePage = () => {
 
   // Check if we should show rendered video or template preview
   const showRenderedVideo =
-    renderJob?.status === "COMPLETED" && (renderJob.outputUrl || renderJob.previewUrl);
+    renderJob?.status === "COMPLETED" && renderJob.outputUrl;
 
   const templateOrientation = getTemplateOrientation(template);
 
-  const isMovOutput =
-    !renderJob?.previewUrl &&
-    Boolean(
-      renderJob?.outputUrl &&
-        (useBackgroundColor === false ||
-          (() => {
-            try {
-              return new URL(renderJob.outputUrl, "http://localhost").pathname
-                .toLowerCase()
-                .endsWith(".mov");
-            } catch {
-              return renderJob.outputUrl.split("?")[0].toLowerCase().endsWith(".mov");
-            }
-          })())
-    );
-  const renderedVideoSrc = showRenderedVideo
-    ? renderJob?.previewUrl ||
-      (!isMovOutput
-        ? toMp4PreviewUrl(renderJob!.outputUrl!) ?? renderJob!.outputUrl!
-        : null)
+  const isMovOutput = !!renderJob?.outputUrl?.includes('.mov');
+  const renderedVideoSrc = showRenderedVideo && !isMovOutput
+    ? (toMp4PreviewUrl(renderJob!.outputUrl!) ?? renderJob!.outputUrl!)
     : null;
 
   // Group fields into categories

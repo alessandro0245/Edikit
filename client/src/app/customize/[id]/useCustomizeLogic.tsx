@@ -31,8 +31,7 @@ export interface CropState {
 interface RenderJob {
   id: string;
   status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  outputUrl?: string | null;
-  previewUrl?: string | null;
+  outputUrl?: string;
   progress?: number;
   error?: string;
 }

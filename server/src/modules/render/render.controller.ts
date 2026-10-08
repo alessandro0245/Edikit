@@ -550,7 +550,6 @@ export class RenderController {
     return job;
   }
 
-  @SkipThrottle()
   @Get('job/:id')
   @ApiOperation({ summary: 'Get render job status' })
   @ApiCookieAuth()
@@ -566,7 +565,6 @@ export class RenderController {
     return job;
   }
 
-  @SkipThrottle()
   @Get('jobs')
   @ApiOperation({ summary: 'Get current user render jobs' })
   @ApiCookieAuth()

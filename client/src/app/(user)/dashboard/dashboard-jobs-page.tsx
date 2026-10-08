@@ -79,14 +79,8 @@ const getJobIcon = (job: DashboardJob) => {
   );
 };
 
-const isMovUrl = (url: string | null | undefined): boolean => {
-  if (!url) return false;
-  try {
-    return new URL(url, "http://localhost").pathname.toLowerCase().endsWith(".mov");
-  } catch {
-    return url.split("?")[0].toLowerCase().endsWith(".mov");
-  }
-};
+const isMovUrl = (url: string | null | undefined) =>
+  Boolean(url?.toLowerCase().includes(".mov"));
 
 const formatFileName = (title: string, outputUrl?: string | null) =>
   `${title
@@ -589,23 +583,9 @@ export default function DashboardJobsPage() {
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
                 {previewJob.outputUrl ? (
-                  previewJob.previewUrl ? (
-                    <VideoPlayer
-                      src={previewJob.previewUrl}
-                      autoPlay
-                      loop
-                      muted
-                      controls
-                      variant="minimal"
-                      aspectRatio="none"
-                      showDownload={false}
-                      showFullscreen
-                      className="max-h-[70vh] w-full rounded-none"
-                    />
-                  ) : isMovUrl(previewJob.outputUrl) ? (
+                  isMovUrl(previewJob.outputUrl) ? (
                     <MovPreview
                       src={previewJob.outputUrl}
-                      previewUrl={previewJob.previewUrl ?? undefined}
                       className="max-h-[70vh] w-full"
                     />
                   ) : (
