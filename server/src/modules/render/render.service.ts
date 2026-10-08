@@ -13,8 +13,11 @@ import { CreateRenderJobDto } from './dto/create-render-job.dto';
 import { RenderStatus } from '@generated/prisma/enums';
 import { firstValueFrom } from 'rxjs';
 import * as path from 'path';
+import * as os from 'os';
 import * as fs from 'fs/promises';
-import { createReadStream, existsSync } from 'fs';
+import { createReadStream, createWriteStream, existsSync } from 'fs';
+import { pipeline } from 'stream/promises';
+import { execFile } from 'child_process';
 import { CreditsService } from '../credits/credits.service';
 import FormData from 'form-data';
 import {
@@ -2181,6 +2184,293 @@ export class RenderService {
   }
 
   /**
+   * Helper to resolve the FFmpeg executable path.
+   * Prioritizes bundled FFmpeg from @remotion/renderer, fallback to system 'ffmpeg'.
+   */
+  private getFfmpegPath(): string {
+    try {
+      const { RenderInternals } = require('@remotion/renderer');
+      const bundledPath = RenderInternals.getExecutablePath({ type: 'ffmpeg' });
+      if (existsSync(bundledPath)) {
+        return bundledPath;
+      }
+    } catch {
+      // fallback to system ffmpeg
+    }
+    return 'ffmpeg';
+  }
+
+  /**
+   * Quick local FFmpeg transcode: converts a transparent ProRes MOV into a web-optimized MP4 preview.
+   * Runs in 2-3 seconds using fast preset.
+   */
+  private async transcodeMovToMp4Preview(
+    inputMovPath: string,
+    outputMp4Path: string,
+  ): Promise<void> {
+    const ffmpegPath = this.getFfmpegPath();
+    return new Promise((resolve, reject) => {
+      const args = [
+        '-y',
+        '-i',
+        inputMovPath,
+        '-c:v',
+        'libx264',
+        '-pix_fmt',
+        'yuv420p',
+        '-preset',
+        'fast',
+        '-crf',
+        '24',
+        '-movflags',
+        '+faststart',
+        outputMp4Path,
+      ];
+      execFile(ffmpegPath, args, (error, _stdout, stderr) => {
+        if (error) {
+          this.logger.error(`FFmpeg transcode failed: ${stderr || error.message}`);
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Helper to determine whether a render output is a transparent ProRes 4444 MOV file.
+   * Priority:
+   * 1. Job customization settings: useBackgroundColor === false triggers ProRes 4444 MOV
+   * 2. HTTP response Content-Type header (e.g. video/quicktime)
+   * 3. S3 keys or stored output paths ending with .mov
+   * 4. URL pathname ending with .mov (stripping any query parameters via URL.pathname)
+   */
+  private isMovOutput(params: {
+    job?: {
+      customizations?: any;
+      s3OutputKey?: string | null;
+      nexrenderOutputUrl?: string | null;
+      outputUrl?: string | null;
+    } | null;
+    outputUrl?: string | null;
+    contentType?: string | null;
+  }): boolean {
+    const { job, outputUrl, contentType } = params;
+
+    // 1. Check job settings/customizations: useBackgroundColor === false triggers ProRes 4444
+    if (job?.customizations) {
+      let cust = job.customizations;
+      if (typeof cust === 'string') {
+        try {
+          cust = JSON.parse(cust);
+        } catch {
+          // ignore parsing error
+        }
+      }
+      if (typeof cust === 'object' && cust !== null) {
+        if (
+          cust.useBackgroundColor === false ||
+          cust.settings?.codec === 'video_prores_4444' ||
+          cust.codec === 'video_prores_4444'
+        ) {
+          return true;
+        }
+      }
+    }
+
+    // 2. Check HTTP Content-Type header if provided
+    if (contentType) {
+      const lower = contentType.toLowerCase();
+      if (
+        lower.includes('quicktime') ||
+        lower.includes('video/mov') ||
+        lower.includes('video/x-quicktime')
+      ) {
+        return true;
+      }
+    }
+
+    // 3. Check S3 keys on the job
+    if (job?.s3OutputKey && job.s3OutputKey.toLowerCase().endsWith('.mov')) {
+      return true;
+    }
+    if (
+      job?.nexrenderOutputUrl &&
+      !job.nexrenderOutputUrl.startsWith('http://') &&
+      !job.nexrenderOutputUrl.startsWith('https://') &&
+      job.nexrenderOutputUrl.toLowerCase().endsWith('.mov')
+    ) {
+      return true;
+    }
+
+    // 4. Check URL pathname without matching query strings
+    const candidateUrls = [outputUrl, job?.outputUrl, job?.nexrenderOutputUrl].filter(Boolean);
+    for (const rawUrl of candidateUrls) {
+      if (typeof rawUrl !== 'string') continue;
+      try {
+        const parsed = new URL(rawUrl, 'http://localhost');
+        if (parsed.pathname.toLowerCase().endsWith('.mov')) {
+          return true;
+        }
+      } catch {
+        const pathOnly = rawUrl.split('?')[0].toLowerCase();
+        if (pathOnly.endsWith('.mov')) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Processes a finished render output:
+   * - If MOV: buffers to temp file, streams master MOV to S3, runs quick FFmpeg pass for preview MP4,
+   *   uploads preview MP4 to S3, and cleans up temp files.
+   * - If MP4: streams directly to S3.
+   * Updates database with both outputUrl (master for download) and previewUrl (inline for web playback).
+   */
+  private async processAndUploadRenderResult(
+    job: {
+      id: string;
+      userId: string;
+      nexrenderJobId?: string | null;
+      customizations?: any;
+      s3OutputKey?: string | null;
+      nexrenderOutputUrl?: string | null;
+      outputUrl?: string | null;
+    },
+    outputUrl: string,
+  ): Promise<{
+    presignedUrl: string;
+    previewUrl: string | null;
+    s3Key: string;
+    s3PreviewKey: string | null;
+    expiresAt: Date;
+  }> {
+    const videoResponse = await firstValueFrom(
+      this.httpService.get(outputUrl, {
+        responseType: 'stream',
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+        timeout: 180000, // 3 min for large files
+      }),
+    );
+
+    const contentTypeHeader = (videoResponse.headers as any)?.['content-type'];
+    const isMov = this.isMovOutput({
+      job,
+      outputUrl,
+      contentType: contentTypeHeader,
+    });
+    const ext = isMov ? 'mov' : 'mp4';
+    const contentType = isMov ? 'video/quicktime' : 'video/mp4';
+    const s3Key = `renders/${job.userId}/${job.nexrenderJobId}.${ext}`;
+    let previewKey: string | null = null;
+
+    if (isMov) {
+      const tempMovPath = path.join(
+        os.tmpdir(),
+        `render-${job.id}-${Date.now()}.mov`,
+      );
+      const tempMp4Path = path.join(
+        os.tmpdir(),
+        `render-${job.id}-${Date.now()}-preview.mp4`,
+      );
+
+      let bufferedComplete = false;
+      let masterUploaded = false;
+      try {
+        this.logger.log(`Buffering MOV to temp file for FFmpeg pass: ${tempMovPath}`);
+        await pipeline(videoResponse.data, createWriteStream(tempMovPath));
+        bufferedComplete = true;
+
+        // 1. Stream master MOV to S3
+        this.logger.log(`Uploading master MOV to S3 key: ${s3Key}`);
+        await this.s3Service.uploadStream(
+          createReadStream(tempMovPath),
+          s3Key,
+          contentType,
+        );
+        masterUploaded = true;
+
+        // 2. Quick local FFmpeg transcode: MOV -> web MP4 preview
+        this.logger.log(`Running FFmpeg transcode for preview: ${tempMp4Path}`);
+        await this.transcodeMovToMp4Preview(tempMovPath, tempMp4Path);
+
+        // 3. Upload preview MP4 to S3
+        previewKey = `renders/${job.userId}/${job.nexrenderJobId}-preview.mp4`;
+        this.logger.log(`Uploading preview MP4 to S3 key: ${previewKey}`);
+        await this.s3Service.uploadStream(
+          createReadStream(tempMp4Path),
+          previewKey,
+          'video/mp4',
+        );
+      } catch (transcodeErr) {
+        this.logger.error('Error during MOV/preview processing:', transcodeErr);
+        previewKey = null;
+        if (!bufferedComplete) {
+          throw transcodeErr;
+        }
+        if (!masterUploaded) {
+          await this.s3Service.uploadStream(
+            createReadStream(tempMovPath),
+            s3Key,
+            contentType,
+          );
+        }
+      } finally {
+        await fs.unlink(tempMovPath).catch(() => {});
+        await fs.unlink(tempMp4Path).catch(() => {});
+      }
+    } else {
+      this.logger.log(`Streaming MP4 to S3 key: ${s3Key}`);
+      await this.s3Service.uploadStream(videoResponse.data, s3Key, contentType);
+      previewKey = s3Key;
+    }
+
+    const presignedUrl = await this.s3Service.generatePresignedUrl(
+      s3Key,
+      7 * 24 * 3600,
+    );
+    const previewUrl = previewKey
+      ? await this.s3Service.generatePresignedUrl(
+          previewKey,
+          7 * 24 * 3600,
+          undefined,
+          'inline',
+        )
+      : null;
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: job.userId },
+      select: { planType: true },
+    });
+    const expiresAt = calculateExpirationDate(user?.planType);
+
+    await this.prisma.renderJob.update({
+      where: { id: job.id },
+      data: {
+        status: RenderStatus.COMPLETED,
+        outputUrl: presignedUrl,
+        previewUrl: previewUrl,
+        nexrenderOutputUrl: s3Key,
+        s3OutputKey: s3Key,
+        s3PreviewKey: previewKey,
+        expiresAt,
+      },
+    });
+
+    return {
+      presignedUrl,
+      previewUrl,
+      s3Key,
+      s3PreviewKey: previewKey,
+      expiresAt,
+    };
+  }
+
+  /**
    * Get job status
    */
   // In your render.service.ts - update getJobStatus
@@ -2300,48 +2590,8 @@ export class RenderService {
           }
 
           try {
-            const videoResponse = await firstValueFrom(
-              this.httpService.get(outputUrl, {
-                responseType: 'stream',
-                maxBodyLength: Infinity,
-                maxContentLength: Infinity,
-                timeout: 180000, // 3 min for large files
-              }),
-            );
-
-            // Detect content type from URL (mov = ProRes transparent, otherwise mp4)
-            const isMov = outputUrl.toLowerCase().includes('.mov');
-            const ext = isMov ? 'mov' : 'mp4';
-            const contentType = isMov ? 'video/quicktime' : 'video/mp4';
-            const s3Key = `renders/${job.userId}/${job.nexrenderJobId}.${ext}`;
-
-            this.logger.log(`Streaming to S3 key: ${s3Key}`);
-            // Stream directly — no Buffer.from(), no RAM spike
-            await this.s3Service.uploadStream(videoResponse.data, s3Key, contentType);
-
-            // Generate a long-lived presigned URL (7 days)
-            const presignedUrl = await this.s3Service.generatePresignedUrl(
-              s3Key,
-              7 * 24 * 3600,
-            );
-            this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
-
-            const user = await this.prisma.user.findUnique({
-              where: { id: job.userId },
-              select: { planType: true },
-            });
-            const expiresAt = calculateExpirationDate(user?.planType);
-
-            await this.prisma.renderJob.update({
-              where: { id: job.id },
-              data: {
-                status: RenderStatus.COMPLETED,
-                outputUrl: presignedUrl,
-                nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
-                s3OutputKey: s3Key,
-                expiresAt,
-              },
-            });
+            const { presignedUrl, previewUrl, s3Key, expiresAt } =
+              await this.processAndUploadRenderResult(job, outputUrl);
 
             return {
               id: job.id,
@@ -2349,6 +2599,7 @@ export class RenderService {
               templateId: job.templateId,
               status: RenderStatus.COMPLETED,
               outputUrl: presignedUrl,
+              previewUrl,
               nexrenderOutputUrl: s3Key,
               expiresAt,
               isExpired: false,
@@ -2371,6 +2622,7 @@ export class RenderService {
               data: {
                 status: RenderStatus.COMPLETED,
                 outputUrl: outputUrl,
+                previewUrl: null,
                 nexrenderOutputUrl: outputUrl,
                 expiresAt,
               },
@@ -2382,6 +2634,7 @@ export class RenderService {
               templateId: job.templateId,
               status: RenderStatus.COMPLETED,
               outputUrl: outputUrl,
+              previewUrl: null,
               nexrenderOutputUrl: outputUrl,
               expiresAt,
               isExpired: false,
@@ -2411,6 +2664,7 @@ export class RenderService {
           templateId: job.templateId,
           status,
           outputUrl: expired ? null : (job.outputUrl || outputUrl),
+          previewUrl: expired ? null : job.previewUrl,
           nexrenderOutputUrl: expired ? null : outputUrl,
           nexrenderState: state,
           progress,
@@ -2428,6 +2682,7 @@ export class RenderService {
     return {
       ...job,
       outputUrl: isExpiredJob ? null : job.outputUrl,
+      previewUrl: isExpiredJob ? null : job.previewUrl,
       nexrenderOutputUrl: isExpiredJob ? null : job.nexrenderOutputUrl,
       isExpired: isExpiredJob,
     };
@@ -2443,6 +2698,7 @@ export class RenderService {
         renderType: true,
         status: true,
         outputUrl: true,
+        previewUrl: true,
         nexrenderOutputUrl: true,
         error: true,
         promptText: true,
@@ -2457,6 +2713,7 @@ export class RenderService {
       return {
         ...job,
         outputUrl: expired ? null : job.outputUrl,
+        previewUrl: expired ? null : job.previewUrl,
         nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
         isExpired: expired,
       };
@@ -2493,51 +2750,13 @@ export class RenderService {
           `Processing completed render job ${job.id}, streaming from: ${outputUrl}`,
         );
 
-        // Stream video from Nexrender directly to S3 — no RAM buffer
-        const videoResponse = await firstValueFrom(
-          this.httpService.get(outputUrl, {
-            responseType: 'stream',
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity,
-            timeout: 180000, // 3 min for large files
-          }),
-        );
-
-        const isMov = outputUrl.toLowerCase().includes('.mov');
-        const ext = isMov ? 'mov' : 'mp4';
-        const contentType = isMov ? 'video/quicktime' : 'video/mp4';
-        const s3Key = `renders/${job.userId}/${nexrenderJobId}.${ext}`;
-
-        this.logger.log(`Streaming to S3 key: ${s3Key}`);
-        await this.s3Service.uploadStream(videoResponse.data, s3Key, contentType);
-
-        const presignedUrl = await this.s3Service.generatePresignedUrl(
-          s3Key,
-          7 * 24 * 3600,
-        );
-        this.logger.log(`Streamed to S3 successfully: ${s3Key}`);
-
-        const user = await this.prisma.user.findUnique({
-          where: { id: job.userId },
-          select: { planType: true },
-        });
-        const expiresAt = calculateExpirationDate(user?.planType);
-
-        // Update job
-        await this.prisma.renderJob.update({
-          where: { id: job.id },
-          data: {
-            status: RenderStatus.COMPLETED,
-            outputUrl: presignedUrl,
-            nexrenderOutputUrl: s3Key, // Store S3 key for URL regeneration
-            s3OutputKey: s3Key,
-            expiresAt,
-          },
-        });
+        const { presignedUrl, previewUrl, expiresAt } =
+          await this.processAndUploadRenderResult(job, outputUrl);
 
         return {
           jobId: job.id,
           outputUrl: presignedUrl,
+          previewUrl,
           expiresAt,
         };
       } catch (error: unknown) {
@@ -2616,7 +2835,7 @@ export class RenderService {
       where: { id: jobId, userId },
     });
 
-    if (!job || !job.outputUrl) {
+    if (!job || (!job.outputUrl && !job.previewUrl)) {
       throw new NotFoundException('Video not ready');
     }
 
@@ -2626,15 +2845,32 @@ export class RenderService {
       );
     }
 
+    // Prioritize preview S3 key for browser playback with inline disposition
+    if (job.s3PreviewKey?.startsWith('renders/') && this.s3Service.isConfigured()) {
+      return this.s3Service.generatePresignedUrl(
+        job.s3PreviewKey,
+        7 * 24 * 3600,
+        undefined,
+        'inline',
+      );
+    }
+
     // If nexrenderOutputUrl looks like an S3 key (starts with 'renders/'), regenerate presigned URL
     if (job.nexrenderOutputUrl?.startsWith('renders/') && this.s3Service.isConfigured()) {
       return this.s3Service.generatePresignedUrl(
         job.nexrenderOutputUrl,
         7 * 24 * 3600, // Fresh 7-day presigned URL
+        undefined,
+        'inline',
       );
     }
 
-    return job.outputUrl;
+    const resultUrl = job.previewUrl || job.outputUrl;
+    if (!resultUrl) {
+      throw new NotFoundException('Video URL not available');
+    }
+
+    return resultUrl;
   }
 
   /**
@@ -2656,7 +2892,10 @@ export class RenderService {
       );
     }
 
-    const isMov = job.nexrenderOutputUrl?.endsWith('.mov') || job.outputUrl?.includes('.mov');
+    const isMov = this.isMovOutput({
+      job,
+      outputUrl: job.outputUrl,
+    });
     const ext = isMov ? 'mov' : 'mp4';
     const filename = `edikit-${job.templateId || 'render'}-${job.id.slice(0, 8)}.${ext}`;
 

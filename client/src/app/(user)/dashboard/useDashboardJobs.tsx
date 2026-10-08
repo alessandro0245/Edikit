@@ -13,6 +13,7 @@ export interface DashboardJob {
   createdLabel: string;
   renderTimeLabel: string;
   outputUrl: string | null;
+  previewUrl?: string | null;
   error: string | null;
   expiresAt?: string | null;
   isExpired?: boolean;
@@ -108,6 +109,7 @@ export const useDashboardJobs = () => {
           createdLabel: formatRelativeDate(job.createdAt),
           renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
           outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),
+          previewUrl: job.isExpired ? null : (job.previewUrl || null),
           error: job.error,
           expiresAt: job.expiresAt,
           isExpired: job.isExpired,
