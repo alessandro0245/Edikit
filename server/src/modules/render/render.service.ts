@@ -2289,16 +2289,24 @@ export class RenderService {
     return new Promise<void>((resolve, reject) => {
       const args = [
         '-y',
+        '-threads',
+        '1',
         '-i',
         inputMovPath,
+        '-vf',
+        'scale=-2:720',
         '-c:v',
         'libx264',
         '-pix_fmt',
         'yuv420p',
         '-preset',
-        'fast',
+        'veryfast',
         '-crf',
-        '24',
+        '26',
+        '-maxrate',
+        '1.5M',
+        '-bufsize',
+        '2M',
         '-movflags',
         '+faststart',
         '-an',
@@ -2799,6 +2807,29 @@ export class RenderService {
           masterUploaded = true;
           presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
           this.logger.log(`Master MOV uploaded to S3: ${s3Key}`);
+
+          // Early checkpoint: Mark job COMPLETED with pristine MOV immediately
+          // Guarantees user is never stuck at 99% if preview pass encounters an issue
+          try {
+            const user = await this.prisma.user.findUnique({
+              where: { id: job.userId },
+              select: { planType: true },
+            });
+            const expiresAt = calculateExpirationDate(user?.planType);
+            await this.prisma.renderJob.update({
+              where: { id: job.id },
+              data: {
+                status: RenderStatus.COMPLETED,
+                outputUrl: presignedUrl,
+                previewUrl: presignedUrl,
+                nexrenderOutputUrl: s3Key,
+                s3OutputKey: s3Key,
+                expiresAt,
+              },
+            });
+          } catch (checkpointErr) {
+            this.logger.warn(`Failed to write early completion checkpoint:`, checkpointErr);
+          }
 
           // 2. Transcode preview MP4
           try {
