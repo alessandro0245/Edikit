@@ -32,6 +32,7 @@ interface RenderJob {
   id: string;
   status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
   outputUrl?: string;
+  previewUrl?: string;
   progress?: number;
   error?: string;
 }

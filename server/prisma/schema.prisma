@@ -66,6 +66,7 @@ model RenderJob {
   nexrenderJobId     String?      @unique
   creditsUsed        Int          @default(0)
   outputUrl          String?
+  previewUrl         String?
   nexrenderOutputUrl String?
   error              String?
   customizations     Json?
@@ -74,6 +75,7 @@ model RenderJob {
   remotionRenderId   String?
   remotionBucketName String?
   s3OutputKey        String?
+  s3PreviewKey       String?
   promptText         String?
   aiConfig           Json?
 

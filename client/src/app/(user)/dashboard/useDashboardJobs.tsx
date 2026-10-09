@@ -13,6 +13,7 @@ export interface DashboardJob {
   createdLabel: string;
   renderTimeLabel: string;
   outputUrl: string | null;
+  previewUrl?: string | null;
   error: string | null;
   expiresAt?: string | null;
   isExpired?: boolean;
@@ -93,9 +94,11 @@ export const useDashboardJobs = () => {
   const [previewJob, setPreviewJob] = useState<DashboardJob | null>(null);
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
-  const loadJobs = async () => {
-    setLoading(true);
-    setError(null);
+  const loadJobs = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
 
     try {
       const data = await jobsApi.getMyJobs();
@@ -108,25 +111,47 @@ export const useDashboardJobs = () => {
           createdLabel: formatRelativeDate(job.createdAt),
           renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
           outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),
+          previewUrl: job.isExpired ? null : (job.previewUrl || null),
           error: job.error,
           expiresAt: job.expiresAt,
           isExpired: job.isExpired,
         })),
       );
+      if (silent) {
+        setError(null);
+      }
     } catch (requestError: any) {
       // If 401, axios interceptor will redirect cleanly to /login — do not display error banner
       if (requestError?.response?.status === 401) {
         return;
       }
-      setError(requestError instanceof Error ? requestError.message : "Failed to load your jobs");
+      if (!silent) {
+        setError(requestError instanceof Error ? requestError.message : "Failed to load your jobs");
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     void loadJobs();
   }, []);
+
+  // Silently auto-refresh when there are active jobs without table flickering or error banners
+  useEffect(() => {
+    const hasActiveJobs = jobs.some(
+      (job) => job.status === "PROCESSING" || job.status === "PENDING",
+    );
+    if (!hasActiveJobs) return;
+
+    const intervalId = setInterval(() => {
+      void loadJobs(true);
+    }, 6000);
+
+    return () => clearInterval(intervalId);
+  }, [jobs]);
 
   const openPreview = (job: DashboardJob) => {
     setActiveMenuJobId(null);

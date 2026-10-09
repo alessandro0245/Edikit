@@ -9,6 +9,7 @@ export interface RenderJobRecord {
   renderType: RenderJobType;
   status: RenderJobStatus;
   outputUrl: string | null;
+  previewUrl?: string | null;
   nexrenderOutputUrl: string | null;
   error: string | null;
   promptText: string | null;

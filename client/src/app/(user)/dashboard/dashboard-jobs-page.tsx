@@ -582,17 +582,32 @@ export default function DashboardJobsPage() {
 
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
-                {previewJob.outputUrl ? (
-                  isMovUrl(previewJob.outputUrl) ? (
+                {previewJob.outputUrl || previewJob.previewUrl ? (
+                  previewJob.previewUrl ? (
+                    <VideoPlayer
+                      src={previewJob.previewUrl}
+                      autoPlay
+                      loop
+                      muted
+                      controls
+                      variant="minimal"
+                      aspectRatio="none"
+                      showDownload={false}
+                      showFullscreen
+                      className="max-h-[70vh] w-full rounded-none"
+                    />
+                  ) : isMovUrl(previewJob.outputUrl) ? (
                     <MovPreview
-                      src={previewJob.outputUrl}
+                      src={previewJob.outputUrl!}
+                      previewUrl={previewJob.previewUrl}
                       className="max-h-[70vh] w-full"
                     />
                   ) : (
                     (() => {
                       const src =
-                        toMp4PreviewUrl(previewJob.outputUrl) ??
-                        previewJob.outputUrl;
+                        (previewJob.outputUrl ? toMp4PreviewUrl(previewJob.outputUrl) : null) ??
+                        previewJob.outputUrl ??
+                        "";
                       return (
                         <VideoPlayer
                           src={src}

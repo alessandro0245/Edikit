@@ -5,11 +5,14 @@ import { Film } from "lucide-react";
 
 interface MovPreviewProps {
   src: string;
+  previewUrl?: string | null;
   className?: string;
 }
 
 export function toMp4PreviewUrl(url: string): string | null {
-  // S3 presigned URLs or non-Cloudinary .mov files: no on-the-fly transcoding available
+  if (!url) return null;
+  if (url.includes(".mp4")) return url;
+  // Cloudinary fallback
   if (!url.includes("res.cloudinary.com")) return null;
   return url
     .replace(/\/upload\//, "/upload/f_mp4,vc_h264,q_auto/")
@@ -31,17 +34,21 @@ function Fallback({ className }: { className: string }) {
   );
 }
 
-export default function MovPreview({ src, className = "" }: MovPreviewProps) {
+export default function MovPreview({
+  src,
+  previewUrl: explicitPreviewUrl,
+  className = "",
+}: MovPreviewProps) {
   const [errored, setErrored] = useState(false);
-  const previewUrl = toMp4PreviewUrl(src);
+  const resolvedPreviewUrl = explicitPreviewUrl || toMp4PreviewUrl(src);
 
-  if (!previewUrl || errored) {
+  if (!resolvedPreviewUrl || errored) {
     return <Fallback className={className} />;
   }
 
   return (
     <video
-      src={previewUrl}
+      src={resolvedPreviewUrl}
       className={className}
       controls
       autoPlay

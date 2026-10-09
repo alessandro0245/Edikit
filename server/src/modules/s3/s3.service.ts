@@ -102,12 +102,18 @@ export class S3Service {
     key: string,
     expiresIn: number = 3600,
     filename?: string,
+    disposition: 'attachment' | 'inline' = 'attachment',
   ): Promise<string> {
     const downloadFilename = filename || key.split('/').pop() || 'video.mp4';
+    const responseContentDisposition =
+      disposition === 'inline'
+        ? 'inline'
+        : `attachment; filename="${downloadFilename}"`;
+
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: key,
-      ResponseContentDisposition: `attachment; filename="${downloadFilename}"`,
+      ResponseContentDisposition: responseContentDisposition,
     });
 
     const url = await getSignedUrl(this.s3Client, command, { expiresIn });
