@@ -583,7 +583,7 @@ export default function DashboardJobsPage() {
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
                 {previewJob.outputUrl || previewJob.previewUrl ? (
-                  previewJob.previewUrl ? (
+                  previewJob.previewUrl && !isMovUrl(previewJob.previewUrl) ? (
                     <VideoPlayer
                       src={previewJob.previewUrl}
                       autoPlay

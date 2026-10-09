@@ -2239,6 +2239,37 @@ export class RenderService {
   }
 
   /**
+   * Safe helper to get a web-playable preview URL.
+   * Browsers (Chrome, Edge, Firefox) cannot decode Apple ProRes 4444 MOV files.
+   * Never feed a .mov file as a previewUrl to the client.
+   */
+  getBrowserPlayablePreviewUrl(
+    job: {
+      customizations?: any;
+      s3OutputKey?: string | null;
+      nexrenderOutputUrl?: string | null;
+      outputUrl?: string | null;
+      previewUrl?: string | null;
+    } | null,
+    previewUrl?: string | null,
+    outputUrl?: string | null,
+  ): string | null {
+    const rawPreview = previewUrl ?? job?.previewUrl;
+    if (rawPreview && !rawPreview.split('?')[0].toLowerCase().endsWith('.mov')) {
+      return rawPreview;
+    }
+    const rawOutput = outputUrl ?? job?.outputUrl;
+    if (
+      rawOutput &&
+      !this.isMovOutput(job, rawOutput) &&
+      !rawOutput.split('?')[0].toLowerCase().endsWith('.mov')
+    ) {
+      return rawOutput;
+    }
+    return null;
+  }
+
+  /**
    * Helper to resolve the FFmpeg executable path.
    * 1. @ffmpeg-installer/ffmpeg with chmod 0o755 permission check on Linux/macOS
    * 2. @remotion/renderer bundled FFmpeg
@@ -2309,7 +2340,10 @@ export class RenderService {
         '2M',
         '-movflags',
         '+faststart',
-        '-an',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '128k',
         outputMp4Path,
       ];
 
@@ -2356,7 +2390,7 @@ export class RenderService {
         templateId: job.templateId,
         status: RenderStatus.COMPLETED,
         outputUrl: expired ? null : job.outputUrl,
-        previewUrl: expired ? null : (job.previewUrl || job.outputUrl),
+        previewUrl: expired ? null : this.getBrowserPlayablePreviewUrl(job),
         nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
         progress: 100,
         isExpired: expired,
@@ -2584,7 +2618,7 @@ export class RenderService {
     return {
       ...job,
       outputUrl: isExpiredJob ? null : job.outputUrl,
-      previewUrl: isExpiredJob ? null : (job.previewUrl || job.outputUrl),
+      previewUrl: isExpiredJob ? null : this.getBrowserPlayablePreviewUrl(job),
       nexrenderOutputUrl: isExpiredJob ? null : job.nexrenderOutputUrl,
       isExpired: isExpiredJob,
       progress: job.outputUrl ? 100 : 0,
@@ -2632,7 +2666,7 @@ export class RenderService {
       return {
         ...job,
         outputUrl: expired ? null : job.outputUrl,
-        previewUrl: expired ? null : (job.previewUrl || job.outputUrl),
+        previewUrl: expired ? null : this.getBrowserPlayablePreviewUrl(job),
         nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
         isExpired: expired,
       };
@@ -2821,7 +2855,7 @@ export class RenderService {
               data: {
                 status: RenderStatus.COMPLETED,
                 outputUrl: presignedUrl,
-                previewUrl: presignedUrl,
+                previewUrl: null,
                 nexrenderOutputUrl: s3Key,
                 s3OutputKey: s3Key,
                 expiresAt,
@@ -2855,8 +2889,8 @@ export class RenderService {
               `Preview transcode failed, continuing with master MOV only:`,
               transcodeErr,
             );
-            presignedPreviewUrl = presignedUrl;
-            finalPreviewKey = s3Key;
+            presignedPreviewUrl = null;
+            finalPreviewKey = null;
           }
         } catch (movErr) {
           if (bufferedComplete && !masterUploaded && existsSync(tmpMovPath)) {
@@ -2867,8 +2901,8 @@ export class RenderService {
                 'video/quicktime',
               );
               presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
-              presignedPreviewUrl = presignedUrl;
-              finalPreviewKey = s3Key;
+              presignedPreviewUrl = null;
+              finalPreviewKey = null;
             } catch {
               throw movErr;
             }
@@ -2919,7 +2953,7 @@ export class RenderService {
         data: {
           status: RenderStatus.COMPLETED,
           outputUrl: outputUrl,
-          previewUrl: outputUrl,
+          previewUrl: isMov ? null : outputUrl,
           nexrenderOutputUrl: outputUrl,
           expiresAt,
         },
@@ -2931,7 +2965,7 @@ export class RenderService {
         templateId: job.templateId,
         status: RenderStatus.COMPLETED,
         outputUrl: outputUrl,
-        previewUrl: outputUrl,
+        previewUrl: isMov ? null : outputUrl,
         nexrenderOutputUrl: outputUrl,
         expiresAt,
         isExpired: false,
@@ -3008,7 +3042,7 @@ export class RenderService {
       );
     }
 
-    return job.previewUrl || job.outputUrl || '';
+    return this.getBrowserPlayablePreviewUrl(job) || '';
   }
 
   /**

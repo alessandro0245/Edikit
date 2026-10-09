@@ -40,7 +40,10 @@ export default function MovPreview({
   className = "",
 }: MovPreviewProps) {
   const [errored, setErrored] = useState(false);
-  const resolvedPreviewUrl = explicitPreviewUrl || toMp4PreviewUrl(src);
+  const resolvedPreviewUrl =
+    explicitPreviewUrl && !explicitPreviewUrl.toLowerCase().includes(".mov")
+      ? explicitPreviewUrl
+      : toMp4PreviewUrl(explicitPreviewUrl || src);
 
   if (!resolvedPreviewUrl || errored) {
     return <Fallback className={className} />;

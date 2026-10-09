@@ -26,7 +26,6 @@ import useCustomizeLogic from "./useCustomizeLogic";
 import AnimationPreview from "@/components/Video/AnimationPreview";
 import VideoPlayer from "@/components/Video/VideoPlayer";
 import { toMp4PreviewUrl } from "@/components/MovPreview";
-import MovPreview from "@/components/MovPreview";
 import { getTemplateOrientation } from "@/utils/templateOrientation";
 import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
@@ -92,15 +91,20 @@ const CustomizePage = () => {
   }
 
   // Check if we should show rendered video or template preview
-  const showRenderedVideo =
-    renderJob?.status === "COMPLETED" && (!!renderJob.outputUrl || !!renderJob.previewUrl);
-
   const templateOrientation = getTemplateOrientation(template);
 
-  const isMovOutput = !renderJob?.previewUrl && !!renderJob?.outputUrl?.includes('.mov');
-  const renderedVideoSrc = showRenderedVideo
-    ? (renderJob?.previewUrl ?? (isMovOutput ? null : (toMp4PreviewUrl(renderJob!.outputUrl!) ?? renderJob!.outputUrl!)))
-    : null;
+  // A browser-playable preview URL (must be an MP4, never a raw ProRes MOV)
+  const previewMp4 =
+    (renderJob?.previewUrl && !renderJob.previewUrl.toLowerCase().includes(".mov"))
+      ? renderJob.previewUrl
+      : (renderJob?.outputUrl && !renderJob.outputUrl.toLowerCase().includes(".mov"))
+      ? renderJob.outputUrl
+      : toMp4PreviewUrl(renderJob?.previewUrl || renderJob?.outputUrl || "");
+
+  const showRenderedVideo =
+    renderJob?.status === "COMPLETED" && !!previewMp4;
+
+  const renderedVideoSrc = showRenderedVideo ? previewMp4 : null;
 
   // Group fields into categories
   const textFields = Object.entries(template.fields).filter(
@@ -187,13 +191,7 @@ const CustomizePage = () => {
                   className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all"
                   style={{ aspectRatio: previewRatio }}
                 >
-                  {showRenderedVideo && isMovOutput ? (
-                    <MovPreview
-                      src={renderJob!.outputUrl!}
-                      previewUrl={renderJob?.previewUrl}
-                      className="h-full w-full rounded-none"
-                    />
-                  ) : showRenderedVideo && renderedVideoSrc ? (
+                  {showRenderedVideo && renderedVideoSrc ? (
                     <VideoPlayer
                       src={renderedVideoSrc}
                       autoPlay
