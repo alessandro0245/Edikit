@@ -896,8 +896,9 @@ export class RenderService {
     assets: Array<{
       type: string;
       layerName?: string;
+      composition?: string;
       property?: string;
-      value?: string | number | number[] | Record<string, any>;
+      value?: string | number | boolean | number[] | Record<string, any>;
       src?: string;
       name?: string;
       params?: Record<string, any>;
@@ -1415,7 +1416,7 @@ export class RenderService {
       layerName?: string;
       composition?: string;
       property?: string;
-      value?: string | number | number[] | Record<string, any>;
+      value?: string | number | boolean | number[] | Record<string, any>;
       src?: string;
       name?: string;
       params?: Record<string, any>;
@@ -1427,7 +1428,7 @@ export class RenderService {
       layerName?: string;
       composition?: string;
       property?: string;
-      value?: string | number | number[] | Record<string, any>;
+      value?: string | number | boolean | number[] | Record<string, any>;
       src?: string;
       name?: string;
       params?: Record<string, any>;
@@ -1782,6 +1783,13 @@ export class RenderService {
     if (templateId === 8 && buttonColorHex) {
       const buttonLayer = layerMapping.buttonColor || 'shape_3';
       const rgbButton = this.hexToRgb(buttonColorHex);
+      assets.push({
+        type: 'data',
+        layerName: buttonLayer,
+        composition: 'nested_sequence_2',
+        property: 'ADBE Effect Parade.ADBE Change To Color.enabled',
+        value: true,
+      });
       assets.push({
         type: 'data',
         layerName: buttonLayer,
