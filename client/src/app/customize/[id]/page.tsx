@@ -91,6 +91,9 @@ const CustomizePage = () => {
   }
 
   // Check if we should show rendered video or template preview
+  const isJobCompleted =
+    renderJob?.status === "COMPLETED" && (!!renderJob.outputUrl || !!renderJob.previewUrl);
+
   const templateOrientation = getTemplateOrientation(template);
 
   // A browser-playable preview URL (must be an MP4, never a raw ProRes MOV)
@@ -101,9 +104,7 @@ const CustomizePage = () => {
       ? renderJob.outputUrl
       : toMp4PreviewUrl(renderJob?.previewUrl || renderJob?.outputUrl || "");
 
-  const showRenderedVideo =
-    renderJob?.status === "COMPLETED" && !!previewMp4;
-
+  const showRenderedVideo = isJobCompleted && !!previewMp4;
   const renderedVideoSrc = showRenderedVideo ? previewMp4 : null;
 
   // Group fields into categories
@@ -871,7 +872,7 @@ const CustomizePage = () => {
             {/* Generate/Download Button (Always accessible below categories) */}
             {authLoading ? (
               <div className="w-full h-12 rounded-lg bg-gray-300 dark:bg-gray-700 animate-pulse" />
-            ) : showRenderedVideo ? (
+            ) : isJobCompleted ? (
               <div className="space-y-3">
                 <EdikitButton
                   onClick={handleDownload}

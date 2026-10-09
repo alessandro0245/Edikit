@@ -2842,8 +2842,7 @@ export class RenderService {
           presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
           this.logger.log(`Master MOV uploaded to S3: ${s3Key}`);
 
-          // Early checkpoint: Mark job COMPLETED with pristine MOV immediately
-          // Guarantees user is never stuck at 99% if preview pass encounters an issue
+          // Early checkpoint: Save master MOV to database
           try {
             const user = await this.prisma.user.findUnique({
               where: { id: job.userId },
@@ -2853,16 +2852,14 @@ export class RenderService {
             await this.prisma.renderJob.update({
               where: { id: job.id },
               data: {
-                status: RenderStatus.COMPLETED,
                 outputUrl: presignedUrl,
-                previewUrl: null,
                 nexrenderOutputUrl: s3Key,
                 s3OutputKey: s3Key,
                 expiresAt,
               },
             });
           } catch (checkpointErr) {
-            this.logger.warn(`Failed to write early completion checkpoint:`, checkpointErr);
+            this.logger.warn(`Failed to write early master MOV checkpoint:`, checkpointErr);
           }
 
           // 2. Transcode preview MP4
