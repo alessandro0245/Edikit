@@ -36,11 +36,18 @@ export const resizeVideo = async (
   targetHeight: number,
   onProgress?: (progress: number) => void,
   maxSizeBytes?: number,
+  onQueued?: (queuePosition: number) => void,
+  onStart?: () => void,
 ): Promise<File> => {
   const limit = maxSizeBytes ?? 200 * 1024 * 1024;
   if (file.size > limit) {
     const limitMB = Math.round(limit / (1024 * 1024));
     throw new Error(`File size exceeds ${limitMB}MB. Only files under ${limitMB}MB are accepted.`);
+  }
+
+  const isQueued = isProcessing;
+  if (isQueued && onQueued) {
+    onQueued(queue.length + 1);
   }
 
   await new Promise<void>((resolve) => {
@@ -51,6 +58,10 @@ export const resizeVideo = async (
       queue.push(resolve);
     }
   });
+
+  if (onStart) {
+    onStart();
+  }
 
   try {
     const ffmpeg = await getFFmpeg();

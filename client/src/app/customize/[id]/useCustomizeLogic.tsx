@@ -88,6 +88,9 @@ export const useCustomizeLogic = () => {
   const [videoResizeProgress, setVideoResizeProgress] = useState<{
     [key: string]: number;
   }>({});
+  const [queuedVideos, setQueuedVideos] = useState<{
+    [key: string]: number;
+  }>({});
 
   /**
    * cropPending[fieldKey] = CropState means the field is waiting for user crop.
@@ -624,7 +627,6 @@ export const useCustomizeLogic = () => {
               height,
             );
             if (!isValid) {
-              showInfoToast("Resizing video to fit template dimensions...");
               try {
                 processedFile = await resizeVideo(
                   processedFile,
@@ -637,6 +639,28 @@ export const useCustomizeLogic = () => {
                     }));
                   },
                   maxBytes,
+                  (queuePosition) => {
+                    setQueuedVideos((prev) => ({
+                      ...prev,
+                      [fieldKey]: queuePosition,
+                    }));
+                    showInfoToast(
+                      "Video in queue",
+                      "Will resize automatically once the current video finishes.",
+                    );
+                  },
+                  () => {
+                    setQueuedVideos((prev) => {
+                      const next = { ...prev };
+                      delete next[fieldKey];
+                      return next;
+                    });
+                    setVideoResizeProgress((prev) => ({
+                      ...prev,
+                      [fieldKey]: 0,
+                    }));
+                    showInfoToast("Resizing video to fit template dimensions...");
+                  },
                 );
               } catch (resizeErr) {
                 console.error("Video auto-resize failed", resizeErr);
@@ -644,6 +668,11 @@ export const useCustomizeLogic = () => {
                   "Video resize failed, uploading original file instead.",
                 );
               } finally {
+                setQueuedVideos((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
                 setVideoResizeProgress((prev) => {
                   const next = { ...prev };
                   delete next[fieldKey];
@@ -917,7 +946,6 @@ export const useCustomizeLogic = () => {
               height,
             );
             if (!isValid) {
-              showInfoToast("Resizing video to fit template dimensions...");
               try {
                 processedFile = await resizeVideo(
                   processedFile,
@@ -930,6 +958,28 @@ export const useCustomizeLogic = () => {
                     }));
                   },
                   maxBytes,
+                  (queuePosition) => {
+                    setQueuedVideos((prev) => ({
+                      ...prev,
+                      [fieldKey]: queuePosition,
+                    }));
+                    showInfoToast(
+                      "Video in queue",
+                      "Will resize automatically once the current video finishes.",
+                    );
+                  },
+                  () => {
+                    setQueuedVideos((prev) => {
+                      const next = { ...prev };
+                      delete next[fieldKey];
+                      return next;
+                    });
+                    setVideoResizeProgress((prev) => ({
+                      ...prev,
+                      [fieldKey]: 0,
+                    }));
+                    showInfoToast("Resizing video to fit template dimensions...");
+                  },
                 );
               } catch (resizeErr) {
                 console.error("Video auto-resize failed", resizeErr);
@@ -937,6 +987,11 @@ export const useCustomizeLogic = () => {
                   "Video resize failed, uploading original file instead.",
                 );
               } finally {
+                setQueuedVideos((prev) => {
+                  const next = { ...prev };
+                  delete next[fieldKey];
+                  return next;
+                });
                 setVideoResizeProgress((prev) => {
                   const next = { ...prev };
                   delete next[fieldKey];
@@ -1332,6 +1387,7 @@ export const useCustomizeLogic = () => {
     setFormData,
     setUploadingAssets,
     videoResizeProgress,
+    queuedVideos,
     deletingAssets,
     // Crop
     cropPending,

@@ -7,6 +7,7 @@ import {
   Sparkles,
   Download,
   Loader2,
+  Clock,
   X,
   CheckCircle,
   AlertCircle,
@@ -79,6 +80,7 @@ const CustomizePage = () => {
     setSelectedFont,
     setImagePreviewReady,
     videoResizeProgress,
+    queuedVideos,
     deletingAssets,
     cropPending,
     applyCrop,
@@ -355,6 +357,8 @@ const CustomizePage = () => {
                       {mediaFields.map(([fieldKey, field]) => {
                         const hasFile =
                           filePreviews[fieldKey] || uploadedAssets[fieldKey];
+                        const isQueued =
+                          queuedVideos[fieldKey] !== undefined;
                         const isResizing =
                           videoResizeProgress[fieldKey] !== undefined;
                         const isCropping = !!cropPending[fieldKey];
@@ -379,6 +383,18 @@ const CustomizePage = () => {
                                 }
                                 onCancel={() => cancelCrop(fieldKey)}
                               />
+                            ) : isQueued ? (
+                              <div className="rounded-xl border border-dashed border-primary/40 bg-primary/[0.03] p-5 flex flex-col items-center justify-center gap-2 min-h-[110px] text-center transition-all animate-in fade-in-50">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-5 h-5 text-primary animate-pulse" />
+                                  <span className="text-xs font-semibold text-foreground">
+                                    Waiting in queue...
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground max-w-[220px]">
+                                  Will start resizing automatically once the current video finishes.
+                                </p>
+                              </div>
                             ) : isResizing ? (
                               <div className="rounded-xl border border-border p-5 flex flex-col items-center justify-center gap-2 min-h-[110px]">
                                 <Loader2 className="w-6 h-6 animate-spin text-primary" />
