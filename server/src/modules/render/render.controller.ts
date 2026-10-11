@@ -49,7 +49,7 @@ export class RenderController {
   @Post('upload-asset')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
-      limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max per file
+      limits: { fileSize: 200 * 1024 * 1024 }, // 200MB max per file (supports dynamic duration * 20MB/s)
     }),
   )
   @ApiOperation({ summary: 'Upload user images/videos to Cloudinary' })
@@ -95,7 +95,7 @@ export class RenderController {
   @Post('upload-video')
   @UseInterceptors(
     FilesInterceptor('files', 5, {
-      limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max per file
+      limits: { fileSize: 200 * 1024 * 1024 }, // 200MB max per file (supports dynamic duration * 20MB/s)
     }),
   )
   @ApiOperation({ summary: 'Upload user videos to Cloudinary' })

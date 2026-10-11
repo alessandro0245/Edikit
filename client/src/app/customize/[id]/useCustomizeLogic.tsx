@@ -10,6 +10,7 @@ import {
   showSuccessToast,
 } from "@/components/Toast/showToast";
 import { resizeVideo } from "@/utils/videoResize";
+import { getUploadLimit } from "@/utils/uploadLimit";
 import { type FontId } from "@/components/FontPicker/FontPicker";
 
 interface FormDataState {
@@ -482,10 +483,24 @@ export const useCustomizeLogic = () => {
     file: File,
     inputElement?: HTMLInputElement,
   ) => {
-    // ── Enforce file size limit (50MB max) ──
-    const MAX_FILE_SIZE = 50 * 1024 * 1024;
-    if (file.size > MAX_FILE_SIZE) {
-      showErrorToast("File size exceeds 50MB. Only files under 50MB are accepted.");
+    // ── Enforce dynamic file size limit (20MB/s for video, 50MB for image) ──
+    const { maxBytes, maxMB, durationSeconds, isVideo } = getUploadLimit(
+      file,
+      template,
+      fieldKey,
+    );
+    if (file.size > maxBytes) {
+      if (isVideo) {
+        showErrorToast(
+          "File too large",
+          `Max size is ${maxMB}MB for this template`,
+        );
+      } else {
+        showErrorToast(
+          "File too large",
+          `Max size is ${maxMB}MB`,
+        );
+      }
       if (inputElement) inputElement.value = "";
       return;
     }
@@ -621,6 +636,7 @@ export const useCustomizeLogic = () => {
                       [fieldKey]: progress,
                     }));
                   },
+                  maxBytes,
                 );
               } catch (resizeErr) {
                 console.error("Video auto-resize failed", resizeErr);
@@ -666,10 +682,24 @@ export const useCustomizeLogic = () => {
   ) => {
     if (!file) return;
 
-    // ── Enforce file size limit (50MB max) ──
-    const MAX_FILE_SIZE = 50 * 1024 * 1024;
-    if (file.size > MAX_FILE_SIZE) {
-      showErrorToast("File size exceeds 50MB. Only files under 50MB are accepted.");
+    // ── Enforce dynamic file size limit (20MB/s for video, 50MB for image) ──
+    const { maxBytes, maxMB, durationSeconds, isVideo } = getUploadLimit(
+      file,
+      template,
+      fieldKey,
+    );
+    if (file.size > maxBytes) {
+      if (isVideo) {
+        showErrorToast(
+          "File too large",
+          `Max size is ${maxMB}MB for this template`,
+        );
+      } else {
+        showErrorToast(
+          "File too large",
+          `Max size is ${maxMB}MB`,
+        );
+      }
       if (inputElement) inputElement.value = "";
       return;
     }
@@ -899,6 +929,7 @@ export const useCustomizeLogic = () => {
                       [fieldKey]: progress,
                     }));
                   },
+                  maxBytes,
                 );
               } catch (resizeErr) {
                 console.error("Video auto-resize failed", resizeErr);

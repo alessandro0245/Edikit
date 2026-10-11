@@ -519,11 +519,12 @@ const CustomizePage = () => {
                                 <p className="text-xs font-medium text-foreground">
                                   {field.label}
                                 </p>
-                                {field.dimensions && (
-                                  <p className="text-[11px] text-muted-foreground/80 mt-0.5">
-                                    {field.dimensions}
-                                  </p>
-                                )}
+                                <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                                  {field.dimensions ? `${field.dimensions} · ` : ""}
+                                  {field.type === "video" || field.type === "media"
+                                    ? `Max ${(field.duration || template?.duration || 6) * 20}MB`
+                                    : "Max 50MB"}
+                                </p>
                               </FileDropZone>
                             )}
                           </div>

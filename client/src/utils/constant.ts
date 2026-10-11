@@ -92,6 +92,7 @@ export interface Template {
   description?: string;
   previewUrl: string;
   thumbnail?: string;
+  duration?: number; // Duration in seconds (e.g. 5, 6, 7, 20)
   hasTransprentBackground?: boolean;
   hasBlurEffect?: boolean;
   fields: {
@@ -102,6 +103,7 @@ export interface Template {
       maxLength?: number;
       dimensions?: string;
       videoDimensions?: string;
+      duration?: number; // Video slot duration override in seconds
       required: boolean;
     };
   };
@@ -113,6 +115,7 @@ export const templates: Template[] = [
     name: "Two Cards Linked Together",
     previewUrl: "/previews/animation-1.mp4",
     thumbnail: "/previews/animation 1.png",
+    duration: 6,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -145,6 +148,7 @@ export const templates: Template[] = [
     name: "Card Tree Branch Layout",
     previewUrl: "/previews/animation-2.mp4",
     thumbnail: "/previews/animation 2.png",
+    duration: 6,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -193,6 +197,7 @@ export const templates: Template[] = [
     name: "Swipeable Stack of Cards",
     previewUrl: "/previews/animation-3.mp4",
     thumbnail: "/previews/animation 3.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -238,6 +243,7 @@ export const templates: Template[] = [
     name: "Product Price Showcase Card",
     previewUrl: "/previews/animation-4.mp4",
     thumbnail: "/previews/animation 4.png",
+    duration: 7,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -274,6 +280,7 @@ export const templates: Template[] = [
     name: "Google Search Results Layout",
     previewUrl: "/previews/animation-5.mp4",
     thumbnail: "/previews/animation 5.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -331,6 +338,7 @@ export const templates: Template[] = [
     name: "Folder Opening Image Reveal",
     previewUrl: "/previews/animation-6.mp4",
     thumbnail: "/previews/animation 6.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -397,6 +405,7 @@ export const templates: Template[] = [
     name: "Clock with Sliding Banner",
     previewUrl: "/previews/animation-7.mp4",
     thumbnail: "/previews/animation 7.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -426,6 +435,7 @@ export const templates: Template[] = [
     name: "Dark Product Showcase Card",
     previewUrl: "/previews/animation-8.mp4",
     thumbnail: "/previews/animation 8.png",
+    duration: 7,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -457,6 +467,7 @@ export const templates: Template[] = [
     name: "Chat Message Notification Stack",
     previewUrl: "/previews/animation-9.mp4",
     thumbnail: "/previews/animation 9.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -521,6 +532,7 @@ export const templates: Template[] = [
     name: "Three Cards Linked Together",
     previewUrl: "/previews/animation-10.mp4",
     thumbnail: "/previews/animation 10.png",
+    duration: 6,
     hasTransprentBackground: true,
     hasBlurEffect: true,
     fields: {
@@ -561,6 +573,7 @@ export const templates: Template[] = [
     name: "Social Media Post",
     previewUrl: "/previews/animation-11.mp4",
     thumbnail: "/previews/animation 11.png",
+    duration: 6,
     hasTransprentBackground: false,
     hasBlurEffect: true,
     fields: {
@@ -599,6 +612,7 @@ export const templates: Template[] = [
     name: "Creator Channel Subscribe Header",
     previewUrl: "/previews/animation-12.mp4",
     thumbnail: "/previews/animation 12.png",
+    duration: 4,
     hasTransprentBackground: false,
     hasBlurEffect: true,
     fields: {
@@ -636,6 +650,7 @@ export const templates: Template[] = [
     name: "Pinned Calendar Event Card",
     previewUrl: "/previews/animation-13.mp4",
     thumbnail: "/previews/animation 13.png",
+    duration: 4,
     hasTransprentBackground: false,
     hasBlurEffect: true,
     fields: {
@@ -667,6 +682,7 @@ export const templates: Template[] = [
     name: "Single Line Bouncing Text",
     previewUrl: "/previews/animation-14.mp4",
     thumbnail: "/previews/animation 14.png",
+    duration: 5,
     hasTransprentBackground: true,
     hasBlurEffect: false,
     fields: {
@@ -693,6 +709,7 @@ export const templates: Template[] = [
     name: "Two-Post Social Thread",
     previewUrl: "/previews/animation-15.mp4",
     thumbnail: "/previews/animation 15.png",
+    duration: 7,
     hasTransprentBackground: false,
     hasBlurEffect: true,
     fields: {
@@ -757,6 +774,7 @@ export const templates: Template[] = [
     name: "Social Video Player Card",
     previewUrl: "/previews/animation-16.mp4",
     thumbnail: "/previews/animation 16.png",
+    duration: 7,
     hasTransprentBackground: false,
     hasBlurEffect: true,
     fields: {

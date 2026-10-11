@@ -39,15 +39,27 @@ export class CloudinaryService {
     options: UploadOptions = {},
   ): Promise<UploadResult> {
     return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: options.resource_type || 'auto',
-          folder: options.folder || 'edikit',
-          public_id: options.public_id,
-          overwrite: options.overwrite || false,
-          invalidate: options.invalidate || true,
-        },
-        (error, result) => {
+      const isLargeFile = buffer.length > 100 * 1024 * 1024;
+      const uploaderFn =
+        isLargeFile && typeof (cloudinary.uploader as any).upload_chunked_stream === 'function'
+          ? (cloudinary.uploader as any).upload_chunked_stream.bind(cloudinary.uploader)
+          : cloudinary.uploader.upload_stream.bind(cloudinary.uploader);
+
+      const uploadOptions: Record<string, any> = {
+        resource_type: options.resource_type || 'auto',
+        folder: options.folder || 'edikit',
+        public_id: options.public_id,
+        overwrite: options.overwrite || false,
+        invalidate: options.invalidate || true,
+      };
+
+      if (isLargeFile && typeof (cloudinary.uploader as any).upload_chunked_stream === 'function') {
+        uploadOptions.chunk_size = 20 * 1024 * 1024;
+      }
+
+      const uploadStream = uploaderFn(
+        uploadOptions,
+        (error: any, result: any) => {
           if (error) {
             reject(error);
           } else if (result) {
