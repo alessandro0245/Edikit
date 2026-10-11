@@ -93,11 +93,11 @@ export const resizeVideo = async (
         "-i", inputName,
         "-vf", `scale=w=${scaledWidth}:h=${scaledHeight}:force_original_aspect_ratio=increase,crop=${targetWidth}:${targetHeight}`,
         "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-crf", "28",
-        "-c:a", "aac",        // ← changed from copy to aac for compatibility
-        "-b:a", "128k",
-        "-movflags", "+faststart",  // ← better for web playback
+        "-preset", "veryfast",
+        "-crf", "17",               // Near-lossless visual quality (preserves fine details)
+        "-c:a", "aac",
+        "-b:a", "192k",
+        "-movflags", "+faststart",  // Better for web playback
         outputName,
       ]);
 
