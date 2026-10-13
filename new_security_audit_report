@@ -1,0 +1,1021 @@
+# Edikit — Full Production Security Audit
+
+**Audited:** 2026-10-01 | **Scope:** `server/` (NestJS) + `client/` (Next.js 16)
+
+> [!NOTE]
+> **Dev Environment Note:** The `.env` secrets found during this audit (`server/.env`, `client/.env`) are **development-only values** used locally. They are **not committed** to the git repository (confirmed via full history scan). No action needed on these specific values — but the patterns and configurations flagged below still need fixing before production deployment.
+
+---
+
+## Section 1 — Dependency Audit
+
+> [!NOTE]
+> Configured npm mirror (`npmmirror.com`) does not expose the advisory bulk endpoint — `pnpm audit` errored. Analysis based on manual version review.
+
+**Koi critical CVE nahi mili** declared versions mein. Argon2 ^0.44, NestJS ^11, Prisma ^7, Stripe ^20, Next ^16, Axios ^1.13 — sab current hain.
+
+**Low-risk flag:** `passport-jwt` v4.0.1 — 2+ saal se update nahi hua. Abhi safe hai, monitor karo.
+
+**Koi unused package nahi mila.**
+
+---
+
+## Section 2 — Secrets and Credentials
+
+### F-001 — Dev-Only / Informational: `.env` files contain development credentials
+
+**SEVERITY:** Informational (Dev Only)
+**FILE:** `server/.env`, `client/.env`
+
+> [!NOTE]
+> **These are development-only values.** Git history scan ne confirm kiya ke yeh files kabhi commit nahi hui. Production deploy ke time real secrets ko environment variables (Render dashboard, Vercel dashboard) mein set karo — source code ya `.env` files mein nahi.
+
+**Masla (Problem):** Agar kabhi bhi `.env` file accidentally commit ho jaye, to saray API keys public ho jayenge.
+
+**Anjam (Consequences if not addressed before production):**
+- Database access — koi bhi production DB read/write kar sakta hai
+- AWS keys — attacker Lambda functions run kar ke aapka bill lakh rupay tak le ja sakta hai
+- Stripe key — fake payments ya refunds generate ho sakte hain
+- Claude API key — aapka AI quota exhaust ho jata hai, cost aati hai
+
+**Fix — Production ke liye:**
+```bash
+# .env kabhi bhi commit mat karo
+# Production secrets sirf deployment platform ke env vars mein dalo:
+# Render Dashboard → Environment → Add Environment Variable
+```
+
+**Root `.gitignore` guard (ensure karo):**
+```gitignore
+# Root .gitignore
+**/.env
+**/.env.*
+!**/.env.example
+```
+
+---
+
+### F-002 — High: JWT Secret Weak Entropy
+
+**SEVERITY:** High
+**FILE:** `server/.env` line 11
+
+**Masla (Roman Urdu):**
+JWT secret jo likha hai wo bahut simple aur short hai. Yeh ek secret key hoti hai jo authentication tokens sign karne ke liye use hoti hai. Agar yeh weak ho to attacker fake tokens bana sakta hai.
+
+**Anjam (Consequences):**
+- Attacker apna khud ka JWT token sign kar sakta hai kisi bhi user ke naam par
+- Bina password ke kisi ka bhi account access ho sakta hai
+- ADMIN role ka token bhi forge kiya ja sakta hai — full system access
+
+**Current (Weak):**
+```env
+JWT_SECRET=d21212324qbuhvr78ff378asui27813bhc89cmu89  # 40 chars, pattern wala — weak
+```
+
+**Fix — Production ke liye (64-byte cryptographically random):**
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+```env
+JWT_SECRET=<upar wale command ka output — kabhi share mat karo>
+```
+
+---
+
+## Section 3 — Environment Variables
+
+### F-003 — Medium: `NEXT_PUBLIC_IUBENDA_API_KEY` Client-Side Exposed
+
+**SEVERITY:** Medium
+**FILE:** `client/.env` line 2, `client/src/app/layout.tsx` line 43
+
+**Masla (Roman Urdu):**
+`NEXT_PUBLIC_` prefix wali har variable JavaScript bundle mein ja ke browser mein dikhti hai. Iubenda key by design semi-public hoti hai — isliye yeh Iubenda ke liye theek hai. Lekin koi bhi aur sensitive key `NEXT_PUBLIC_` prefix ke saath nahi honi chahiye.
+
+**Anjam (Consequences if sensitive key added here by mistake):**
+- Koi bhi user browser DevTools mein jakar secret key dekh sakta hai
+- API abuse ya impersonation possible hai
+
+**Fix:** Iubenda key ke liye acceptable hai — document karo ke yeh intentional hai. Koi aur key `NEXT_PUBLIC_` se shuru mat karo.
+
+---
+
+### F-004 — Medium: Backend URL `NEXT_PUBLIC_` Fallback in `next.config.ts`
+
+**SEVERITY:** Medium
+**FILE:** `client/next.config.ts`
+**LINE:** 63
+
+**Masla (Roman Urdu):**
+`next.config.ts` mein backend URL fetch karte waqt `NEXT_PUBLIC_BACKEND_URL` ko fallback ke taur par use kiya ja raha hai. Yeh variable browser JS mein bhi available hota hai — agar production backend URL koi internal/private address ho to wo bhi expose ho jata hai.
+
+**Anjam (Consequences):**
+- Internal server IP ya hostname publicly expose ho sakta hai
+- Attacker internal network topology samajh sakta hai
+
+**Current (Problematic):**
+```ts
+const rawBackendUrl =
+  process.env.BACKEND_API_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||  // <- ye wali line hatao
+  "http://localhost:8000";
+```
+
+**Fix (`next.config.ts` lines 62-65):**
+```ts
+const rawBackendUrl =
+  process.env.BACKEND_API_URL ||
+  "http://localhost:8000";
+const backendUrl = rawBackendUrl.replace(/\/+$/, "");
+```
+
+---
+
+## Section 4 — Authentication and Session Security
+
+### F-006 — High: JWT Token URL Mein Leak Ho Raha Hai (Google OAuth Callback)
+
+**SEVERITY:** High
+**FILE:** `server/src/modules/auth/auth.controller.ts`
+**LINE:** 115-118
+
+**Masla (Roman Urdu):**
+Google login ke baad user ko redirect kiya jata hai lekin JWT token URL ke andar `?token=...` ke saath laga diya jata hai. Yeh bahut badi security galti hai kyunke:
+- Browser history mein token save ho jata hai
+- Server access logs mein token likhta hai
+- Agar callback page pe koi third-party script ho (Google Analytics, etc.) to unhe `Referer` header se token mil jata hai
+
+**Anjam (Consequences):**
+- Koi bhi jo browser history dekh sake (shared computer, malware) woh token le kar login kar sakta hai
+- Server logs access karne wala bhi token steal kar sakta hai
+- Token valid rahta hai puri JWT expiry tak (7 din)
+
+**Current (Vulnerable — lines 115-118):**
+```ts
+let redirectUrl = `${frontendUrl}/auth/callback?success=true`;
+if (isProduction && 'token' in authData && authData.token) {
+  // Token URL mein daal diya — YAHI MASLA HAI
+  redirectUrl = `${frontendUrl}/auth/callback?success=true&token=${encodeURIComponent(authData.token)}`;
+}
+return res.redirect(redirectUrl);
+```
+
+**Fix — Token URL se hatao. Cookie pehle se set ho chuki hai `generateTokenAndSetCookie()` mein:**
+```ts
+// auth.controller.ts — lines 115-120 replace karo:
+const redirectUrl = `${frontendUrl}/auth/callback?success=true`;
+return res.redirect(redirectUrl);
+```
+
+**`auth.service.ts` mein bhi token response se hatao (lines 238-250):**
+```ts
+// BEFORE (Problematic):
+return {
+  userId, email: user.email, fullName: user.fullName,
+  role: user.role, planType: user.planType,
+  ...(isProduction && { token }),  // <- YEH LINE HATAO
+};
+
+// AFTER (Fixed):
+return {
+  userId, email: user.email, fullName: user.fullName,
+  role: user.role, planType: user.planType,
+};
+```
+
+---
+
+### F-007 — High: `/api/auth/set-cookie` Bina Verification Ke Token Set Karta Hai
+
+**SEVERITY:** High
+**FILE:** `client/src/app/api/auth/set-cookie/route.ts`
+**LINE:** 3-30
+
+**Masla (Roman Urdu):**
+Yeh Next.js API route koi bhi string body mein receive karta hai aur use JWT cookie ki tarah set kar deta hai — bina yeh check kiye ke token genuine hai ya nahi. Koi bhi attacker apna bana hua fake token POST kar sakta hai aur system use valid samajh leta hai.
+
+**Anjam (Consequences):**
+- Attacker kisi bhi user ka impersonation kar sakta hai — sirf ek forged string bhej ke
+- ADMIN account ka bhi fake token set kiya ja sakta hai
+- Ye ek complete authentication bypass hai
+
+**Current (Vulnerable):**
+```ts
+const { token } = await request.json();
+if (!token) { ... }
+// Koi signature check nahi — koi bhi string accept ho jati hai!
+response.cookies.set("user_token", token, { httpOnly: true });
+```
+
+**Fix — JWT signature verify karo pehle (`jose` package use karo):**
+```ts
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
+
+export async function POST(request: NextRequest) {
+  try {
+    const { token } = await request.json();
+    if (!token || typeof token !== "string") {
+      return NextResponse.json({ error: "Token is required" }, { status: 400 });
+    }
+
+    // Pehle signature verify karo
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    try {
+      await jwtVerify(token, secret);
+    } catch {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const response = NextResponse.json({ success: true });
+    response.cookies.set("user_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    return response;
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+```
+
+> [!IMPORTANT]
+> `JWT_SECRET` (non-`NEXT_PUBLIC_`) client `.env` mein add karo. `jose` install karo: `npm install jose`
+
+---
+
+### F-008 — Medium: Middleware Sirf Token Expiry Check Karta Hai — Signature Nahi
+
+**SEVERITY:** Medium
+**FILE:** `client/src/proxy.ts`
+**LINE:** 4-19
+
+**Masla (Roman Urdu):**
+Next.js middleware (Edge Runtime) mein Node.js crypto available nahi hota, isliye `isTokenExpired()` sirf `exp` field check karta hai — signature verify nahi karta. Iska matlab hai ek manually crafted fake token middleware se guzar sakta hai. Lekin backend pe `JwtAuthGuard` properly verify karta hai — isliye actual data compromise nahi hoga. Yeh sirf UX layer ka masla hai.
+
+**Anjam (Consequences):**
+- Forged token se protected route ka UI render ho sakta hai
+- Lekin backend pe pehla API call fail ho jata hai — data leak nahi hota
+- Thoda confusing user experience ho sakta hai
+
+**Fix — Comment add karo clarity ke liye:**
+```ts
+// proxy.ts — isTokenExpired() se upar:
+// NOTE: Edge middleware mein Node.js crypto nahi hoti.
+// Yeh check sirf UX ke liye hai (expired sessions redirect karna).
+// Asli cryptographic verification backend JwtAuthGuard karta hai
+// har authenticated request par.
+function isTokenExpired(token: string): boolean {
+```
+
+---
+
+### F-009 — Low: JWT 7 Din Tak Valid Rehta Hai
+
+**SEVERITY:** Low
+**FILE:** `server/.env` line 12
+
+**Masla (Roman Urdu):**
+Agar kisi ka token chura liya jaye aur wo logout na kare, to attacker 7 din tak freely account use kar sakta hai. `tokenVersion` invalidation logout par kaam karta hai, lekin pre-logout theft mein 7 din bahut zyada hain.
+
+**Anjam (Consequences):**
+- Stolen token 7 din valid rahta hai
+- Shared computers ya session hijacking mein risk zyada hota hai
+
+**Fix:**
+```env
+JWT_EXPIRES_IN=1d
+```
+
+---
+
+## Section 5 — Password Security
+
+### F-011 — Medium: Password Minimum 6 Characters — Bahut Kam Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/auth/dto/register.dto.ts`
+**LINE:** 32
+
+**Masla (Roman Urdu):**
+6 character ka password bahut weak hota hai. Aaj ke powerful computers ke saath 6-character password seconds mein crack ho sakta hai — chahe Argon2id use ho. Industry standard minimum 8 characters hai.
+
+**Anjam (Consequences):**
+- Brute force attacks mein accounts crack ho sakte hain
+- Users weak passwords set kar sakte hain jaise `abc123` ya `pass12`
+- Account takeover ka risk badh jata hai
+
+**Current (Weak):**
+```ts
+@MinLength(6)  // bahut kam
+password: string;
+```
+
+**Fix (`register.dto.ts` lines 26-33):**
+```ts
+@ApiProperty({ description: 'User password (minimum 8 characters)', minLength: 8 })
+@IsString()
+@MinLength(8)
+@MaxLength(128)
+password: string;
+```
+
+---
+
+### F-012 — PASS: Argon2id Hashing ✅
+
+`hash(registerDto.password)` — Argon2id use ho raha hai. Bilkul sahi. ✅
+
+---
+
+### F-013 — PASS: Password Reset Tokens Hashed + 1 Hour Expiry ✅
+
+SHA-256 hash stored, 1-hour TTL, single-use. ✅
+
+---
+
+### F-014 — Medium: Raw Password Object Mein Pass Ho Raha Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/user/user.controller.ts`
+**LINE:** 50-52
+
+**Masla (Roman Urdu):**
+Password change karte waqt plain text password ek object mein `userService.update()` ko pass kiya ja raha hai. `UserService` hash karta hai DB save se pehle — to database safe hai. Lekin agar kabhi NestJS debug logging enable ho to yeh object log mein aa sakta hai.
+
+**Anjam (Consequences):**
+- Debug mode mein logs mein plaintext password appear ho sakta hai
+- Pattern risky hai — agar koi future developer logger add kare to security breach
+
+**Current:**
+```ts
+await this.userService.update(userId, {
+  password: updatePasswordDto.newPassword,  // Plain text object mein
+});
+```
+
+**Fix — Controller mein hi hash karo:**
+```ts
+import { hash } from 'argon2';
+
+const hashedNew = await hash(updatePasswordDto.newPassword);
+await this.userService.updateRaw(userId, { password: hashedNew });
+// updateRaw() alag method hoga jo double-hashing skip kare
+```
+
+---
+
+## Section 6 — Rate Limiting
+
+### F-015 — High: Login Endpoint 1,200 Attempts/Hour Allow Karta Hai
+
+**SEVERITY:** High
+**FILE:** `server/src/modules/auth/auth.controller.ts` line 66, `server/src/app.module.ts` lines 22-31
+
+**Masla (Roman Urdu):**
+Login pe abhi 20 requests per minute limit hai — yani ek attacker ek ghante mein **1,200 passwords try kar sakta hai**. Yeh credential stuffing attack ke liye kaafi hai. Aur yeh throttle in-memory hai — server restart hone par sab reset ho jata hai.
+
+**Anjam (Consequences):**
+- Credential stuffing attacks possible hain — leaked password lists se accounts crack ho sakte hain
+- Server restart ke baad limit reset — attack phir se shuru ho sakta hai
+- Multiple servers pe throttle kaam nahi karta (in-memory per instance)
+
+**Current (Too Permissive):**
+```ts
+@Throttle({ default: { limit: 20, ttl: 60000 } })  // 20/min = 1200/hr
+@Post('login')
+```
+
+**Fix (`auth.controller.ts` line 66):**
+```ts
+@Throttle({ default: { limit: 5, ttl: 900000 } })  // 5 attempts per 15 minutes
+@Post('login')
+```
+
+**Fix for production — Redis-backed throttle (`app.module.ts`):**
+```ts
+ThrottlerModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (cfg: ConfigService) => ({
+    throttlers: [{ name: 'default', ttl: 60000, limit: 60 }],
+    storage: new ThrottlerStorageRedisService(cfg.get<string>('REDIS_URL')),
+  }),
+}),
+```
+
+---
+
+### F-016 — Low: AI/Render Rate Limits Cost Expose Kar Sakte Hain
+
+**SEVERITY:** Low
+**FILE:** `server/src/modules/render/render.controller.ts` line 512
+
+**Masla (Roman Urdu):**
+Render job 5 per minute allowed hai. Ek malicious user ya bug ek ghante mein 300 Lambda renders trigger kar sakta hai — yeh bahut mehenga ho sakta hai.
+
+**Anjam (Consequences):**
+- AWS Lambda + S3 costs uncontrolled badh sakte hain
+- Claude API credits ek raat mein exhaust ho sakte hain
+
+**Fix:**
+```ts
+@Throttle({ default: { limit: 3, ttl: 60000 } })  // 5 se 3 per minute
+@Post('create-job/:templateId')
+```
+
+---
+
+## Section 7 — Input Validation and Sanitization
+
+### F-017 — Medium: Avatar Field Koi Bhi URL Accept Karta Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/user/dto/update-user.dto.ts` line 10-11
+
+**Masla (Roman Urdu):**
+User apna avatar URL khud set karta hai — aur koi validation nahi hai. Koi bhi URL diya ja sakta hai, including internal IP addresses. Agar server kabhi bhi avatar URL fetch kare (e.g., thumbnail generation), to SSRF (Server-Side Request Forgery) attack possible hai.
+
+**Anjam (Consequences):**
+- `http://169.254.169.254/` (AWS metadata service) fetch ho sakti hai — AWS credentials leak
+- Internal services pe requests ja sakti hain
+- `javascript:` URIs inject ho sakte hain
+
+**Current (No Validation):**
+```ts
+@IsString()
+@IsOptional()
+avatar?: string;  // Kuch bhi accept karta hai
+```
+
+**Fix (`update-user.dto.ts`):**
+```ts
+import { IsUrl, IsString, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
+
+export class UpdateProfileDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  @MaxLength(100)
+  fullName?: string;
+
+  @IsUrl({ protocols: ['https'], require_tld: true })
+  @IsOptional()
+  @MaxLength(512)
+  avatar?: string;  // Sirf valid HTTPS URLs
+}
+```
+
+---
+
+### F-018 — PASS: Global ValidationPipe `whitelist: true` ✅
+
+Unknown fields strip hote hain globally. ✅
+
+---
+
+## Section 8 — SQL Injection and ORM Safety
+
+### F-019 — PASS: Saari DB Access Prisma ORM Se — Koi Raw SQL Nahi ✅
+
+`$queryRaw`, `queryRaw`, `rawQuery` — koi result nahi mila. ✅
+
+---
+
+## Section 9 — XSS Protection
+
+### F-020 — PASS: `dangerouslySetInnerHTML` User Content Se Nahi ✅
+
+Sirf compiled `remotion/build/bundle.js` mein — application source code mein nahi. ✅
+
+---
+
+### F-021 — Medium: User Data (Email, Role) `localStorage` Mein Store Ho Raha Hai
+
+**SEVERITY:** Medium
+**FILE:** `client/src/app/prompt/[id]/usePromptLogic.ts` line 64
+**FILE:** `client/src/app/match-cut/useMatchCutLogic.ts` line 63
+**FILE:** `client/src/app/customize/[id]/useCustomizeLogic.tsx` line 112
+
+**Masla (Roman Urdu):**
+User ka pura data (email, role, planType, provider) `localStorage` mein store ho raha hai. `localStorage` page pe chalane wali **kisi bhi** JavaScript se accessible hai — including third-party packages. Agar koi XSS vulnerability mile (abhi ya future mein), to yeh saara data instantly steal ho jata hai.
+
+**Anjam (Consequences):**
+- User ka email aur role kisi bhi page script ko dikh sakta hai
+- XSS attack mein complete user profile steal ho jata hai
+- Data browser mein indefinitely store rehta hai — logout ke baad bhi
+
+**Current (Problematic):**
+```ts
+localStorage.setItem("user", JSON.stringify(data));  // Full user object
+```
+
+**Fix — Redux store use karo (pehle se project mein hai):**
+```ts
+// BEFORE:
+localStorage.setItem("user", JSON.stringify(data));
+
+// AFTER:
+dispatch(setUser(data));  // Redux authSlice mein
+```
+
+---
+
+## Section 10 — Security Headers
+
+### F-022 — High: CSP `unsafe-inline` + `unsafe-eval` — XSS Protection Zero Hai
+
+**SEVERITY:** High
+**FILE:** `client/next.config.ts`
+**LINE:** 55
+
+**Masla (Roman Urdu):**
+Content Security Policy (CSP) ek browser feature hai jo XSS attacks rokti hai. Lekin `unsafe-inline` aur `unsafe-eval` dono saath dene se CSP completely useless ho jati hai — koi bhi injected script ya `eval()` freely execute ho sakta hai.
+
+**Anjam (Consequences):**
+- XSS attack hone par CSP koi protection nahi deta
+- Injected `<script>` tags freely execute hote hain
+- `eval()` based attacks possible hain
+- Browser ki built-in XSS defense completely bypass ho jati hai
+
+**Current (Neutralized CSP):**
+```ts
+"script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;"
+// Dono directives ne CSP ko useless bana diya
+```
+
+**Short-term Fix — Kam se kam `unsafe-eval` hatao:**
+```ts
+"script-src 'self' 'unsafe-inline' https:;"
+```
+
+**Full Fix — Nonce-based CSP (Next.js 15+):**
+```ts
+// middleware.ts
+import crypto from 'crypto';
+export function middleware(request) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const csp = `script-src 'self' 'nonce-${nonce}' https://cdn.iubenda.com;`;
+  const response = NextResponse.next();
+  response.headers.set('Content-Security-Policy', csp);
+  response.headers.set('x-nonce', nonce);
+  return response;
+}
+```
+
+---
+
+### F-023 — PASS: Baqi Saare Security Headers Sahi Set Hain ✅
+
+`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` — sab theek hain `next.config.ts` mein. ✅
+
+---
+
+### F-024 — Medium: NestJS Server Helmet CSP Explicitly Configure Nahi
+
+**SEVERITY:** Medium
+**FILE:** `server/src/main.ts` line 26
+
+**Masla (Roman Urdu):**
+`helmet()` default CSP use karta hai jo REST API ke liye bahut permissive hai. API server pe koi HTML serve nahi hota, to CSP bilkul restrict honi chahiye.
+
+**Anjam (Consequences):**
+- Agar koi HTML response accidentally serve ho jaye, to XSS protection nahi hogi
+- Helmet defaults future mein change ho sakte hain — explicit config better hai
+
+**Fix (`main.ts` line 26):**
+```ts
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+}));
+```
+
+---
+
+## Section 11 — CORS Configuration
+
+### F-025 — PASS: CORS Sahi Whitelist Hai — Koi Wildcard Nahi ✅
+
+`origin: [frontendUrl]`, dev origins production mein disable, `credentials: true` wildcard ke saath nahi. ✅
+
+---
+
+## Section 12 — API Endpoint Security
+
+### F-026 — High: Template Layer Debug Endpoint Saray Users Ko Accessible Hai
+
+**SEVERITY:** High
+**FILE:** `server/src/modules/render/render.controller.ts`
+**LINE:** 667
+
+**Masla (Roman Urdu):**
+`GET /render/templates/:templateId/layers` ek debugging endpoint hai jo internal template configuration return karta hai — layer names, compositions, layer mapping. Lekin `@Roles('ADMIN')` decorator nahi hai, isliye koi bhi logged-in user yeh call kar sakta hai.
+
+**Anjam (Consequences):**
+- Internal infrastructure details expose hoti hain
+- Competitors aapki template structure copy kar sakte hain
+- Layer names se attacker render jobs mein manipulation try kar sakta hai
+
+**Current (No Role Check):**
+```ts
+// @Roles('ADMIN') missing hai!
+@Get('templates/:templateId/layers')
+async getTemplateLayers(...)
+```
+
+**Fix (`render.controller.ts` line 667):**
+```ts
+@Roles('ADMIN')  // Yeh line add karo
+@Get('templates/:templateId/layers')
+@ApiOperation({ summary: 'Get template layer names (admin debugging only)' })
+async getTemplateLayers(...)
+```
+
+---
+
+### F-027 — Medium: Font List Endpoint Saray Users Ko Accessible Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/render/render.controller.ts`
+**LINE:** 302
+
+**Masla (Roman Urdu):**
+`GET /render/fonts` NexRender Cloud se saare fonts return karta hai — yeh internal admin data hai jo sirf admins ko dikhna chahiye.
+
+**Anjam (Consequences):**
+- Internal font infrastructure expose hoti hai
+- Users yeh data exploit kar ke font-based attacks try kar sakte hain
+
+**Fix:**
+```ts
+@Roles('ADMIN')  // Add karo
+@Get('fonts')
+async listFonts() { ... }
+```
+
+---
+
+### F-028 — High: Stripe Checkout Amount Client Se Aa Raha Hai — Price Manipulation Possible
+
+**SEVERITY:** High
+**FILE:** `server/src/stripe/stripe.controller.ts`
+**LINE:** 48-53
+
+**Masla (Roman Urdu):**
+Checkout session banate waqt `amount` aur `productName` directly client (browser) se aa raha hai. Iska matlab koi bhi user **apna subscription Rs. 1 mein khareed sakta hai** — sirf request modify karke.
+
+**Anjam (Consequences):**
+- Koi bhi Pro subscription for free ya 1 cent mein le sakta hai
+- Revenue complete loss
+- Stripe account ban ho sakta hai fraud ke liye
+
+**Current (Vulnerable):**
+```ts
+return await this.stripeService.payment(
+  body.amount,       // <- Browser se aaya hua amount — attacker change kar sakta hai
+  body.productName,  // <- Browser se aaya hua name
+  body.currency || 'usd',
+  userId,
+);
+```
+
+**Fix — Server side se price lookup karo:**
+```ts
+// stripe.controller.ts
+const PLAN_PRICES: Record<string, { amount: number; productName: string }> = {
+  'pro-monthly': { amount: 2900, productName: 'Edikit Pro Monthly' },
+  'pro-yearly':  { amount: 24900, productName: 'Edikit Pro Yearly' },
+};
+
+async createCheckoutSession(@CurrentUser('userId') userId: string, @Body() body: { planId: string }) {
+  const plan = PLAN_PRICES[body.planId];
+  if (!plan) throw new BadRequestException('Invalid plan ID');
+  return await this.stripeService.payment(plan.amount, plan.productName, 'usd', userId);
+}
+```
+
+---
+
+### F-029 — PASS: Render Jobs Pe IDOR Protection Hai ✅
+
+`getJobStatus()`, `deleteRenderJob()` — dono `userId` filter karte hain. ✅
+
+---
+
+### F-030 — PASS: Admin Endpoints Properly Guarded ✅
+
+Saare template/font admin routes pe `@Roles('ADMIN')` + `RolesGuard` hai. ✅
+
+---
+
+## Section 13 — File Upload Security
+
+### F-031 — PASS: Magic Bytes Validation Render Endpoint Mein ✅
+
+`render.controller.ts` JPEG, PNG, WEBP, GIF, MP4/MOV, WebM ke actual byte signatures verify karta hai. ✅
+
+---
+
+### F-032 — High: Asset Upload MIME Header Check Karta Hai — Magic Bytes Nahi
+
+**SEVERITY:** High
+**FILE:** `server/src/modules/assets/assets.service.ts`
+**LINE:** 45-49
+
+**Masla (Roman Urdu):**
+Assets upload karte waqt file type sirf HTTP header se check hoti hai — jo completely attacker control karta hai. Agar koi `.exe` file `Content-Type: image/png` ke saath bheje, to yeh check pass kar jati hai.
+
+**Anjam (Consequences):**
+- Malicious files (viruses, scripts) server pe upload ho sakte hain
+- Agar file serve ki jaye to users ko malware download ho sakta hai
+- Server compromise possible hai
+
+**Current (Vulnerable):**
+```ts
+if (!ALLOWED_MIME_TYPES.has(mimeType)) {  // mimeType = HTTP header = attacker-controlled
+  throw new BadRequestException(...);
+}
+// .exe + Content-Type: image/png = PASS! Yeh galat hai
+```
+
+**Fix — Magic bytes validation add karo `assets.service.ts` mein:**
+```ts
+private validateMagicBytes(buffer: Buffer): boolean {
+  if (!buffer || buffer.length < 12) return false;
+  // JPEG: FF D8 FF
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return true;
+  // PNG: 89 50 4E 47
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return true;
+  // WEBP: RIFF....WEBP
+  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+      buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return true;
+  // SVG
+  const start = buffer.toString('utf-8', 0, 5);
+  if (start.startsWith('<?xml') || start.startsWith('<svg ')) return true;
+  // MP4/MOV
+  if (buffer.length >= 8) {
+    const box = buffer.toString('ascii', 4, 8);
+    if (['ftyp','moov','mdat','wide'].includes(box)) return true;
+  }
+  // WebM: 1A 45 DF A3
+  if (buffer[0] === 0x1a && buffer[1] === 0x45 && buffer[2] === 0xdf && buffer[3] === 0xa3) return true;
+  return false;
+}
+
+// uploadAsset() mein line 45 replace karo:
+if (!ALLOWED_MIME_TYPES.has(mimeType) || !this.validateMagicBytes(buffer)) {
+  throw new BadRequestException('Invalid or mismatched file type.');
+}
+```
+
+---
+
+### F-033 — PASS: File Size Limits Multer Level Pe Enforce ✅
+
+Assets: 5MB, render: 50MB, fonts: 20MB — sab `FilesInterceptor` mein set hain. ✅
+
+---
+
+## Section 14 — Debug Mode and Logging
+
+### F-034 — Medium: User Emails `console.log` Se Logs Mein Ja Rahe Hain (PII)
+
+**SEVERITY:** Medium
+**FILE:** `server/src/stripe/stripe.service.ts`
+**LINE:** 188, 337, 342, 380, 385, 414, 419, 438, 461+
+
+**Masla (Roman Urdu):**
+Stripe service mein user ka **email address** directly `console.log` mein print ho raha hai. Yeh logs Render/Heroku/Datadog jaise cloud platforms pe capture hote hain. GDPR aur CCPA ke under user emails logs mein nahi hone chahiye.
+
+**Anjam (Consequences):**
+- Log aggregators mein user emails store hote hain — data breach ka risk
+- GDPR violation — €20 million ya revenue ka 4% fine possible
+- Log export se user database leak ho sakti hai
+
+**Current (PII Logging):**
+```ts
+console.log(`✅ Credits upgraded for user ${user.email} to ${planType}`);
+// Yahan email directly print ho raha hai — YAHI MASLA HAI
+```
+
+**Fix — `console.log` ki jagah NestJS `Logger` use karo, email ki jagah `user.id`:**
+```ts
+// stripe.service.ts mein class ke andar:
+private readonly logger = new Logger(StripeService.name);
+
+// Har console.log replace karo:
+this.logger.log(`Credits upgraded: userId=${user.id} plan=${planType}`);
+this.logger.error('Webhook error', err.message);
+```
+
+---
+
+### F-035 — Medium: `auth.service.ts` Mein Full Error Object Log Ho Raha Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/auth/auth.service.ts`
+**LINE:** 454
+
+**Masla (Roman Urdu):**
+`forgotPassword` mein error object seedha log ho raha hai. Error object mein kabhi kabhi request data (jis mein email hota hai) bhi aa sakta hai.
+
+**Anjam (Consequences):**
+- User emails logs mein expose ho sakte hain
+- Stack trace se internal file paths reveal ho sakte hain
+
+**Current:**
+```ts
+console.error('ForgotPassword error (silent):', error);
+```
+
+**Fix:**
+```ts
+this.logger.error('ForgotPassword error', error instanceof Error ? error.message : String(error));
+```
+
+---
+
+### F-036 — PASS: Swagger Production Mein Disabled ✅
+
+`if(process.env.NODE_ENV !== 'production')` — sahi hai. ✅
+
+---
+
+## Section 15 — Database Access
+
+### F-037 — Medium: Database Connection Owner Role Se Hai
+
+**SEVERITY:** Medium
+**FILE:** `server/.env` line 6
+
+**Masla (Roman Urdu):**
+Database connection `neondb_owner` user se hai — yeh database ka **owner** hai. Iska matlab application ko `DROP TABLE`, `CREATE TABLE` jaise DDL permissions hain. Yeh kabhi nahi honi chahiye normal app operations ke liye.
+
+**Anjam (Consequences):**
+- Agar application hack ho jaye, attacker poora database drop kar sakta hai
+- SQL injection (agar ho jaye) se complete database destroy ho sakti hai
+- Accidental queries se critical tables delete ho sakte hain
+
+**Fix — Restricted user banao Neon mein:**
+```sql
+CREATE USER edikit_app WITH PASSWORD '<strong-random-password>';
+GRANT CONNECT ON DATABASE neondb TO edikit_app;
+GRANT USAGE ON SCHEMA public TO edikit_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO edikit_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO edikit_app;
+-- DROP, CREATE, ALTER mat do
+```
+`DATABASE_URL` mein `edikit_app` use karo. `neondb_owner` sirf migrations ke liye.
+
+---
+
+### F-038 — Low: Database Backup Retention Confirm Nahi
+
+**SEVERITY:** Low
+
+Neon free tier: 7-day PITR. Production ke liye paid plan pe longer retention ensure karo.
+
+---
+
+## Section 16 — Exposed Files and Endpoints
+
+### F-039 — Medium: `.git` Directory HTTP Se Accessible Ho Sakti Hai
+
+**SEVERITY:** Medium
+
+**Masla (Roman Urdu):**
+NestJS `process.cwd()` repo root use karta hai. Agar deployment platform static files serve kare, to `.git` folder accessible ho sakta hai — jis mein pura source code history hoti hai.
+
+**Anjam (Consequences):**
+- Poora source code history leak ho sakti hai
+- Past commits mein agar koi secret commit hua ho to wo bhi expose hoga
+- Internal architecture reveal ho jati hai
+
+**Fix — Nginx/Caddy mein:**
+```nginx
+location ~ /\.git {
+  deny all;
+  return 404;
+}
+```
+
+---
+
+### F-040 — PASS: Server `.env` Files Serve Nahi Karta ✅
+
+`app.useStaticAssets()` call nahi hoti. ✅
+
+---
+
+## Section 17 — User Access Control
+
+### F-041 — PASS: Role Checks Server-Side `RolesGuard` Se ✅
+
+`@Roles('ADMIN')` JWT payload se read karta hai — server-side validated. ✅
+
+---
+
+### F-042 — PASS: Deleted Accounts Block Hote Hain ✅
+
+`validateJwtUser` har request pe DB query karta hai — deleted user null return karta hai → `UnauthorizedException`. ✅
+
+---
+
+### F-043 — Medium: Account Delete Karte Waqt Session Invalidate Nahi Hoti
+
+**SEVERITY:** Medium
+**FILE:** `server/src/modules/user/user.controller.ts`
+**LINE:** 57-68
+
+**Masla (Roman Urdu):**
+Account delete karte waqt `tokenVersion` increment nahi hota — sirf DB se user delete hota hai aur cookie clear hoti hai. In-flight requests technically error-prone ho sakte hain.
+
+**Anjam (Consequences):**
+- Agar delete ke waqt koi request in-flight ho to unpredictable behavior ho sakta hai
+- Cleaner session invalidation best practice hai
+
+**Current:**
+```ts
+await this.userService.delete(userId);
+clearAuthCookie(res, this.configService);
+// tokenVersion increment nahi hua
+```
+
+**Fix:**
+```ts
+@Delete('account')
+async deleteAccount(@Request() req, @Response({ passthrough: true }) res) {
+  const userId = req.user.userId;
+  await this.authService.invalidateUserSessions(userId).catch(() => {});  // Pehle invalidate karo
+  await this.userService.delete(userId);
+  clearAuthCookie(res, this.configService);
+  return { success: true, message: 'Account deleted successfully' };
+}
+```
+
+---
+
+---
+
+# Prioritized Fix List — Severity Ke Hisaab Se
+
+## Critical — 24 Ghante Mein (Before Production)
+
+| ID | File | Masla | Anjam Agar Na Kiya |
+|----|------|-------|-------------------|
+| F-001 | `server/.env` | Dev secrets in plaintext files | Production mein real secrets commit ho sakte hain |
+
+---
+
+## High — Agla Deploy Karne Se Pehle
+
+| ID | File:Line | Masla | Anjam Agar Na Kiya |
+|----|----------|-------|-------------------|
+| F-006 | `auth.controller.ts:117` | JWT URL mein leak | Token steal → account hijack (7 din tak) |
+| F-007 | `set-cookie/route.ts:14` | Fake JWT accept karta hai | Complete auth bypass — koi bhi admin ban sakta hai |
+| F-015 | `auth.controller.ts:66` | 1,200 login attempts/hour | Password brute force attacks possible |
+| F-022 | `next.config.ts:55` | CSP nullified | XSS attack mein koi protection nahi |
+| F-026 | `render.controller.ts:667` | Internal debug data expose | Infrastructure leak, competitor copy |
+| F-028 | `stripe.controller.ts:48` | Amount client se — manipulation | Pro subscription for free lena possible |
+| F-032 | `assets.service.ts:45` | MIME header check — not magic bytes | .exe files upload possible |
+| F-002 | `server/.env:11` | Weak JWT secret | JWT tokens forge kiye ja sakte hain |
+
+---
+
+## Medium — Ek Sprint Mein
+
+| ID | File:Line | Masla | Anjam Agar Na Kiya |
+|----|----------|-------|-------------------|
+| F-004 | `next.config.ts:63` | Internal URL `NEXT_PUBLIC_` mein | Internal server address expose |
+| F-011 | `register.dto.ts:32` | Password min 6 chars | Weak passwords, brute force easy |
+| F-014 | `user.controller.ts:50` | Raw password object mein | Debug logs mein plaintext |
+| F-017 | `update-user.dto.ts:10` | Avatar koi bhi URL | SSRF attack possible |
+| F-021 | `usePromptLogic.ts:64` | User PII localStorage mein | XSS mein complete profile steal |
+| F-024 | `main.ts:26` | Helmet CSP explicit nahi | API server CSP weak |
+| F-027 | `render.controller.ts:302` | Font list saray users ko | Internal infra expose |
+| F-034 | `stripe.service.ts:188+` | Email console.log mein | GDPR violation, PII leak |
+| F-035 | `auth.service.ts:454` | Full error object log | User data logs mein |
+| F-037 | `server/.env:6` | DB owner role use | DROP TABLE possible if hacked |
+| F-039 | Deployment | `.git` HTTP pe accessible | Full source history leak |
+| F-043 | `user.controller.ts:57` | Delete pe session invalidate nahi | In-flight request issues |
+
+---
+
+## Low — Agli Hardening Cycle Mein
+
+| ID | File | Masla | Anjam Agar Na Kiya |
+|----|------|-------|-------------------|
+| F-009 | `.env:12` | JWT 7 din valid | Stolen token 7 din kaam karta hai |
+| F-016 | `render.controller.ts:512` | AI rate limits | Cost runaway possible |
+| F-008 | `proxy.ts:4` | No comment on signature limitation | Future developer confusion |
+| F-038 | Infrastructure | DB backup retention | Data loss in disaster |
+| F-010 | `google.strategy.ts` | Passport state/CSRF undocumented | Future developer may remove accidentally |

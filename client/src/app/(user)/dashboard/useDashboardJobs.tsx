@@ -10,6 +10,8 @@ export interface DashboardJob {
   title: string;
   subtitle: string;
   status: RenderJobRecord["status"];
+  previewStatus?: RenderJobRecord["previewStatus"];
+  previewError?: string | null;
   createdLabel: string;
   renderTimeLabel: string;
   outputUrl: string | null;
@@ -108,6 +110,8 @@ export const useDashboardJobs = () => {
           title: resolveTitle(job),
           subtitle: `${resolveSubtitle(job)} · ${statusLabels[job.status]}`,
           status: job.status,
+          previewStatus: job.previewStatus,
+          previewError: job.previewError,
           createdLabel: formatRelativeDate(job.createdAt),
           renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
           outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),

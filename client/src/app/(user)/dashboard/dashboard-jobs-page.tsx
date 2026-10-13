@@ -582,21 +582,31 @@ export default function DashboardJobsPage() {
 
             <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.8fr)]">
               <div className="overflow-hidden rounded-xl border border-border bg-black">
-                {previewJob.outputUrl || previewJob.previewUrl ? (
-                  previewJob.previewUrl && !isMovUrl(previewJob.previewUrl) ? (
-                    <VideoPlayer
-                      src={previewJob.previewUrl}
-                      autoPlay
-                      loop
-                      muted
-                      controls
-                      variant="minimal"
-                      aspectRatio="none"
-                      showDownload={false}
-                      showFullscreen
-                      className="max-h-[70vh] w-full rounded-none"
-                    />
-                  ) : isMovUrl(previewJob.outputUrl) ? (
+                {previewJob.previewUrl && !isMovUrl(previewJob.previewUrl) ? (
+                  <VideoPlayer
+                    src={previewJob.previewUrl}
+                    autoPlay
+                    loop
+                    muted
+                    controls
+                    variant="minimal"
+                    aspectRatio="none"
+                    showDownload={false}
+                    showFullscreen
+                    className="max-h-[70vh] w-full rounded-none"
+                  />
+                ) : previewJob.previewStatus === "PROCESSING" || previewJob.previewStatus === "PENDING" ? (
+                  <div className="flex min-h-80 flex-col items-center justify-center p-6 text-center space-y-3 bg-muted/20">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    <p className="font-semibold text-foreground text-sm">
+                      Your preview is being prepared.
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-xs">
+                      Your original video is available for immediate download on the right.
+                    </p>
+                  </div>
+                ) : previewJob.outputUrl || previewJob.previewUrl ? (
+                  isMovUrl(previewJob.outputUrl) ? (
                     <MovPreview
                       src={previewJob.outputUrl!}
                       previewUrl={previewJob.previewUrl}

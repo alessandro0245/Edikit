@@ -1,6 +1,7 @@
 import api from "./api";
 
 export type RenderJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+export type PreviewJobStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 export type RenderJobType = "TEMPLATE" | "AI_PROMPT";
 
 export interface RenderJobRecord {
@@ -8,6 +9,8 @@ export interface RenderJobRecord {
   templateId: number | null;
   renderType: RenderJobType;
   status: RenderJobStatus;
+  previewStatus?: PreviewJobStatus;
+  previewError?: string | null;
   outputUrl: string | null;
   previewUrl?: string | null;
   nexrenderOutputUrl: string | null;
@@ -26,6 +29,9 @@ export const jobsApi = {
   },
   deleteJob: async (jobId: string): Promise<void> => {
     await api.delete(`/render/job/${jobId}`);
+  },
+  retryPreview: async (jobId: string): Promise<void> => {
+    await api.post(`/render/job/${jobId}/retry-preview`);
   },
 };
 

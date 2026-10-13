@@ -28,6 +28,13 @@ enum RenderStatus {
   FAILED
 }
 
+enum PreviewStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
 enum CreditType {
   PURCHASE
   RENDER
@@ -67,6 +74,8 @@ model RenderJob {
   creditsUsed        Int          @default(0)
   outputUrl          String?
   previewUrl         String?
+  previewStatus      PreviewStatus @default(PENDING)
+  previewError       String?
   nexrenderOutputUrl String?
   error              String?
   customizations     Json?

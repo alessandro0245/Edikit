@@ -98,6 +98,18 @@ export class S3Service {
     return key;
   }
 
+  /**
+   * Get an object stream from S3 for reading/downloading.
+   */
+  async getObjectStream(key: string): Promise<Readable> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+    const response = await this.s3Client.send(command);
+    return response.Body as Readable;
+  }
+
   async generatePresignedUrl(
     key: string,
     expiresIn: number = 3600,

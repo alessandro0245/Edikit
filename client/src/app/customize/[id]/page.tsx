@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Lightbulb,
   TriangleAlert,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import useCustomizeLogic from "./useCustomizeLogic";
@@ -86,6 +87,7 @@ const CustomizePage = () => {
     applyCrop,
     cancelCrop,
     editCrop,
+    handleRetryPreview,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -108,6 +110,18 @@ const CustomizePage = () => {
 
   const showRenderedVideo = isJobCompleted && !!previewMp4;
   const renderedVideoSrc = showRenderedVideo ? previewMp4 : null;
+
+  const isPreviewPreparing =
+    isJobCompleted &&
+    !previewMp4 &&
+    (renderJob?.previewStatus === "PROCESSING" ||
+      renderJob?.previewStatus === "PENDING" ||
+      !renderJob?.previewStatus);
+
+  const isPreviewFailed =
+    isJobCompleted &&
+    !previewMp4 &&
+    renderJob?.previewStatus === "FAILED";
 
   // Group fields into categories
   const textFields = Object.entries(template.fields).filter(
@@ -191,7 +205,7 @@ const CustomizePage = () => {
 
               <div className="p-2">
                 <div
-                  className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all"
+                  className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all bg-card/40"
                   style={{ aspectRatio: previewRatio }}
                 >
                   {showRenderedVideo && renderedVideoSrc ? (
@@ -207,6 +221,34 @@ const CustomizePage = () => {
                       showFullscreen
                       className="h-full w-full rounded-none"
                     />
+                  ) : isPreviewPreparing ? (
+                    <div className="flex flex-col items-center justify-center h-full w-full bg-card/60 backdrop-blur-xs p-6 text-center gap-2.5">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Preparing preview...
+                      </p>
+                    </div>
+                  ) : isPreviewFailed ? (
+                    <div className="flex flex-col items-center justify-center h-full w-full bg-card/90 p-6 text-center space-y-3">
+                      <AlertCircle className="w-7 h-7 text-amber-500" />
+                      <div className="space-y-1">
+                        <p className="font-semibold text-foreground text-sm">
+                          Preview Unavailable
+                        </p>
+                        <p className="text-xs text-muted-foreground max-w-xs">
+                          {renderJob?.previewError ||
+                            "Preview generation encountered an issue. You can still download your original video."}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRetryPreview}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        Retry Preview
+                      </button>
+                    </div>
                   ) : (
                     <AnimationPreview
                       src={template.previewUrl}
@@ -850,7 +892,11 @@ const CustomizePage = () => {
                       <div className="flex-1">
                         <p className="font-medium text-foreground">Completed!</p>
                         <p className="text-sm text-muted-foreground">
-                          Your video is ready
+                          {isPreviewPreparing
+                            ? "Original export ready to download · Preparing preview..."
+                            : isPreviewFailed
+                            ? "Original export ready to download · Preview unavailable"
+                            : "Your video is ready to download"}
                         </p>
                       </div>
                     </>

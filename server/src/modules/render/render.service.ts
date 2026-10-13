@@ -10,7 +10,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { S3Service } from '../s3/s3.service';
 import { CreateRenderJobDto } from './dto/create-render-job.dto';
-import { RenderStatus } from '@generated/prisma/enums';
+import { RenderStatus, PreviewStatus } from '@generated/prisma/enums';
 import { firstValueFrom } from 'rxjs';
 import * as path from 'path';
 import * as os from 'os';
@@ -70,6 +70,7 @@ export class RenderService {
   private readonly animationsPath: string;
   private readonly animationsFontsPath: string;
   private readonly activeUploads = new Set<string>();
+  private readonly activePreviewJobs = new Set<string>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -2315,25 +2316,26 @@ export class RenderService {
   }
 
   /**
-   * Fast FFmpeg transcode: converts a transparent ProRes MOV into a web-optimized MP4 preview.
-   * Runs in 2-4 seconds using fast preset and timeout guard.
+   * Fast FFmpeg transcode: converts a transparent ProRes MOV into a web-optimized 1080p MP4 preview.
+   * - Preserves aspect ratio without distortion for both landscape and portrait.
+   * - Uses 'veryfast' preset and CRF 23 with yuv420p for fast execution and universal browser compatibility.
+   * - Measures actual processing time.
    */
   private async transcodeMovToMp4Preview(
     inputMovPath: string,
     outputMp4Path: string,
-  ): Promise<void> {
+  ): Promise<{ durationMs: number }> {
     const ffmpegPath = this.getFfmpegPath();
-    this.logger.log(`Using FFmpeg binary at: ${ffmpegPath}`);
+    this.logger.log(`Starting FFmpeg 1080p transcode using binary at: ${ffmpegPath}`);
+    const startTimestamp = Date.now();
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<{ durationMs: number }>((resolve, reject) => {
       const args = [
         '-y',
-        '-threads',
-        '1',
         '-i',
         inputMovPath,
         '-vf',
-        'scale=-2:720',
+        'scale=if(gte(iw\\,ih)\\,-2\\,1080):if(gte(iw\\,ih)\\,1080\\,-2)',
         '-c:v',
         'libx264',
         '-pix_fmt',
@@ -2341,11 +2343,7 @@ export class RenderService {
         '-preset',
         'veryfast',
         '-crf',
-        '26',
-        '-maxrate',
-        '1.5M',
-        '-bufsize',
-        '2M',
+        '23',
         '-movflags',
         '+faststart',
         '-c:a',
@@ -2359,20 +2357,212 @@ export class RenderService {
         ffmpegPath,
         args,
         {
-          timeout: 60000, // 60-second execution cap to prevent hang
-          maxBuffer: 10 * 1024 * 1024,
+          timeout: 120000, // 2-minute safety timeout cap
+          maxBuffer: 20 * 1024 * 1024,
           windowsHide: true,
         },
         (error, _stdout, stderr) => {
+          const durationMs = Date.now() - startTimestamp;
           if (error) {
-            this.logger.error(`FFmpeg transcode failed: ${error.message}`, stderr);
+            this.logger.error(
+              `FFmpeg 1080p transcode failed after ${(durationMs / 1000).toFixed(2)}s (${durationMs}ms): ${error.message}`,
+              stderr,
+            );
             reject(error);
           } else {
-            resolve();
+            this.logger.log(
+              `FFmpeg 1080p transcode completed successfully in ${(durationMs / 1000).toFixed(2)}s (${durationMs}ms)`,
+            );
+            resolve({ durationMs });
           }
         },
       );
     });
+  }
+
+  /**
+   * Trigger preview generation in a detached background task.
+   * Completely decoupled from the Nexrender rendering lifecycle.
+   * Does NOT block the original MOV export from reaching 100% or being immediately downloadable.
+   */
+  triggerPreviewGeneration(
+    jobId: string,
+    s3OutputKey: string,
+    localMovPath?: string,
+  ): void {
+    if (this.activePreviewJobs.has(jobId)) {
+      this.logger.log(
+        `Preview generation already actively running for job ${jobId}, ignoring duplicate trigger.`,
+      );
+      return;
+    }
+
+    this.activePreviewJobs.add(jobId);
+    this.logger.log(
+      `[Preview Job Initiated] Starting background 1080p preview generation for job ${jobId} (s3Key: ${s3OutputKey})`,
+    );
+
+    // Run detached background task (non-blocking)
+    (async () => {
+      const startTime = Date.now();
+      let tmpSourceMovPath = localMovPath;
+      let downloadedFromS3 = false;
+      const rand = crypto.randomBytes(4).toString('hex');
+      const tmpMp4Path = path.join(
+        os.tmpdir(),
+        `edikit-${jobId}-${Date.now()}-${rand}-preview-1080p.mp4`,
+      );
+
+      try {
+        await this.prisma.renderJob.update({
+          where: { id: jobId },
+          data: {
+            previewStatus: PreviewStatus.PROCESSING,
+            previewError: null,
+          },
+        });
+
+        // 1. Ensure source MOV is available locally; if not (e.g. server reboot or retry), stream from S3
+        if (!tmpSourceMovPath || !existsSync(tmpSourceMovPath)) {
+          this.logger.log(
+            `Local MOV not present on disk for job ${jobId}. Streaming master MOV from S3 key: ${s3OutputKey}`,
+          );
+          tmpSourceMovPath = path.join(
+            os.tmpdir(),
+            `edikit-${jobId}-${Date.now()}-${rand}-source.mov`,
+          );
+          downloadedFromS3 = true;
+
+          const s3Stream = await this.s3Service.getObjectStream(s3OutputKey);
+          await streamPipeline(s3Stream, createWriteStream(tmpSourceMovPath));
+          this.logger.log(
+            `Successfully streamed source MOV from S3 for job ${jobId} to temp file: ${tmpSourceMovPath}`,
+          );
+        }
+
+        // 2. Perform 1080p FFmpeg transcode
+        const { durationMs: ffmpegDurationMs } =
+          await this.transcodeMovToMp4Preview(tmpSourceMovPath, tmpMp4Path);
+
+        // 3. Upload generated 1080p preview MP4 to S3
+        const previewS3Key = s3OutputKey.replace(/\.mov$/i, '-preview.mp4');
+        this.logger.log(
+          `Uploading 1080p MP4 preview to S3: ${previewS3Key} for job ${jobId}`,
+        );
+        await this.s3Service.uploadStream(
+          createReadStream(tmpMp4Path),
+          previewS3Key,
+          'video/mp4',
+        );
+
+        // 4. Generate presigned URL for browser preview playback
+        const presignedPreviewUrl = await this.s3Service.generatePresignedUrl(
+          previewS3Key,
+          7 * 24 * 3600,
+          undefined,
+          'inline',
+        );
+
+        // 5. Update database: preview status is READY
+        await this.prisma.renderJob.update({
+          where: { id: jobId },
+          data: {
+            previewStatus: PreviewStatus.READY,
+            previewUrl: presignedPreviewUrl,
+            s3PreviewKey: previewS3Key,
+            previewError: null,
+          },
+        });
+
+        const totalElapsedSec = ((Date.now() - startTime) / 1000).toFixed(2);
+        this.logger.log(
+          `[Preview Job Completed] Job ${jobId} 1080p preview ready in ${totalElapsedSec}s (FFmpeg: ${(ffmpegDurationMs / 1000).toFixed(2)}s). Preview S3 key: ${previewS3Key}`,
+        );
+      } catch (err: any) {
+        const totalElapsedSec = ((Date.now() - startTime) / 1000).toFixed(2);
+        this.logger.error(
+          `[Preview Job Failed] Preview generation failed for job ${jobId} after ${totalElapsedSec}s: ${err?.message || err}`,
+          err?.stack,
+        );
+
+        // Preview failure must NEVER fail the completed render job or block downloads!
+        try {
+          await this.prisma.renderJob.update({
+            where: { id: jobId },
+            data: {
+              previewStatus: PreviewStatus.FAILED,
+              previewError:
+                err?.message || 'FFmpeg preview generation failed',
+            },
+          });
+        } catch (dbErr) {
+          this.logger.error(
+            `Failed to persist preview failure status for job ${jobId}:`,
+            dbErr,
+          );
+        }
+      } finally {
+        // Clean up temporary files
+        if (tmpSourceMovPath) {
+          await fs.unlink(tmpSourceMovPath).catch(() => {});
+        }
+        await fs.unlink(tmpMp4Path).catch(() => {});
+        this.activePreviewJobs.delete(jobId);
+      }
+    })();
+  }
+
+  /**
+   * Retry preview generation for a completed render job.
+   */
+  async retryPreviewGeneration(jobId: string, userId: string) {
+    const job = await this.prisma.renderJob.findFirst({
+      where: { id: jobId, userId },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Render job not found');
+    }
+
+    if (job.status !== RenderStatus.COMPLETED) {
+      throw new BadRequestException(
+        'Cannot generate preview for a job that is not completed',
+      );
+    }
+
+    const s3Key =
+      job.s3OutputKey ||
+      (job.nexrenderOutputUrl?.startsWith('renders/')
+        ? job.nexrenderOutputUrl
+        : null);
+
+    if (!s3Key) {
+      throw new BadRequestException(
+        'Job has no master export in storage to generate preview from',
+      );
+    }
+
+    this.logger.log(
+      `Manual preview retry triggered for job ${jobId} (userId: ${userId})`,
+    );
+
+    // Reset status to PROCESSING
+    await this.prisma.renderJob.update({
+      where: { id: job.id },
+      data: {
+        previewStatus: PreviewStatus.PROCESSING,
+        previewError: null,
+      },
+    });
+
+    this.triggerPreviewGeneration(job.id, s3Key);
+
+    return {
+      id: job.id,
+      status: job.status,
+      previewStatus: PreviewStatus.PROCESSING,
+      message: 'Preview generation has been re-triggered in background',
+    };
   }
 
   /**
@@ -2392,11 +2582,31 @@ export class RenderService {
     // 1. Fast path: if already COMPLETED and outputUrl is set, return immediately in < 2ms
     if (job.status === RenderStatus.COMPLETED && job.outputUrl) {
       const expired = isJobExpired(job);
+      const isMov = this.isMovOutput(job, job.outputUrl);
+
+      // Auto-recovery: If it's a MOV and previewStatus is PROCESSING or PENDING, but not currently active in memory
+      // (e.g. server restarted or process died during preview generation), resume background generation
+      if (
+        isMov &&
+        !job.previewUrl &&
+        job.s3OutputKey &&
+        (job.previewStatus === PreviewStatus.PROCESSING ||
+          job.previewStatus === PreviewStatus.PENDING) &&
+        !this.activePreviewJobs.has(job.id)
+      ) {
+        this.logger.log(
+          `Resuming background preview generation for completed job ${job.id}`,
+        );
+        this.triggerPreviewGeneration(job.id, job.s3OutputKey);
+      }
+
       return {
         id: job.id,
         userId: job.userId,
         templateId: job.templateId,
         status: RenderStatus.COMPLETED,
+        previewStatus: job.previewStatus,
+        previewError: job.previewError,
         outputUrl: expired ? null : job.outputUrl,
         previewUrl: expired ? null : this.getBrowserPlayablePreviewUrl(job),
         nexrenderOutputUrl: expired ? null : job.nexrenderOutputUrl,
@@ -2414,6 +2624,8 @@ export class RenderService {
         userId: job.userId,
         templateId: job.templateId,
         status: RenderStatus.FAILED,
+        previewStatus: PreviewStatus.FAILED,
+        previewError: job.previewError || job.error,
         error: job.error,
         outputUrl: null,
         previewUrl: null,
@@ -2551,6 +2763,8 @@ export class RenderService {
             userId: job.userId,
             templateId: job.templateId,
             status: RenderStatus.PROCESSING,
+            previewStatus: PreviewStatus.PROCESSING,
+            previewError: null,
             outputUrl: null,
             previewUrl: null,
             progress: 99,
@@ -2565,6 +2779,7 @@ export class RenderService {
             where: { id: job.id },
             data: {
               status: RenderStatus.FAILED,
+              previewStatus: PreviewStatus.FAILED,
               error: errorMessage || 'Render failed on Nexrender Cloud',
             },
           });
@@ -2584,6 +2799,8 @@ export class RenderService {
             userId: job.userId,
             templateId: job.templateId,
             status: RenderStatus.FAILED,
+            previewStatus: PreviewStatus.FAILED,
+            previewError: job.previewError || errorMessage || 'Render failed on Nexrender Cloud',
             error: errorMessage || 'Render failed on Nexrender Cloud',
             outputUrl: null,
             previewUrl: null,
@@ -2607,6 +2824,8 @@ export class RenderService {
           userId: job.userId,
           templateId: job.templateId,
           status,
+          previewStatus: job.previewStatus,
+          previewError: job.previewError,
           outputUrl: null,
           previewUrl: null,
           nexrenderOutputUrl: null,
@@ -2625,6 +2844,8 @@ export class RenderService {
     const isExpiredJob = isJobExpired(job);
     return {
       ...job,
+      previewStatus: job.previewStatus,
+      previewError: job.previewError,
       outputUrl: isExpiredJob ? null : job.outputUrl,
       previewUrl: isExpiredJob ? null : this.getBrowserPlayablePreviewUrl(job),
       nexrenderOutputUrl: isExpiredJob ? null : job.nexrenderOutputUrl,
@@ -2658,6 +2879,8 @@ export class RenderService {
         templateId: true,
         renderType: true,
         status: true,
+        previewStatus: true,
+        previewError: true,
         outputUrl: true,
         previewUrl: true,
         nexrenderOutputUrl: true,
@@ -2806,20 +3029,12 @@ export class RenderService {
       ? `renders/${job.userId}/${job.nexrenderJobId}-preview.mp4`
       : s3Key;
 
-    let presignedUrl: string;
-    let presignedPreviewUrl: string | null = null;
-    let finalPreviewKey: string | null = null;
-
     try {
       if (isMov) {
         const rand = crypto.randomBytes(4).toString('hex');
         const tmpMovPath = path.join(
           os.tmpdir(),
           `edikit-${job.id}-${Date.now()}-${rand}.mov`,
-        );
-        const tmpMp4Path = path.join(
-          os.tmpdir(),
-          `edikit-${job.id}-${Date.now()}-${rand}-preview.mp4`,
         );
 
         let bufferedComplete = false;
@@ -2840,63 +3055,62 @@ export class RenderService {
           bufferedComplete = true;
           this.logger.log(`Downloaded MOV successfully, uploading master to S3: ${s3Key}`);
 
-          // 1. Upload master MOV to S3
+          // 1. Upload pristine master MOV to S3
           await this.s3Service.uploadStream(
             createReadStream(tmpMovPath),
             s3Key,
             'video/quicktime',
           );
           masterUploaded = true;
-          presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
-          this.logger.log(`Master MOV uploaded to S3: ${s3Key}`);
+          const presignedUrl = await this.s3Service.generatePresignedUrl(
+            s3Key,
+            7 * 24 * 3600,
+          );
+          this.logger.log(`Master MOV successfully uploaded to S3: ${s3Key}`);
 
-          // Early checkpoint: Save master MOV to database
-          try {
-            const user = await this.prisma.user.findUnique({
-              where: { id: job.userId },
-              select: { planType: true },
-            });
-            const expiresAt = calculateExpirationDate(user?.planType);
-            await this.prisma.renderJob.update({
-              where: { id: job.id },
-              data: {
-                outputUrl: presignedUrl,
-                nexrenderOutputUrl: s3Key,
-                s3OutputKey: s3Key,
-                expiresAt,
-              },
-            });
-          } catch (checkpointErr) {
-            this.logger.warn(`Failed to write early master MOV checkpoint:`, checkpointErr);
-          }
+          // 2. Mark render stage completed in database immediately
+          const user = await this.prisma.user.findUnique({
+            where: { id: job.userId },
+            select: { planType: true },
+          });
+          const expiresAt = calculateExpirationDate(user?.planType);
 
-          // 2. Transcode preview MP4
-          try {
-            this.logger.log(`Transcoding MOV to MP4 preview using FFmpeg...`);
-            await this.transcodeMovToMp4Preview(tmpMovPath, tmpMp4Path);
+          await this.prisma.renderJob.update({
+            where: { id: job.id },
+            data: {
+              status: RenderStatus.COMPLETED,
+              outputUrl: presignedUrl,
+              nexrenderOutputUrl: s3Key,
+              s3OutputKey: s3Key,
+              previewStatus: PreviewStatus.PROCESSING,
+              previewUrl: null,
+              expiresAt,
+            },
+          });
+          this.logger.log(
+            `Render marked COMPLETED (100%) for job ${job.id}. Original export is ready for immediate download.`,
+          );
 
-            this.logger.log(`Uploading MP4 preview to S3: ${previewS3Key}`);
-            await this.s3Service.uploadStream(
-              createReadStream(tmpMp4Path),
-              previewS3Key,
-              'video/mp4',
-            );
-            presignedPreviewUrl = await this.s3Service.generatePresignedUrl(
-              previewS3Key,
-              7 * 24 * 3600,
-              undefined,
-              'inline',
-            );
-            finalPreviewKey = previewS3Key;
-            this.logger.log(`Preview MP4 uploaded successfully: ${previewS3Key}`);
-          } catch (transcodeErr) {
-            this.logger.warn(
-              `Preview transcode failed, continuing with master MOV only:`,
-              transcodeErr,
-            );
-            presignedPreviewUrl = null;
-            finalPreviewKey = null;
-          }
+          // 3. Trigger decoupled non-blocking background preview generation
+          // Hands off tmpMovPath to background task (which will transcode and unlink it)
+          this.triggerPreviewGeneration(job.id, s3Key, tmpMovPath);
+
+          // 4. Return immediately — do NOT wait for preview transcode
+          return {
+            id: job.id,
+            userId: job.userId,
+            templateId: job.templateId,
+            status: RenderStatus.COMPLETED,
+            previewStatus: PreviewStatus.PROCESSING,
+            outputUrl: presignedUrl,
+            previewUrl: null,
+            nexrenderOutputUrl: s3Key,
+            expiresAt,
+            isExpired: false,
+            progress: 100,
+            createdAt: job.createdAt,
+            updatedAt: job.updatedAt,
+          };
         } catch (movErr) {
           if (bufferedComplete && !masterUploaded && existsSync(tmpMovPath)) {
             try {
@@ -2905,18 +3119,54 @@ export class RenderService {
                 s3Key,
                 'video/quicktime',
               );
-              presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
-              presignedPreviewUrl = null;
-              finalPreviewKey = null;
+              const presignedUrl = await this.s3Service.generatePresignedUrl(
+                s3Key,
+                7 * 24 * 3600,
+              );
+              const user = await this.prisma.user.findUnique({
+                where: { id: job.userId },
+                select: { planType: true },
+              });
+              const expiresAt = calculateExpirationDate(user?.planType);
+
+              await this.prisma.renderJob.update({
+                where: { id: job.id },
+                data: {
+                  status: RenderStatus.COMPLETED,
+                  outputUrl: presignedUrl,
+                  nexrenderOutputUrl: s3Key,
+                  s3OutputKey: s3Key,
+                  previewStatus: PreviewStatus.PROCESSING,
+                  previewUrl: null,
+                  expiresAt,
+                },
+              });
+
+              this.triggerPreviewGeneration(job.id, s3Key, tmpMovPath);
+
+              return {
+                id: job.id,
+                userId: job.userId,
+                templateId: job.templateId,
+                status: RenderStatus.COMPLETED,
+                previewStatus: PreviewStatus.PROCESSING,
+                outputUrl: presignedUrl,
+                previewUrl: null,
+                nexrenderOutputUrl: s3Key,
+                expiresAt,
+                isExpired: false,
+                progress: 100,
+                createdAt: job.createdAt,
+                updatedAt: job.updatedAt,
+              };
             } catch {
+              await fs.unlink(tmpMovPath).catch(() => {});
               throw movErr;
             }
           } else {
+            await fs.unlink(tmpMovPath).catch(() => {});
             throw movErr;
           }
-        } finally {
-          await fs.unlink(tmpMovPath).catch(() => {});
-          await fs.unlink(tmpMp4Path).catch(() => {});
         }
       } else {
         // Direct stream for standard MP4
@@ -2931,15 +3181,53 @@ export class RenderService {
 
         this.logger.log(`Streaming MP4 to S3 key: ${s3Key}`);
         await this.s3Service.uploadStream(videoResponse.data, s3Key, 'video/mp4');
-        presignedUrl = await this.s3Service.generatePresignedUrl(s3Key, 7 * 24 * 3600);
-        presignedPreviewUrl = await this.s3Service.generatePresignedUrl(
+        const presignedUrl = await this.s3Service.generatePresignedUrl(
+          s3Key,
+          7 * 24 * 3600,
+        );
+        const presignedPreviewUrl = await this.s3Service.generatePresignedUrl(
           s3Key,
           7 * 24 * 3600,
           undefined,
           'inline',
         );
-        finalPreviewKey = s3Key;
         this.logger.log(`Streamed MP4 to S3 successfully: ${s3Key}`);
+
+        const user = await this.prisma.user.findUnique({
+          where: { id: job.userId },
+          select: { planType: true },
+        });
+        const expiresAt = calculateExpirationDate(user?.planType);
+
+        await this.prisma.renderJob.update({
+          where: { id: job.id },
+          data: {
+            status: RenderStatus.COMPLETED,
+            outputUrl: presignedUrl,
+            previewUrl: presignedPreviewUrl,
+            previewStatus: PreviewStatus.READY,
+            nexrenderOutputUrl: s3Key,
+            s3OutputKey: s3Key,
+            s3PreviewKey: s3Key,
+            expiresAt,
+          },
+        });
+
+        return {
+          id: job.id,
+          userId: job.userId,
+          templateId: job.templateId,
+          status: RenderStatus.COMPLETED,
+          previewStatus: PreviewStatus.READY,
+          outputUrl: presignedUrl,
+          previewUrl: presignedPreviewUrl,
+          nexrenderOutputUrl: s3Key,
+          expiresAt,
+          isExpired: false,
+          progress: 100,
+          createdAt: job.createdAt,
+          updatedAt: job.updatedAt,
+        };
       }
     } catch (uploadPipelineError) {
       this.logger.error(
@@ -2959,6 +3247,8 @@ export class RenderService {
           status: RenderStatus.COMPLETED,
           outputUrl: outputUrl,
           previewUrl: isMov ? null : outputUrl,
+          previewStatus: isMov ? PreviewStatus.FAILED : PreviewStatus.READY,
+          previewError: isMov ? 'S3 upload failed for preview pipeline' : null,
           nexrenderOutputUrl: outputUrl,
           expiresAt,
         },
@@ -2969,6 +3259,7 @@ export class RenderService {
         userId: job.userId,
         templateId: job.templateId,
         status: RenderStatus.COMPLETED,
+        previewStatus: isMov ? PreviewStatus.FAILED : PreviewStatus.READY,
         outputUrl: outputUrl,
         previewUrl: isMov ? null : outputUrl,
         nexrenderOutputUrl: outputUrl,
@@ -2979,40 +3270,6 @@ export class RenderService {
         updatedAt: job.updatedAt,
       };
     }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: job.userId },
-      select: { planType: true },
-    });
-    const expiresAt = calculateExpirationDate(user?.planType);
-
-    await this.prisma.renderJob.update({
-      where: { id: job.id },
-      data: {
-        status: RenderStatus.COMPLETED,
-        outputUrl: presignedUrl,
-        previewUrl: presignedPreviewUrl,
-        nexrenderOutputUrl: s3Key,
-        s3OutputKey: s3Key,
-        s3PreviewKey: finalPreviewKey,
-        expiresAt,
-      },
-    });
-
-    return {
-      id: job.id,
-      userId: job.userId,
-      templateId: job.templateId,
-      status: RenderStatus.COMPLETED,
-      outputUrl: presignedUrl,
-      previewUrl: presignedPreviewUrl,
-      nexrenderOutputUrl: s3Key,
-      expiresAt,
-      isExpired: false,
-      progress: 100,
-      createdAt: job.createdAt,
-      updatedAt: job.updatedAt,
-    };
   }
 
   /**

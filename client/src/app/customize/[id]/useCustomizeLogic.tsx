@@ -32,10 +32,13 @@ export interface CropState {
 interface RenderJob {
   id: string;
   status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  outputUrl?: string;
-  previewUrl?: string;
+  previewStatus?: "PENDING" | "PROCESSING" | "READY" | "FAILED";
+  previewError?: string | null;
+  outputUrl?: string | null;
+  previewUrl?: string | null;
+  nexrenderOutputUrl?: string | null;
   progress?: number;
-  error?: string;
+  error?: string | null;
 }
 
 interface CustomizePersistedState {
@@ -231,18 +234,22 @@ export const useCustomizeLogic = () => {
     useBackgroundColor,
   ]);
 
-  // Poll job status
+  // Poll job status (both render progress and background preview generation)
   useEffect(() => {
-    if (
-      !renderJob ||
-      renderJob.status === "COMPLETED" ||
-      renderJob.status === "FAILED"
-    ) {
+    if (!renderJob) return;
+
+    // A job needs polling if render is pending/processing OR if render is completed but preview is still preparing
+    const isRenderRunning =
+      renderJob.status === "PENDING" || renderJob.status === "PROCESSING";
+    const isPreviewRunning =
+      renderJob.status === "COMPLETED" &&
+      (renderJob.previewStatus === "PROCESSING" ||
+        renderJob.previewStatus === "PENDING" ||
+        (!renderJob.previewUrl && renderJob.previewStatus !== "FAILED"));
+
+    if (!isRenderRunning && !isPreviewRunning) {
       return;
     }
-
-    // Reset notification flag when starting a new job
-    hasNotifiedRef.current = false;
 
     const pollInterval = setInterval(async () => {
       try {
@@ -250,33 +257,66 @@ export const useCustomizeLogic = () => {
           withCredentials: true,
         });
 
-        // Check status BEFORE updating state to prevent re-triggering
-        if (data.status === "COMPLETED") {
+        const isRenderDone = data.status === "COMPLETED";
+        const isRenderFailed = data.status === "FAILED";
+        const isPreviewDone =
+          data.previewStatus === "READY" || !!data.previewUrl;
+        const isPreviewFailed = data.previewStatus === "FAILED";
+
+        if (isRenderDone && !hasNotifiedRef.current) {
+          hasNotifiedRef.current = true;
+          showSuccessToast("Video rendered successfully!");
+        } else if (isRenderFailed && !hasNotifiedRef.current) {
+          hasNotifiedRef.current = true;
+          showErrorToast(data.error || "Rendering failed");
+        }
+
+        setRenderJob(data);
+
+        // Stop polling once render is failed, or once render is complete AND preview has finished (ready or failed)
+        if (
+          isRenderFailed ||
+          (isRenderDone && (isPreviewDone || isPreviewFailed))
+        ) {
           clearInterval(pollInterval);
-          // Only show toast once, even if multiple requests complete simultaneously
-          if (!hasNotifiedRef.current) {
-            hasNotifiedRef.current = true;
-            showSuccessToast("Video rendered successfully!");
-          }
-          setRenderJob(data);
-        } else if (data.status === "FAILED") {
-          clearInterval(pollInterval);
-          if (!hasNotifiedRef.current) {
-            hasNotifiedRef.current = true;
-            showErrorToast(data.error || "Rendering failed");
-          }
-          setRenderJob(data);
-        } else {
-          // Only update state if still processing
-          setRenderJob(data);
         }
       } catch (error) {
         console.error("Failed to poll job status:", error);
       }
-    }, 8000);
+    }, 4000);
 
     return () => clearInterval(pollInterval);
-  }, [renderJob]);
+  }, [
+    renderJob?.id,
+    renderJob?.status,
+    renderJob?.previewStatus,
+    renderJob?.previewUrl,
+  ]);
+
+  const handleRetryPreview = async () => {
+    if (!renderJob?.id) return;
+    try {
+      setRenderJob((prev) =>
+        prev
+          ? {
+              ...prev,
+              previewStatus: "PROCESSING",
+              previewError: null,
+            }
+          : null,
+      );
+      await api.post(
+        `/render/job/${renderJob.id}/retry-preview`,
+        {},
+        { withCredentials: true },
+      );
+      showSuccessToast("Retrying preview generation...");
+    } catch (err: any) {
+      showErrorToast(
+        err?.response?.data?.message || "Failed to retry preview generation",
+      );
+    }
+  };
 
   const handleTextChange = (fieldKey: string, value: string) => {
     setFormData((prev) => {
@@ -1394,6 +1434,7 @@ export const useCustomizeLogic = () => {
     applyCrop,
     cancelCrop,
     editCrop,
+    handleRetryPreview,
   } as const;
 };
 

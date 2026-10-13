@@ -680,6 +680,17 @@ export class RenderController {
     return { url, filename };
   }
 
+  @Post('job/:id/retry-preview')
+  @ApiOperation({ summary: 'Retry preview generation for a completed render job' })
+  @ApiCookieAuth()
+  @ApiResponse({ status: 200, description: 'Preview generation retried' })
+  async retryPreview(
+    @Param('id') jobId: string,
+    @CurrentUser('userId') userId: string,
+  ) {
+    return this.renderService.retryPreviewGeneration(jobId, userId);
+  }
+
   @Get('templates/:templateId/layers')
   @ApiOperation({
     summary: 'Get template layer names (for debugging layer mapping)',
