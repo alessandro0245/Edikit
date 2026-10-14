@@ -71,6 +71,8 @@ export class RenderService {
   private readonly animationsFontsPath: string;
   private readonly activeUploads = new Set<string>();
   private readonly activePreviewJobs = new Set<string>();
+  private readonly previewQueue: Array<() => Promise<void>> = [];
+  private isProcessingPreviewQueue = false;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -2332,8 +2334,12 @@ export class RenderService {
     return new Promise<{ durationMs: number }>((resolve, reject) => {
       const args = [
         '-y',
+        '-threads',
+        '2',
         '-i',
         inputMovPath,
+        '-threads',
+        '2',
         '-vf',
         'scale=if(gte(iw\\,ih)\\,-2\\,1080):if(gte(iw\\,ih)\\,1080\\,-2)',
         '-c:v',
@@ -2380,6 +2386,32 @@ export class RenderService {
     });
   }
 
+  private enqueuePreviewTask(task: () => Promise<void>): void {
+    this.previewQueue.push(task);
+    void this.processPreviewQueue();
+  }
+
+  private async processPreviewQueue(): Promise<void> {
+    if (this.isProcessingPreviewQueue || this.previewQueue.length === 0) {
+      return;
+    }
+    this.isProcessingPreviewQueue = true;
+    try {
+      while (this.previewQueue.length > 0) {
+        const nextTask = this.previewQueue.shift();
+        if (nextTask) {
+          try {
+            await nextTask();
+          } catch (taskErr) {
+            this.logger.error('Error executing queued preview task:', taskErr);
+          }
+        }
+      }
+    } finally {
+      this.isProcessingPreviewQueue = false;
+    }
+  }
+
   /**
    * Trigger preview generation in a detached background task.
    * Completely decoupled from the Nexrender rendering lifecycle.
@@ -2399,11 +2431,11 @@ export class RenderService {
 
     this.activePreviewJobs.add(jobId);
     this.logger.log(
-      `[Preview Job Initiated] Starting background 1080p preview generation for job ${jobId} (s3Key: ${s3OutputKey})`,
+      `[Preview Job Initiated] Enqueueing background 1080p preview generation for job ${jobId} (s3Key: ${s3OutputKey})`,
     );
 
-    // Run detached background task (non-blocking)
-    (async () => {
+    // Enqueue non-blocking background task (processes 1 at a time to keep CPU and memory stable)
+    this.enqueuePreviewTask(async () => {
       const startTime = Date.now();
       let tmpSourceMovPath = localMovPath;
       let downloadedFromS3 = false;
@@ -2440,7 +2472,7 @@ export class RenderService {
           );
         }
 
-        // 2. Perform 1080p FFmpeg transcode
+        // 2. Perform 1080p FFmpeg transcode (capped at 2 threads to prevent CPU/memory exhaustion)
         const { durationMs: ffmpegDurationMs } =
           await this.transcodeMovToMp4Preview(tmpSourceMovPath, tmpMp4Path);
 
@@ -2509,7 +2541,7 @@ export class RenderService {
         await fs.unlink(tmpMp4Path).catch(() => {});
         this.activePreviewJobs.delete(jobId);
       }
-    })();
+    });
   }
 
   /**
@@ -2585,7 +2617,7 @@ export class RenderService {
       const isMov = this.isMovOutput(job, job.outputUrl);
 
       // Auto-recovery: If it's a MOV and previewStatus is PROCESSING or PENDING, but not currently active in memory
-      // (e.g. server restarted or process died during preview generation), resume background generation
+      // (e.g. server restarted or process died during preview generation)
       if (
         isMov &&
         !job.previewUrl &&
@@ -2594,10 +2626,33 @@ export class RenderService {
           job.previewStatus === PreviewStatus.PENDING) &&
         !this.activePreviewJobs.has(job.id)
       ) {
-        this.logger.log(
-          `Resuming background preview generation for completed job ${job.id}`,
-        );
-        this.triggerPreviewGeneration(job.id, job.s3OutputKey);
+        const elapsedSinceUpdateMs =
+          Date.now() - new Date(job.updatedAt).getTime();
+        const isStale = elapsedSinceUpdateMs > 3 * 60 * 1000; // 3 minutes timeout
+
+        if (isStale) {
+          this.logger.warn(
+            `Preview job ${job.id} has been in ${job.previewStatus} for ${(elapsedSinceUpdateMs / 1000).toFixed(0)}s without completing. Marking FAILED so user can retry.`,
+          );
+          const timeoutMsg =
+            'Preview generation timed out. You can still download your video below or click Retry Preview.';
+          await this.prisma.renderJob
+            .update({
+              where: { id: job.id },
+              data: {
+                previewStatus: PreviewStatus.FAILED,
+                previewError: timeoutMsg,
+              },
+            })
+            .catch(() => {});
+          job.previewStatus = PreviewStatus.FAILED;
+          job.previewError = timeoutMsg;
+        } else {
+          this.logger.log(
+            `Resuming background preview generation for completed job ${job.id}`,
+          );
+          this.triggerPreviewGeneration(job.id, job.s3OutputKey);
+        }
       }
 
       return {

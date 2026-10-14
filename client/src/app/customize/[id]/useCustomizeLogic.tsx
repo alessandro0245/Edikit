@@ -84,6 +84,7 @@ export const useCustomizeLogic = () => {
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isPreviewSlow, setIsPreviewSlow] = useState(false);
   const [useBackgroundColor, setUseBackgroundColor] = useState(true);
   const [useBlurEffect, setUseBlurEffect] = useState(true);
   const [muteAudio, setMuteAudio] = useState(true);
@@ -251,7 +252,13 @@ export const useCustomizeLogic = () => {
       return;
     }
 
+    let backoffUntil = 0;
     const pollInterval = setInterval(async () => {
+      // If backoff is active due to 429/502/503, skip poll tick without killing the interval
+      if (Date.now() < backoffUntil) {
+        return;
+      }
+
       try {
         const { data } = await api.get(`/render/job/${renderJob.id}`, {
           withCredentials: true,
@@ -280,12 +287,37 @@ export const useCustomizeLogic = () => {
         ) {
           clearInterval(pollInterval);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to poll job status:", error);
+
+        // If client receives rate limit (429) or server gateway error (502/503),
+        // pause polls for 8 seconds before retrying, without destroying the interval!
+        if (
+          error?.response?.status === 429 ||
+          error?.response?.status === 502 ||
+          error?.response?.status === 503
+        ) {
+          backoffUntil = Date.now() + 8000;
+        }
       }
     }, 4000);
 
-    return () => clearInterval(pollInterval);
+    // Client-side UX timeout: If preview has been preparing for > 2 minutes,
+    // display a slow-preview notice with retry button WITHOUT setting terminal FAILED status,
+    // allowing background polling to continue until the server finishes.
+    let safetyTimeout: NodeJS.Timeout | null = null;
+    if (isPreviewRunning) {
+      safetyTimeout = setTimeout(() => {
+        setIsPreviewSlow(true);
+      }, 120000); // 2 minutes
+    } else {
+      setIsPreviewSlow(false);
+    }
+
+    return () => {
+      clearInterval(pollInterval);
+      if (safetyTimeout) clearTimeout(safetyTimeout);
+    };
   }, [
     renderJob?.id,
     renderJob?.status,
@@ -296,6 +328,7 @@ export const useCustomizeLogic = () => {
   const handleRetryPreview = async () => {
     if (!renderJob?.id) return;
     try {
+      setIsPreviewSlow(false);
       setRenderJob((prev) =>
         prev
           ? {
@@ -1357,12 +1390,27 @@ export const useCustomizeLogic = () => {
       const filename = `video-${timestamp}.${ext}`;
 
       // Step 1: Call backend (auth-gated) to get a fresh presigned S3 URL
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await api.get<{ url: string; filename: string }>(
-        `/render/job/${renderJob.id}/download`
-      );
-      const s3Url = response.data.url;
-      const serverFilename = response.data.filename || filename;
+      let s3Url: string | null = null;
+      let serverFilename: string = filename;
+
+      try {
+        const response = await api.get<{ url: string; filename: string }>(
+          `/render/job/${renderJob.id}/download`
+        );
+        s3Url = response.data.url;
+        serverFilename = response.data.filename || filename;
+      } catch (apiErr) {
+        // Fallback: If backend is temporarily busy/restarting, use existing completed outputUrl
+        if (renderJob.outputUrl) {
+          s3Url = renderJob.outputUrl;
+        } else {
+          throw apiErr;
+        }
+      }
+
+      if (!s3Url) {
+        throw new Error("No download URL available");
+      }
 
       // Step 2: Download from S3 directly via XHR (no credentials needed for presigned URLs)
       // This gives a proper progress bar and avoids the redirect confusion.
@@ -1435,6 +1483,7 @@ export const useCustomizeLogic = () => {
     cancelCrop,
     editCrop,
     handleRetryPreview,
+    isPreviewSlow,
   } as const;
 };
 

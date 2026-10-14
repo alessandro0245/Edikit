@@ -26,7 +26,7 @@ import { VideoCleanupModule } from './modules/video-cleanup/video-cleanup.module
         {
           name: 'default',
           ttl: 60000,
-          limit: 60,
+          limit: 120,
         },
       ],
       errorMessage: 'Too many requests. Try again in 60 seconds',

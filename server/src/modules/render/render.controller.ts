@@ -666,6 +666,7 @@ export class RenderController {
     return { url };
   }
 
+  @SkipThrottle()
   @Get('job/:id/download')
   @ApiOperation({ summary: 'Get a presigned download URL for a render job video' })
   @ApiCookieAuth()
@@ -680,6 +681,7 @@ export class RenderController {
     return { url, filename };
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('job/:id/retry-preview')
   @ApiOperation({ summary: 'Retry preview generation for a completed render job' })
   @ApiCookieAuth()

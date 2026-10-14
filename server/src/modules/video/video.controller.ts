@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { VideoService } from './video.service';
 import { GeneratePromptDto } from './dto/generate-prompt.dto';
@@ -42,6 +42,7 @@ export class VideoController {
     return this.videoService.generateMatchCut(dto, user.userId);
   }
 
+  @SkipThrottle()
   @Get('job/:id')
   @UseGuards(JwtAuthGuard)
   getJobStatus(@Param('id') jobId: string, @CurrentUser() user: JwtUser) {

@@ -1,4 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { CreditsService } from './credits.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -15,6 +16,7 @@ import {
 export class CreditsController {
   constructor(private readonly creditsService: CreditsService) {}
 
+  @SkipThrottle()
   @Get()
   @ApiOperation({ summary: 'Get user credits and subscription info' })
   @ApiCookieAuth()

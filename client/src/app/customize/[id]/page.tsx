@@ -88,6 +88,7 @@ const CustomizePage = () => {
     cancelCrop,
     editCrop,
     handleRetryPreview,
+    isPreviewSlow,
   } = useCustomizeLogic();
 
   if (!template) {
@@ -227,6 +228,21 @@ const CustomizePage = () => {
                       <p className="text-xs font-medium text-muted-foreground">
                         Preparing preview...
                       </p>
+                      {isPreviewSlow && (
+                        <div className="mt-2 space-y-2 animate-in fade-in duration-300">
+                          <p className="text-[11px] text-muted-foreground max-w-xs leading-relaxed">
+                            Preview is taking longer than usual. You can wait, or retry below.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleRetryPreview}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            Retry Preview
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : isPreviewFailed ? (
                     <div className="flex flex-col items-center justify-center h-full w-full bg-card/90 p-6 text-center space-y-3">
