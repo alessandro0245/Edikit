@@ -11,7 +11,20 @@ import {
 } from "@/components/Toast/showToast";
 import { resizeVideo } from "@/utils/videoResize";
 import { getUploadLimit } from "@/utils/uploadLimit";
+import { getVideoMetadata, trimVideo } from "@/utils/videoTrim";
 import { type FontId } from "@/components/FontPicker/FontPicker";
+
+export interface QueuedVideoState {
+  position: number;
+  type: "trim" | "resize";
+}
+
+export interface TrimPendingState {
+  originalFile: File;
+  videoUrl: string;
+  videoDuration: number;
+  slotDuration: number;
+}
 
 interface FormDataState {
   [key: string]: string | File | null | undefined;
@@ -93,7 +106,10 @@ export const useCustomizeLogic = () => {
     [key: string]: number;
   }>({});
   const [queuedVideos, setQueuedVideos] = useState<{
-    [key: string]: number;
+    [key: string]: QueuedVideoState;
+  }>({});
+  const [trimmingVideos, setTrimmingVideos] = useState<{
+    [key: string]: boolean;
   }>({});
 
   /**
@@ -102,6 +118,21 @@ export const useCustomizeLogic = () => {
    */
   const [cropPending, setCropPending] = useState<{
     [key: string]: CropState;
+  }>({});
+
+  /**
+   * trimPending[fieldKey] = TrimPendingState means the video field is waiting for user trim.
+   * Once user confirms or cancels, it is removed from this map.
+   */
+  const [trimPending, setTrimPending] = useState<{
+    [key: string]: TrimPendingState;
+  }>({});
+
+  /**
+   * Preserves the original untrimmed video File so the user can re-trim if desired.
+   */
+  const [originalVideoFiles, setOriginalVideoFiles] = useState<{
+    [key: string]: File;
   }>({});
 
   // Redirect if template not found
@@ -715,7 +746,7 @@ export const useCustomizeLogic = () => {
                   (queuePosition) => {
                     setQueuedVideos((prev) => ({
                       ...prev,
-                      [fieldKey]: queuePosition,
+                      [fieldKey]: { position: queuePosition, type: "resize" },
                     }));
                     showInfoToast(
                       "Video in queue",
@@ -784,28 +815,6 @@ export const useCustomizeLogic = () => {
   ) => {
     if (!file) return;
 
-    // ── Enforce dynamic file size limit (20MB/s for video, 50MB for image) ──
-    const { maxBytes, maxMB, durationSeconds, isVideo } = getUploadLimit(
-      file,
-      template,
-      fieldKey,
-    );
-    if (file.size > maxBytes) {
-      if (isVideo) {
-        showErrorToast(
-          "File too large",
-          `Max size is ${maxMB}MB for this template`,
-        );
-      } else {
-        showErrorToast(
-          "File too large",
-          `Max size is ${maxMB}MB`,
-        );
-      }
-      if (inputElement) inputElement.value = "";
-      return;
-    }
-
     // ── Enforce field-level MIME type — accept attribute is only a browser hint ──
     const field = template?.fields[fieldKey];
     const isImageFile = file.type.startsWith("image/");
@@ -830,6 +839,24 @@ export const useCustomizeLogic = () => {
       showErrorToast("Only image (PNG, JPG, WEBP) and video (MP4, MOV) files are accepted.");
       if (inputElement) inputElement.value = "";
       return;
+    }
+
+    // ── Enforce file size limits before processing ──
+    if (isImageFile) {
+      const { maxBytes, maxMB } = getUploadLimit(file, template, fieldKey);
+      if (file.size > maxBytes) {
+        showErrorToast("File too large", `Max size is ${maxMB}MB`);
+        if (inputElement) inputElement.value = "";
+        return;
+      }
+    } else if (isVideoFile) {
+      // Allow up to 300MB for the raw source video before trimming down to the slot
+      const maxSourceBytes = 300 * 1024 * 1024;
+      if (file.size > maxSourceBytes) {
+        showErrorToast("File too large", "Max video file size is 300MB.");
+        if (inputElement) inputElement.value = "";
+        return;
+      }
     }
 
     // ── For image fields, open the inline crop editor first ──
@@ -867,233 +894,51 @@ export const useCustomizeLogic = () => {
       }
     }
 
-    // Video or image with no dimensions config → process immediately
-    setUploadingAssets((prev) => new Set(prev).add(fieldKey));
+    // ── For video fields, enforce minimum duration and open trim editor ──
+    if (isVideoFile) {
+      const slotDuration = field?.duration || template?.duration || 6;
+      try {
+        const meta = await getVideoMetadata(file);
 
-    try {
-      let processedFile = file;
-
-      if (processedFile.type.startsWith("image/")) {
-      // Get the field to check if it has required dimensions
-      const field = template?.fields[fieldKey];
-      if (field && field.dimensions) {
-        // Check if dimensions contain a range (e.g., "800x800-1920x1920")
-        if (field.dimensions.includes("-")) {
-          // Parse range dimensions
-          const [minDimensions, maxDimensions] = field.dimensions.split("-");
-          const [minWidth, minHeight] = minDimensions
-            .split("x")
-            .map((d) => parseInt(d.trim()));
-          const [maxWidth, maxHeight] = maxDimensions
-            .split("x")
-            .map((d) => parseInt(d.trim()));
-
-          if (minWidth && minHeight && maxWidth && maxHeight) {
-            try {
-              const result = await validateImageDimensionsRange(
-                processedFile,
-                minWidth,
-                minHeight,
-                maxWidth,
-                maxHeight,
-              );
-              if (!result.isValid) {
-                showInfoToast("Auto-resizing image to fit dimensions...");
-                try {
-                  processedFile = await resizeAndStretchImage(
-                    processedFile,
-                    maxWidth,
-                    maxHeight,
-                  );
-                } catch (resizeErr) {
-                  console.error("Auto-resize failed", resizeErr);
-                  showErrorToast("Failed to resize image automatically");
-                  if (inputElement) {
-                    inputElement.value = "";
-                  }
-                  setImagePreviewReady((prev) => {
-                    const next = { ...prev };
-                    delete next[fieldKey];
-                    return next;
-                  });
-                  return;
-                }
-              }
-            } catch (error) {
-              console.error("Image range validation failed", error);
-              showErrorToast("Failed to validate image");
-              if (inputElement) {
-                inputElement.value = "";
-              }
-              setImagePreviewReady((prev) => {
-                const next = { ...prev };
-                delete next[fieldKey];
-                return next;
-              });
-              return;
-            }
-          }
-        } else {
-          // Parse exact dimensions (format: "1920x1080")
-          const [width, height] = field.dimensions
-            .split("x")
-            .map((d) => parseInt(d.trim()));
-
-          if (width && height) {
-            try {
-              const isValid = await validateImageDimensions(
-                processedFile,
-                width,
-                height,
-              );
-              if (!isValid) {
-                showInfoToast(
-                  `Auto-resizing image to target ${field.dimensions}...`,
-                );
-                try {
-                  processedFile = await resizeAndStretchImage(
-                    processedFile,
-                    width,
-                    height,
-                  );
-                } catch (resizeErr) {
-                  console.error("Auto-resize failed", resizeErr);
-                  showErrorToast("Failed to resize image automatically");
-                  if (inputElement) {
-                    inputElement.value = "";
-                  }
-                  setImagePreviewReady((prev) => {
-                    const next = { ...prev };
-                    delete next[fieldKey];
-                    return next;
-                  });
-                  return;
-                }
-              }
-            } catch (error) {
-              console.error("Image validation failed", error);
-              showErrorToast("Failed to validate image");
-              // Clear the file input
-              if (inputElement) {
-                inputElement.value = "";
-              }
-              setImagePreviewReady((prev) => {
-                const next = { ...prev };
-                delete next[fieldKey];
-                return next;
-              });
-              return;
-            }
-          }
+        // If video is shorter than the slot, block upload!
+        if (meta.duration < slotDuration - 0.05) {
+          showErrorToast(
+            "Video too short",
+            `This slot needs exactly ${slotDuration} seconds, but your video is ${meta.duration.toFixed(1)}s. Please choose another video.`
+          );
+          if (inputElement) inputElement.value = "";
+          return;
         }
-      }
 
-      setImagePreviewReady((prev) => ({
-        ...prev,
-        [fieldKey]: false,
-      }));
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreviews((prev) => ({
+        // Open video trim editor!
+        const videoUrl = URL.createObjectURL(file);
+        setOriginalVideoFiles((prev) => ({
           ...prev,
-          [fieldKey]: reader.result as string,
+          [fieldKey]: file,
         }));
-      };
-      reader.readAsDataURL(processedFile);
-    } else if (processedFile.type.startsWith("video/")) {
-      // Get the field to check if it has required dimensions
-      const field = template?.fields[fieldKey];
-      const targetDimensions = field?.videoDimensions || field?.dimensions;
-      if (field && targetDimensions) {
-        // Parse dimensions (format: "1920x1080")
-        const [width, height] = targetDimensions
-          .split("x")
-          .map((d) => parseInt(d.trim()));
-
-        if (width && height) {
-          try {
-            const isValid = await validateVideoDimensions(
-              processedFile,
-              width,
-              height,
-            );
-            if (!isValid) {
-              try {
-                processedFile = await resizeVideo(
-                  processedFile,
-                  width,
-                  height,
-                  (progress) => {
-                    setVideoResizeProgress((prev) => ({
-                      ...prev,
-                      [fieldKey]: progress,
-                    }));
-                  },
-                  maxBytes,
-                  (queuePosition) => {
-                    setQueuedVideos((prev) => ({
-                      ...prev,
-                      [fieldKey]: queuePosition,
-                    }));
-                    showInfoToast(
-                      "Video in queue",
-                      "Will resize automatically once the current video finishes.",
-                    );
-                  },
-                  () => {
-                    setQueuedVideos((prev) => {
-                      const next = { ...prev };
-                      delete next[fieldKey];
-                      return next;
-                    });
-                    setVideoResizeProgress((prev) => ({
-                      ...prev,
-                      [fieldKey]: 0,
-                    }));
-                    showInfoToast("Resizing video to fit template dimensions...");
-                  },
-                );
-              } catch (resizeErr) {
-                console.error("Video auto-resize failed", resizeErr);
-                showInfoToast(
-                  "Video resize failed, uploading original file instead.",
-                );
-              } finally {
-                setQueuedVideos((prev) => {
-                  const next = { ...prev };
-                  delete next[fieldKey];
-                  return next;
-                });
-                setVideoResizeProgress((prev) => {
-                  const next = { ...prev };
-                  delete next[fieldKey];
-                  return next;
-                });
-              }
-            }
-          } catch (error) {
-            console.error("Video validation failed", error);
-            showInfoToast(
-              "Video validation failed, uploading original file instead.",
-            );
-          }
-        }
+        setTrimPending((prev) => ({
+          ...prev,
+          [fieldKey]: {
+            originalFile: file,
+            videoUrl,
+            videoDuration: meta.duration,
+            slotDuration,
+          },
+        }));
+        return; // Don't upload yet — wait for user to apply trim
+      } catch (videoErr) {
+        console.error("Failed to read video metadata", videoErr);
+        showErrorToast(
+          "Video validation failed",
+          "Could not read video metadata. Please select another video."
+        );
+        if (inputElement) inputElement.value = "";
+        return;
       }
-
-      const videoUrl = URL.createObjectURL(processedFile);
-      setFilePreviews((prev) => ({ ...prev, [fieldKey]: videoUrl }));
     }
 
-    setFormData((prev) => ({ ...prev, [fieldKey]: processedFile }));
-    await uploadSingleAsset(fieldKey, processedFile);
-    } finally {
-      setUploadingAssets((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(fieldKey);
-        return newSet;
-      });
-    }
+    // No crop or trim needed → process and upload immediately
+    await processAndUploadFile(fieldKey, file, inputElement);
   };
 
   /**
@@ -1163,6 +1008,115 @@ export const useCustomizeLogic = () => {
     }
   };
 
+  /**
+   * Called by VideoTrimEditor when the user confirms a trim.
+   * Trims the video losslessly (respecting queue lock) and proceeds to resize/upload.
+   */
+  const applyTrim = async (fieldKey: string, startTime: number) => {
+    const pending = trimPending[fieldKey];
+    if (!pending) return;
+
+    if (pending.videoUrl) {
+      URL.revokeObjectURL(pending.videoUrl);
+    }
+    setTrimPending((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+
+    try {
+      const trimmedFile = await trimVideo(
+        pending.originalFile,
+        startTime,
+        pending.slotDuration,
+        {
+          onQueued: (pos) => {
+            setQueuedVideos((prev) => ({
+              ...prev,
+              [fieldKey]: { position: pos, type: "trim" },
+            }));
+            showInfoToast(
+              "Video in queue",
+              "Will start trimming automatically once the current video finishes."
+            );
+          },
+          onStart: () => {
+            setQueuedVideos((prev) => {
+              const next = { ...prev };
+              delete next[fieldKey];
+              return next;
+            });
+            setTrimmingVideos((prev) => ({ ...prev, [fieldKey]: true }));
+            showInfoToast("Trimming video...");
+          },
+        }
+      );
+
+      setTrimmingVideos((prev) => {
+        const next = { ...prev };
+        delete next[fieldKey];
+        return next;
+      });
+
+      await processAndUploadFile(fieldKey, trimmedFile);
+    } catch (error) {
+      console.error("Failed to trim video:", error);
+      setQueuedVideos((prev) => {
+        const next = { ...prev };
+        delete next[fieldKey];
+        return next;
+      });
+      setTrimmingVideos((prev) => {
+        const next = { ...prev };
+        delete next[fieldKey];
+        return next;
+      });
+      showErrorToast("Failed to trim video. Please try again.");
+    }
+  };
+
+  /**
+   * Called when the user cancels the trim editor.
+   */
+  const cancelTrim = (fieldKey: string) => {
+    if (trimPending[fieldKey]?.videoUrl) {
+      URL.revokeObjectURL(trimPending[fieldKey].videoUrl);
+    }
+    setTrimPending((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+  };
+
+  /**
+   * Re-opens the trim editor for a field using the original untrimmed video.
+   */
+  const editTrim = (fieldKey: string) => {
+    const origFile = originalVideoFiles[fieldKey];
+    const field = template?.fields[fieldKey];
+    const slotDuration = field?.duration || template?.duration || 6;
+    if (!origFile) return;
+
+    getVideoMetadata(origFile)
+      .then((meta) => {
+        const videoUrl = URL.createObjectURL(origFile);
+        setTrimPending((prev) => ({
+          ...prev,
+          [fieldKey]: {
+            originalFile: origFile,
+            videoUrl,
+            videoDuration: meta.duration,
+            slotDuration,
+          },
+        }));
+      })
+      .catch((err) => {
+        console.error("Failed to re-open trim editor:", err);
+      });
+  };
+
   const uploadSingleAsset = async (fieldKey: string, file: File) => {
     if (!isLoggedIn) return;
 
@@ -1212,6 +1166,19 @@ export const useCustomizeLogic = () => {
       delete newAssets[fieldKey];
       return newAssets;
     });
+    setOriginalVideoFiles((prev) => {
+      const next = { ...prev };
+      delete next[fieldKey];
+      return next;
+    });
+    if (trimPending[fieldKey]?.videoUrl) {
+      URL.revokeObjectURL(trimPending[fieldKey].videoUrl);
+      setTrimPending((prev) => {
+        const next = { ...prev };
+        delete next[fieldKey];
+        return next;
+      });
+    }
   };
 
   const deleteAsset = async (fieldKey: string) => {
@@ -1482,6 +1449,13 @@ export const useCustomizeLogic = () => {
     applyCrop,
     cancelCrop,
     editCrop,
+    // Video Trim
+    trimPending,
+    trimmingVideos,
+    originalVideoFiles,
+    applyTrim,
+    cancelTrim,
+    editTrim,
     handleRetryPreview,
     isPreviewSlow,
   } as const;

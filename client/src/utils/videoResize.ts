@@ -7,7 +7,7 @@ let ffmpegLoaded = false;
 let isProcessing = false;
 const queue: (() => void)[] = [];
 
-const getFFmpeg = async (): Promise<FFmpeg> => {
+export const getFFmpeg = async (): Promise<FFmpeg> => {
   if (ffmpegInstance && ffmpegLoaded) return ffmpegInstance;
 
   ffmpegInstance = new FFmpeg();
@@ -30,21 +30,10 @@ const getFFmpeg = async (): Promise<FFmpeg> => {
   return ffmpegInstance;
 };
 
-export const resizeVideo = async (
-  file: File,
-  targetWidth: number,
-  targetHeight: number,
-  onProgress?: (progress: number) => void,
-  maxSizeBytes?: number,
+export const acquireFFmpegLock = async (
   onQueued?: (queuePosition: number) => void,
-  onStart?: () => void,
-): Promise<File> => {
-  const limit = maxSizeBytes ?? 200 * 1024 * 1024;
-  if (file.size > limit) {
-    const limitMB = Math.round(limit / (1024 * 1024));
-    throw new Error(`File size exceeds ${limitMB}MB. Only files under ${limitMB}MB are accepted.`);
-  }
-
+  onStart?: () => void
+): Promise<() => void> => {
   const isQueued = isProcessing;
   if (isQueued && onQueued) {
     onQueued(queue.length + 1);
@@ -62,6 +51,33 @@ export const resizeVideo = async (
   if (onStart) {
     onStart();
   }
+
+  return () => {
+    if (queue.length > 0) {
+      const next = queue.shift();
+      if (next) next();
+    } else {
+      isProcessing = false;
+    }
+  };
+};
+
+export const resizeVideo = async (
+  file: File,
+  targetWidth: number,
+  targetHeight: number,
+  onProgress?: (progress: number) => void,
+  maxSizeBytes?: number,
+  onQueued?: (queuePosition: number) => void,
+  onStart?: () => void,
+): Promise<File> => {
+  const limit = maxSizeBytes ?? 200 * 1024 * 1024;
+  if (file.size > limit) {
+    const limitMB = Math.round(limit / (1024 * 1024));
+    throw new Error(`File size exceeds ${limitMB}MB. Only files under ${limitMB}MB are accepted.`);
+  }
+
+  const releaseLock = await acquireFFmpegLock(onQueued, onStart);
 
   try {
     const ffmpeg = await getFFmpeg();
@@ -117,11 +133,6 @@ export const resizeVideo = async (
       try { await ffmpeg.deleteFile(outputName); } catch {}
     }
   } finally {
-    if (queue.length > 0) {
-      const next = queue.shift();
-      if (next) next();
-    } else {
-      isProcessing = false;
-    }
+    releaseLock();
   }
 };

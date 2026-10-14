@@ -33,7 +33,8 @@ import FileDropZone from "@/components/Upload/FileDropZone";
 import EdikitButton from "@/components/ShimmerButton/ShimmerButton";
 import FontPicker from "@/components/FontPicker/FontPicker";
 import ImageCropEditor from "@/components/ImageCropEditor/ImageCropEditor";
-import { Crop as CropIcon } from "lucide-react";
+import VideoTrimEditor from "@/components/VideoTrimEditor/VideoTrimEditor";
+import { Crop as CropIcon, Scissors } from "lucide-react";
 
 const CustomizePage = () => {
   const [previewRatio] = useState("9/16");
@@ -87,6 +88,12 @@ const CustomizePage = () => {
     applyCrop,
     cancelCrop,
     editCrop,
+    trimPending,
+    trimmingVideos,
+    originalVideoFiles,
+    applyTrim,
+    cancelTrim,
+    editTrim,
     handleRetryPreview,
     isPreviewSlow,
   } = useCustomizeLogic();
@@ -427,11 +434,11 @@ const CustomizePage = () => {
                       {mediaFields.map(([fieldKey, field]) => {
                         const hasFile =
                           filePreviews[fieldKey] || uploadedAssets[fieldKey];
-                        const isQueued =
-                          queuedVideos[fieldKey] !== undefined;
-                        const isResizing =
-                          videoResizeProgress[fieldKey] !== undefined;
+                        const isQueued = queuedVideos[fieldKey] !== undefined;
+                        const isTrimmingVideo = !!trimmingVideos[fieldKey];
+                        const isResizing = videoResizeProgress[fieldKey] !== undefined;
                         const isCropping = !!cropPending[fieldKey];
+                        const isTrimming = !!trimPending[fieldKey];
                         const isImage =
                           field.type === "image" ||
                           (field.type === "media" &&
@@ -440,8 +447,19 @@ const CustomizePage = () => {
 
                         return (
                           <div key={fieldKey} className="space-y-1.5">
-                            {/* ── Crop editor (inline, replaces the card) ── */}
-                            {isCropping ? (
+                            {isTrimming ? (
+                              <VideoTrimEditor
+                                videoFile={trimPending[fieldKey].originalFile}
+                                videoUrl={trimPending[fieldKey].videoUrl}
+                                slotDuration={trimPending[fieldKey].slotDuration}
+                                totalDuration={trimPending[fieldKey].videoDuration}
+                                fieldLabel={field.label}
+                                onApply={(startTime) =>
+                                  applyTrim(fieldKey, startTime)
+                                }
+                                onCancel={() => cancelTrim(fieldKey)}
+                              />
+                            ) : isCropping ? (
                               <ImageCropEditor
                                 src={cropPending[fieldKey].rawSrc}
                                 targetWidth={cropPending[fieldKey].targetWidth}
@@ -462,7 +480,14 @@ const CustomizePage = () => {
                                   </span>
                                 </div>
                                 <p className="text-[11px] text-muted-foreground max-w-[220px]">
-                                  Will start resizing automatically once the current video finishes.
+                                  Will start {queuedVideos[fieldKey]?.type === "trim" ? "trimming" : "resizing"} automatically once the current video finishes.
+                                </p>
+                              </div>
+                            ) : isTrimmingVideo ? (
+                              <div className="rounded-xl border border-border p-5 flex flex-col items-center justify-center gap-2 min-h-[110px]">
+                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                <p className="text-xs font-medium text-foreground">
+                                  Trimming video...
                                 </p>
                               </div>
                             ) : isResizing ? (
@@ -555,6 +580,20 @@ const CustomizePage = () => {
                                       >
                                         <CropIcon className="w-3 h-3" />
                                         Edit Crop
+                                      </button>
+                                    )}
+                                    {/* Edit Trim — for video slots */}
+                                    {!isImage && filePreviews[fieldKey] && originalVideoFiles[fieldKey] && (
+                                      <button
+                                        type="button"
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          editTrim(fieldKey);
+                                        }}
+                                        className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md text-primary/70 hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                                      >
+                                        <Scissors className="w-3 h-3" />
+                                        Edit Trim
                                       </button>
                                     )}
                                     {/* Remove / Delete */}
