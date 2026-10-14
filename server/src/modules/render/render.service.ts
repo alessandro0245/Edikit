@@ -2341,13 +2341,15 @@ export class RenderService {
         '-threads',
         '2',
         '-vf',
-        'scale=if(gte(iw\\,ih)\\,-2\\,1080):if(gte(iw\\,ih)\\,1080\\,-2)',
+        'scale=if(gte(iw\\,ih)\\,-2\\,1080):if(gte(iw\\,ih)\\,1080\\,-2):flags=fast_bilinear',
         '-c:v',
         'libx264',
         '-pix_fmt',
         'yuv420p',
         '-preset',
         'veryfast',
+        '-tune',
+        'fastdecode',
         '-crf',
         '23',
         '-movflags',
@@ -2363,7 +2365,7 @@ export class RenderService {
         ffmpegPath,
         args,
         {
-          timeout: 120000, // 2-minute safety timeout cap
+          timeout: 300000, // 5-minute safety timeout cap for background preview queue
           maxBuffer: 20 * 1024 * 1024,
           windowsHide: true,
         },
@@ -2517,14 +2519,24 @@ export class RenderService {
           err?.stack,
         );
 
+        // Sanitize error message so internal FFmpeg progress dumps never leak to user UI
+        const isTimeout =
+          Boolean((err as any)?.killed) ||
+          (err as any)?.signal === 'SIGTERM' ||
+          err?.message?.toLowerCase().includes('timeout') ||
+          err?.message?.toLowerCase().includes('timed out');
+
+        const sanitizedError = isTimeout
+          ? 'Preview generation took longer than expected. Please click Retry Preview to try again.'
+          : 'Preview generation could not be completed. Your original video is ready for download below.';
+
         // Preview failure must NEVER fail the completed render job or block downloads!
         try {
           await this.prisma.renderJob.update({
             where: { id: jobId },
             data: {
               previewStatus: PreviewStatus.FAILED,
-              previewError:
-                err?.message || 'FFmpeg preview generation failed',
+              previewError: sanitizedError,
             },
           });
         } catch (dbErr) {
@@ -2628,7 +2640,7 @@ export class RenderService {
       ) {
         const elapsedSinceUpdateMs =
           Date.now() - new Date(job.updatedAt).getTime();
-        const isStale = elapsedSinceUpdateMs > 3 * 60 * 1000; // 3 minutes timeout
+        const isStale = elapsedSinceUpdateMs > 6 * 60 * 1000; // 6 minutes timeout (allows full 5m FFmpeg window)
 
         if (isStale) {
           this.logger.warn(

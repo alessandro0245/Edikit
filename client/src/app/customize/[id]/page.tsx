@@ -252,8 +252,20 @@ const CustomizePage = () => {
                           Preview Unavailable
                         </p>
                         <p className="text-xs text-muted-foreground max-w-xs">
-                          {renderJob?.previewError ||
-                            "Preview generation encountered an issue. You can still download your original video."}
+                          {(() => {
+                            const raw = renderJob?.previewError;
+                            if (!raw) return "Preview generation encountered an issue. You can still download your original video.";
+                            if (
+                              raw.length > 150 ||
+                              raw.includes("Metadata:") ||
+                              raw.includes("Command failed:") ||
+                              raw.includes("fps=") ||
+                              raw.includes("Stream #")
+                            ) {
+                              return "Preview generation took longer than expected. You can still download your original video export below, or retry the preview.";
+                            }
+                            return raw;
+                          })()}
                         </p>
                       </div>
                       <button

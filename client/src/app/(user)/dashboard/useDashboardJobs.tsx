@@ -104,23 +104,27 @@ export const useDashboardJobs = () => {
 
     try {
       const data = await jobsApi.getMyJobs();
-      setJobs(
-        data.map((job) => ({
-          id: job.id,
-          title: resolveTitle(job),
-          subtitle: `${resolveSubtitle(job)} · ${statusLabels[job.status]}`,
-          status: job.status,
-          previewStatus: job.previewStatus,
-          previewError: job.previewError,
-          createdLabel: formatRelativeDate(job.createdAt),
-          renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
-          outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),
-          previewUrl: job.isExpired ? null : (job.previewUrl || null),
-          error: job.error,
-          expiresAt: job.expiresAt,
-          isExpired: job.isExpired,
-        })),
-      );
+      const mappedJobs = data.map((job) => ({
+        id: job.id,
+        title: resolveTitle(job),
+        subtitle: `${resolveSubtitle(job)} · ${statusLabels[job.status]}`,
+        status: job.status,
+        previewStatus: job.previewStatus,
+        previewError: job.previewError,
+        createdLabel: formatRelativeDate(job.createdAt),
+        renderTimeLabel: formatDuration(job.createdAt, job.updatedAt, job.status),
+        outputUrl: job.isExpired ? null : (job.outputUrl || job.nexrenderOutputUrl),
+        previewUrl: job.isExpired ? null : (job.previewUrl || null),
+        error: job.error,
+        expiresAt: job.expiresAt,
+        isExpired: job.isExpired,
+      }));
+      setJobs(mappedJobs);
+      setPreviewJob((current) => {
+        if (!current) return null;
+        const updated = mappedJobs.find((j) => j.id === current.id);
+        return updated ?? current;
+      });
       if (silent) {
         setError(null);
       }
@@ -143,16 +147,20 @@ export const useDashboardJobs = () => {
     void loadJobs();
   }, []);
 
-  // Silently auto-refresh when there are active jobs without table flickering or error banners
+  // Silently auto-refresh when there are active jobs or active preview jobs without table flickering
   useEffect(() => {
     const hasActiveJobs = jobs.some(
-      (job) => job.status === "PROCESSING" || job.status === "PENDING",
+      (job) =>
+        job.status === "PROCESSING" ||
+        job.status === "PENDING" ||
+        job.previewStatus === "PROCESSING" ||
+        job.previewStatus === "PENDING",
     );
     if (!hasActiveJobs) return;
 
     const intervalId = setInterval(() => {
       void loadJobs(true);
-    }, 6000);
+    }, 5000);
 
     return () => clearInterval(intervalId);
   }, [jobs]);
@@ -172,6 +180,31 @@ export const useDashboardJobs = () => {
 
   const closeMenu = () => {
     setActiveMenuJobId(null);
+  };
+
+  const retryPreview = async (jobId: string) => {
+    try {
+      showSuccessToast("Retrying preview generation...");
+      setJobs((prev) =>
+        prev.map((j) =>
+          j.id === jobId
+            ? { ...j, previewStatus: "PROCESSING", previewError: null }
+            : j,
+        ),
+      );
+      setPreviewJob((current) =>
+        current && current.id === jobId
+          ? { ...current, previewStatus: "PROCESSING", previewError: null }
+          : current,
+      );
+      await jobsApi.retryPreview(jobId);
+      void loadJobs(true);
+    } catch (requestError: any) {
+      showErrorToast(
+        "Could not retry preview",
+        requestError?.response?.data?.message || requestError?.message || "Please try again",
+      );
+    }
   };
 
   const deleteJob = async (jobId: string) => {
@@ -207,6 +240,7 @@ export const useDashboardJobs = () => {
     closePreview,
     toggleMenu,
     closeMenu,
+    retryPreview,
     deleteJob,
   };
 };

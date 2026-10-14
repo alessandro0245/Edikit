@@ -155,6 +155,7 @@ export default function DashboardJobsPage() {
     closePreview,
     toggleMenu,
     closeMenu,
+    retryPreview,
     deleteJob,
   } = useDashboardJobs();
 
@@ -604,6 +605,26 @@ export default function DashboardJobsPage() {
                     <p className="text-xs text-muted-foreground max-w-xs">
                       Your original video is available for immediate download on the right.
                     </p>
+                  </div>
+                ) : previewJob.previewStatus === "FAILED" ? (
+                  <div className="flex min-h-80 flex-col items-center justify-center p-6 text-center space-y-3 bg-muted/20">
+                    <AlertCircle className="w-8 h-8 text-amber-500" />
+                    <div className="space-y-1">
+                      <p className="font-semibold text-foreground text-sm">
+                        Preview Unavailable
+                      </p>
+                      <p className="text-xs text-muted-foreground max-w-xs">
+                        Your original video export is ready to download on the right. You can retry generating the preview below.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void retryPreview(previewJob.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Retry Preview
+                    </button>
                   </div>
                 ) : previewJob.outputUrl || previewJob.previewUrl ? (
                   isMovUrl(previewJob.outputUrl) ? (
