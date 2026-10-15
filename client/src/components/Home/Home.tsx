@@ -120,7 +120,7 @@ export default function Hero() {
                   {templates.length} professionally crafted animations
                 </div>
 
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white text-balance">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white text-balance">
                   Templates designed for{" "}
                   <span className="inline-block bg-linear-to-r from-[#1A73E8] to-[#5EB5FC] bg-clip-text text-transparent">
                     creators
