@@ -5,6 +5,7 @@ import EdikitHero from "./Hero";
 import EdikitButton from "../ShimmerButton/ShimmerButton";
 import CarouselWithMultipleSlides from "./NewSlider";
 import MatchCut from "./Match-cut";
+import { templates } from "@/utils/constant";
 
 export default function Hero() {
   return (
@@ -116,7 +117,7 @@ export default function Hero() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
                   </span>
-                  16 professionally crafted animations
+                  {templates.length} professionally crafted animations
                 </div>
 
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white text-balance">

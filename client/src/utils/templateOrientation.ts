@@ -3,7 +3,7 @@ import type { Template } from "@/utils/constant";
 export type VideoOrientation = "portrait" | "landscape" | "square";
 
 export function getTemplateOrientation(template: Template): VideoOrientation {
-  const dims = template.fields.background?.dimensions;
+  const dims = template.fields?.background?.dimensions;
   const [w, h] = dims?.split("x").map(Number) ?? [9, 16];
   if (w === h) return "square";
   return w > h ? "landscape" : "portrait";

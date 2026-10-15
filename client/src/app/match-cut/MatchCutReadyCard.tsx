@@ -115,7 +115,7 @@ export default function MatchCutReadyCard({
 
       {/* Center: Video Player Container */}
       <div
-        className={`relative ${aspectClass} rounded-2xl overflow-hidden bg-black border border-white/10 group select-none`}
+        className={`relative ${aspectClass} rounded-[20px] border-3 border-[#4B4B4B] overflow-hidden bg-card/40 group select-none`}
       >
         <video
           ref={videoRef}

@@ -289,7 +289,7 @@ export default function EdikitHero() {
           </h1>
 
           {/* ── Card deck ── */}
-          <div
+          {/* <div
             ref={deckRef}
             className="ek-deck relative mx-auto max-w-230"
             style={{
@@ -356,10 +356,10 @@ export default function EdikitHero() {
                 </div>
               );
             })}
-          </div>
+          </div> */}
 
           {/* ── Subtitle ── */}
-          <p className="ek-sub text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
+          <p className="ek-sub text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed mt-5">
             Pick a template, customize text and colors in your browser and
             download the rendered video. That&apos;s it.
           </p>

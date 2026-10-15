@@ -19,9 +19,10 @@ interface NewSliderCardProps {
 
 function NewSliderCard({ template }: NewSliderCardProps) {
   const orientation = getTemplateOrientation(template);
+  const href = template.href || `/customize/${template.id}`;
 
   return (
-    <Link href={`/customize/${template.id}`} className="group block w-full">
+    <Link href={href} className="group block w-full">
       <div className="flex origin-center flex-col overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] transition-[border-color] duration-300 ease-in-out group-hover:border-primary sm:rounded-[22px] aspect-[9/16] w-full">
         <AnimationPreview
           src={template.previewUrl}

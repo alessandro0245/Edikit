@@ -95,6 +95,7 @@ export interface Template {
   duration?: number; // Duration in seconds (e.g. 5, 6, 7, 20)
   hasTransprentBackground?: boolean;
   hasBlurEffect?: boolean;
+  href?: string;
   fields: {
     [key: string]: {
       type: "text" | "image" | "video" | "media" | "color";
@@ -798,6 +799,33 @@ export const templates: Template[] = [
         type: "image",
         label: "Background",
         dimensions: "2160x3840",
+        required: false,
+      },
+    },
+  },
+  {
+    id: 17,
+    name: "Match Cut",
+    description:
+      "One topic in, one viral match cut out. Morph headlines, posts, and videos around any name, brand, or idea.",
+    previewUrl: "/matchcut/preview.mp4",
+    thumbnail: "/matchcut/matchcut-preview.jpg",
+    duration: 7,
+    href: "/match-cut",
+    hasTransprentBackground: false,
+    hasBlurEffect: false,
+    fields: {
+      topic: {
+        type: "text",
+        value: "Lionel Messi",
+        label: "Topic",
+        maxLength: 14,
+        required: true,
+      },
+      background: {
+        type: "image",
+        label: "Background",
+        dimensions: "1080x1920",
         required: false,
       },
     },

@@ -37,7 +37,7 @@ const MatchCut: React.FC<MatchCutProps> = ({
                 Match cut Template
               </div>
 
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold text-foreground tracking-tight leading-tight text-balance mt-3">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-semibold text-foreground tracking-tight leading-tight text-balance mt-3">
                 One topic.{" "}
                 <span className="inline-block bg-gradient-to-r from-[#1A73E8] via-[#3B82F6] to-[#5EB5FC] bg-clip-text text-transparent">
                   Instant match cut.
@@ -112,7 +112,7 @@ const MatchCut: React.FC<MatchCutProps> = ({
 
           {/* ─── RIGHT COLUMN: Video Player Card ─── */}
           <div>
-            <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-[#090a0d] overflow-hidden">
+            <div className="relative aspect-video w-full rounded-2xl border-2 border-[#4B4B4B] bg-card overflow-hidden hover:border-primary/30">
               <video
                 src={activeVideo}
                 poster={scene1Poster}

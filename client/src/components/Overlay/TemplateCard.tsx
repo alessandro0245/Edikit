@@ -11,9 +11,10 @@ interface TemplateCardProps {
 
 export default function TemplateCard({ template }: TemplateCardProps) {
   const orientation = getTemplateOrientation(template);
+  const href = template.href || `/customize/${template.id}`;
 
   return (
-    <Link href={`/customize/${template.id}`} className="group block w-full">
+    <Link href={href} className="group block w-full">
       <div className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] bg-black transition-all duration-300 group-hover:border-primary ">
         <AnimationPreview
           src={template.previewUrl}

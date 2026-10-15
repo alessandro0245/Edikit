@@ -135,12 +135,14 @@ export const useCustomizeLogic = () => {
     [key: string]: File;
   }>({});
 
-  // Redirect if template not found
+  // Redirect if template not found or points to a custom page
   useEffect(() => {
     if (!template) {
       router.push("/templates");
+    } else if (template.href && template.href !== `/customize/${params.id}`) {
+      router.replace(template.href);
     }
-  }, [template, router]);
+  }, [template, params.id, router]);
 
   // Check authentication
   useEffect(() => {

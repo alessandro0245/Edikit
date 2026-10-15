@@ -711,64 +711,35 @@ export default function MatchCutPage() {
               </div>
 
               <div className="p-2">
-                {/* Outer: owns the visible ring + border-radius. No overflow-hidden here
-                    so the ring corners are never fighting the clip boundary.           */}
                 <div
-                  className="rounded-[20px] ring-[3px] ring-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all"
+                  className="overflow-hidden rounded-[20px] border-3 border-[#4B4B4B] relative mx-auto w-full max-h-[79vh] transition-all bg-card/40"
                   style={{ aspectRatio: previewRatio }}
                 >
-                  {/* Inner: owns overflow-hidden. radius = 20 - 3 = 17px so the clipped
-                      content sits flush with the inside edge of the ring.              */}
-                  <div className="overflow-hidden rounded-[17px] bg-black absolute inset-0 flex items-center justify-center">
-                    {outputUrl ? (
-                      <VideoPlayer
-                        src={outputUrl}
-                        autoPlay
-                        loop
-                        muted
-                        controls
-                        variant="minimal"
-                        aspectRatio="none"
-                        showDownload={false}
-                        showFullscreen
-                        className="h-full w-full rounded-none"
-                      />
-                    ) : (
-                      <div className="relative w-full h-full">
-                        <AnimationPreview
-                          src={MATCH_CUT_PREVIEW_VIDEO}
-                          poster={MATCH_CUT_PREVIEW_POSTER}
-                          orientation="portrait"
-                          fit="contain"
-                          showFullscreen
-                          playOverlay={false}
-                          trigger="auto"
-                          className="h-full w-full"
-                        />
-                        {/* {isGenerating && (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 gap-3.5 px-6 z-20">
-                            <div className="flex items-center gap-2">
-                              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-
-                            </div>
-                            <div className="w-full space-y-1.5 max-w-[200px]">
-                              <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-primary transition-all duration-500 ease-out"
-                                  style={{
-                                    width: `${Math.max(5, Math.min(100, progress))}%`,
-                                  }}
-                                />
-                              </div>
-                              <p className="text-right text-[11px] font-mono text-white/80">
-                                {Math.round(progress)}%
-                              </p>
-                            </div>
-                          </div>
-                        )} */}
-                      </div>
-                    )}
-                  </div>
+                  {outputUrl ? (
+                    <VideoPlayer
+                      src={outputUrl}
+                      autoPlay
+                      loop
+                      muted
+                      controls
+                      variant="minimal"
+                      aspectRatio="none"
+                      showDownload={false}
+                      showFullscreen
+                      className="h-full w-full rounded-none"
+                    />
+                  ) : (
+                    <AnimationPreview
+                      src={MATCH_CUT_PREVIEW_VIDEO}
+                      poster={MATCH_CUT_PREVIEW_POSTER}
+                      orientation="portrait"
+                      fit="contain"
+                      showFullscreen
+                      playOverlay={false}
+                      trigger="auto"
+                      className="h-full w-full"
+                    />
+                  )}
                 </div>
 
 
